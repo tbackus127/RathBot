@@ -1,3 +1,6 @@
+*.conf
+lib/*
+
 # Compiled class file
 *.class
 

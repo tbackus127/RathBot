@@ -3,23 +3,20 @@ package com.rath.rathbot;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.api.events.IListener;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.handle.obj.IUser;
 
-// TODO: Put console on a separate thread, send messages to the bot
 /*
  * Console commands:
  *   login - Logs the bot in.
  *   logout - Logs the bot out.
  *   say {channel} {message} - Posts $message in $channel.
- *   shutdown - Logs out and terminates the program.
  *   lst - Lists tracked users.
  *   rmt {user} - Removes a user from the tracking system.
  */
@@ -36,13 +33,20 @@ import sx.blah.discord.util.DiscordException;
  * 
  * @author Tim Backus tbackus127@gmail.com
  */
-public class RathBot implements IListener<MessageReceivedEvent> {
+public class RathBot {
   
   /** Relative path to the bot's config file containing the authentication key. */
   private static final String CONFIG_FILE_PATH = "rathbot.conf";
   
   /** Reference to the client. */
   private final IDiscordClient client;
+  
+  private final HashMap<String, Long> channelMap;
+  
+  private final HashMap<String, String> faqMap;
+  
+  /** osu! player statistics map. */
+  private final HashMap<String, PlayerStats> playerMap;
   
   /**
    * Default constructor.
@@ -51,28 +55,127 @@ public class RathBot implements IListener<MessageReceivedEvent> {
    */
   public RathBot(final IDiscordClient client) {
     this.client = client;
+    this.channelMap = buildChannelMap(client);
+    this.playerMap = new HashMap<String, PlayerStats>();
+    this.faqMap = new HashMap<String, String>();
+  }
+  
+  /**
+   * Builds a map of Channel Name -> Channel ID.
+   * 
+   * @param client the logged-in client instance.
+   * @return a HashMap of type String -> Long.
+   */
+  private final HashMap<String, Long> buildChannelMap(final IDiscordClient client) {
+    
+    // Log in and wait until ready to receive commands
+    client.login();
+    while (!client.isReady()) {}
+    client.changePlayingText("\u2606I\u2606MA\u2606SU\u2606GU\u2606");
+    final List<IChannel> channels = client.getChannels();
+    final HashMap<String, Long> result = new HashMap<String, Long>();
+    for (IChannel c : channels) {
+      final String name = c.getName();
+      final long id = c.getLongID();
+      System.out.println("Added channel #" + name + " -> " + id + ".");
+      result.put(name, id);
+    }
+    return result;
+  }
+  
+  /**
+   * Sends a plain text message in the specified channel.
+   * 
+   * @param channel the channel to send the message on.
+   * @param msg the message as a String.
+   */
+  public final void sendMessage(final IChannel channel, final String msg) {
+    channel.sendMessage(msg);
+  }
+  
+  /**
+   * Sets the bot's Now Playing message.
+   * 
+   * @param status the status to set the bot's NP to.
+   */
+  public final void setPlaying(final String status) {
+    client.changePlayingText(status);
+  }
+  
+  /**
+   * Posts the list of FAQs that are currently set.
+   * 
+   * @param channel the channel to send the list to.
+   */
+  public void postFaqList(final IChannel channel) {
+    
+    if (this.faqMap.size() <= 0) {
+      sendMessage(channel, "No FAQs available!");
+      return;
+    }
+    
+    String message = "FAQ List:\n";
+    for (final String s : this.faqMap.keySet()) {
+      message += ("  " + s + "\n");
+    }
+    sendMessage(channel, message);
+  }
+  
+  /**
+   * Tests if the FAQ map has a specific ID registered.
+   * 
+   * @param faq the FAQ ID.
+   * @return true if the map's key set contains the ID; false if not.
+   */
+  public boolean hasFaq(final String faq) {
+    return this.faqMap.containsKey(faq);
+  }
+  
+  /**
+   * Sends a FAQ's contents to the specific channel.
+   * 
+   * @param faq
+   * @param channel
+   */
+  public void postFaq(final String faq, final IChannel channel) {
+    sendMessage(channel, this.faqMap.get(faq));
+  }
+  
+  /**
+   * Adds or replaces a FAQ entry.
+   * 
+   * @param faqName the FAQ ID.
+   * @param message the FAQ's contents.
+   */
+  public void addFaq(final String faqName, final String message) {
+    System.out.println("Adding FAQ: \"" + faqName + "\" -> \"" + message + "\".");
+    this.faqMap.put(faqName, message);
+  }
+  
+  /**
+   * Removes a FAQ entry.
+   * 
+   * @param faqName the FAQ ID.
+   */
+  public void removeFaq(final String faqName) {
+    System.out.println("Removing FAQ: \"" + faqName + "\".");
+    this.faqMap.remove(faqName);
   }
   
   /**
    * Has the bot log in to the server.
    */
-  public void login() {
+  public final void login() {
     System.out.println("Logging in...");
     client.login();
   }
   
   /**
-   * Performs message handling.
-   * 
-   * @param evt the event data from a message.
+   * Has the bot log out from the server.
    */
-  @Override
-  public void handle(MessageReceivedEvent evt) {
-    final IMessage msgObj = evt.getMessage();
-    final IChannel channelObj = evt.getChannel();
-    final long channelID = channelObj.getLongID();
-    System.out.println("Message from \"" + msgObj.getAuthor().getName() + "\":");
-    System.out.println(msgObj.getContent());
+  public final void logout() {
+    System.out.println("Logging out...");
+    client.logout();
   }
   
   /**
@@ -80,18 +183,85 @@ public class RathBot implements IListener<MessageReceivedEvent> {
    * 
    * @param args runtime arguments (ignored).
    */
-  public static void main(String[] args) {
+  public static final void main(String[] args) {
     
     // Get the authentication token
     final String token = readToken(CONFIG_FILE_PATH);
+    System.out.println("Creating bot with token " + token + ".");
     if (token == null) {
       System.err.println("Fetching the authentication token went wrong. Exiting.");
       return;
     }
     
     // Create the client and the bot
-    final IDiscordClient client = createClient(token);
+    System.out.println("Creating client...");
+    final IDiscordClient client = new ClientBuilder().withPingTimeout(5).withToken(token).build();
     final RathBot bot = new RathBot(client);
+    client.getDispatcher().registerListener(new EventHandler(bot));
+    
+    // Log in and create the bot
+    System.out.println("Logging in...");
+    
+    // Get commands from terminal
+    Scanner cin = new Scanner(System.in);
+    getCommands(bot, cin);
+    
+    // Clean everything up
+    cin.close();
+    if (bot.client.isLoggedIn()) {
+      bot.logout();
+    }
+  }
+  
+  /**
+   * Starts the command line interpreter.
+   * 
+   * @param bot reference to the RathBot object.
+   * @param cin reference to System.in.
+   */
+  private static final void getCommands(final RathBot bot, final Scanner cin) {
+    
+    // Command interface
+    while (cin.hasNextLine()) {
+      
+      // Split command into tokens
+      final String line = cin.nextLine();
+      final String[] tokens = line.split("\\s+");
+      if (tokens.length < 1) continue;
+      switch (tokens[0]) {
+        
+        // Logout
+        case "logout":
+          System.out.println("Logging out...");
+          bot.logout();
+          
+        break;
+        // Change Now Playing status
+        case "np":
+          if (tokens.length >= 2) {
+            String npMessage = tokens[1];
+            for (int i = 2; i < tokens.length; i++) {
+              npMessage += " " + tokens[i];
+            }
+            bot.setPlaying(npMessage);
+          }
+        break;
+      
+        // Send a message to a specific channel
+        case "say":
+          if (tokens.length >= 3) {
+            final String channel = tokens[1];
+            String npMessage = tokens[2];
+            for (int i = 3; i < tokens.length; i++) {
+              npMessage += " " + tokens[i];
+            }
+            bot.sendMessage(bot.client.getChannelByID(bot.channelMap.get(channel)), npMessage);
+          }
+        break;
+        default:
+          System.out.println("Command not recognized.");
+      }
+    }
   }
   
   /**
@@ -136,29 +306,11 @@ public class RathBot implements IListener<MessageReceivedEvent> {
    */
   private static final String readToken(final Scanner confScan) {
     if (confScan.hasNextLine()) {
-      return confScan.nextLine().trim();
+      return confScan.nextLine().split(":")[1];
     } else {
       System.err.println("Scanner couldn't get token from config file.");
       return null;
     }
   }
   
-  /**
-   * Creates a Discord client, but does not log it in.
-   * 
-   * @param authToken the authentication token from the CONFIG_FILE_PATH file.
-   * @return an instance of an IDiscordClient object.
-   */
-  private static final IDiscordClient createClient(final String authToken) {
-    
-    final ClientBuilder builder = new ClientBuilder();
-    builder.withToken(authToken);
-    try {
-      return builder.build();
-    } catch (DiscordException dce) {
-      dce.printStackTrace(System.err);
-    }
-    
-    return null;
-  }
 }

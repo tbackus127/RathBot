@@ -12,10 +12,17 @@ import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedE
  */
 public class EventHandler {
   
+  /** The prefix for all commands. */
   private static final String COMMAND_PREFIX = "rb!";
   
+  /** A reference to the bot. */
   private final RathBot bot;
   
+  /**
+   * Default constructor.
+   * 
+   * @param bot a reference to an already-built RathBot.
+   */
   public EventHandler(final RathBot bot) {
     this.bot = bot;
   }
@@ -32,6 +39,8 @@ public class EventHandler {
     if (message.startsWith(COMMAND_PREFIX)) {
       CommandParser.parseCommand(this.bot, event.getChannel(), event.getAuthor(), message);
     }
+    
+    // TODO: do spam filtering stuff here
   }
   
   /**

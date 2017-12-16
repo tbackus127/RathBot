@@ -4,29 +4,18 @@ package com.rath.rathbot;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+
+import com.rath.rathbot.cmd.HelpCmd;
+import com.rath.rathbot.cmd.RBCommand;
+import com.rath.rathbot.cmd.faq.FAQCmd;
 
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IUser;
-
-/*
- * Console commands:
- *   login - Logs the bot in.
- *   logout - Logs the bot out.
- *   say {channel} {message} - Posts $message in $channel.
- *   lst - Lists tracked users.
- *   rmt {user} - Removes a user from the tracking system.
- */
-
-// TODO: Command dispatcher
-// TODO: Command parser
-// TODO: rb!help
-// TODO: rb!faq
-// TODO: rb!setplayer
-// TODO: rb!poll
 
 /**
  * Main class for RathBot.
@@ -38,15 +27,17 @@ public class RathBot {
   /** Relative path to the bot's config file containing the authentication key. */
   private static final String CONFIG_FILE_PATH = "rathbot.conf";
   
+  /** The default Playing text under the bot's username. */
+  private static final String DEFAULT_PLAYING_TEXT = "\u2606I\u2606MA\u2606SU\u2606GU\u2606";
+  
   /** Reference to the client. */
   private final IDiscordClient client;
   
+  /** A map from channel name to ID. */
   private final HashMap<String, Long> channelMap;
   
-  private final HashMap<String, String> faqMap;
-  
-  /** osu! player statistics map. */
-  private final HashMap<String, PlayerStats> playerMap;
+  /** The set of commands this bot responds to. */
+  private final Set<RBCommand> commandSet;
   
   /**
    * Default constructor.
@@ -56,31 +47,15 @@ public class RathBot {
   public RathBot(final IDiscordClient client) {
     this.client = client;
     this.channelMap = buildChannelMap(client);
-    this.playerMap = new HashMap<String, PlayerStats>();
-    this.faqMap = new HashMap<String, String>();
-  }
-  
-  /**
-   * Builds a map of Channel Name -> Channel ID.
-   * 
-   * @param client the logged-in client instance.
-   * @return a HashMap of type String -> Long.
-   */
-  private final HashMap<String, Long> buildChannelMap(final IDiscordClient client) {
     
-    // Log in and wait until ready to receive commands
-    client.login();
-    while (!client.isReady()) {}
-    client.changePlayingText("\u2606I\u2606MA\u2606SU\u2606GU\u2606");
-    final List<IChannel> channels = client.getChannels();
-    final HashMap<String, Long> result = new HashMap<String, Long>();
-    for (IChannel c : channels) {
-      final String name = c.getName();
-      final long id = c.getLongID();
-      System.out.println("Added channel #" + name + " -> " + id + ".");
-      result.put(name, id);
-    }
-    return result;
+    // Build the command set
+    this.commandSet = new HashSet<RBCommand>();
+    
+    // TODO: Register commands here
+    this.commandSet.add(new FAQCmd());
+    
+    // Build the help command (other commands must have been registered first!)
+    this.commandSet.add(buildHelpCommand());
   }
   
   /**
@@ -103,66 +78,6 @@ public class RathBot {
   }
   
   /**
-   * Posts the list of FAQs that are currently set.
-   * 
-   * @param channel the channel to send the list to.
-   */
-  public void postFaqList(final IChannel channel) {
-    
-    if (this.faqMap.size() <= 0) {
-      sendMessage(channel, "No FAQs available!");
-      return;
-    }
-    
-    String message = "FAQ List:\n";
-    for (final String s : this.faqMap.keySet()) {
-      message += ("  " + s + "\n");
-    }
-    sendMessage(channel, message);
-  }
-  
-  /**
-   * Tests if the FAQ map has a specific ID registered.
-   * 
-   * @param faq the FAQ ID.
-   * @return true if the map's key set contains the ID; false if not.
-   */
-  public boolean hasFaq(final String faq) {
-    return this.faqMap.containsKey(faq);
-  }
-  
-  /**
-   * Sends a FAQ's contents to the specific channel.
-   * 
-   * @param faq
-   * @param channel
-   */
-  public void postFaq(final String faq, final IChannel channel) {
-    sendMessage(channel, this.faqMap.get(faq));
-  }
-  
-  /**
-   * Adds or replaces a FAQ entry.
-   * 
-   * @param faqName the FAQ ID.
-   * @param message the FAQ's contents.
-   */
-  public void addFaq(final String faqName, final String message) {
-    System.out.println("Adding FAQ: \"" + faqName + "\" -> \"" + message + "\".");
-    this.faqMap.put(faqName, message);
-  }
-  
-  /**
-   * Removes a FAQ entry.
-   * 
-   * @param faqName the FAQ ID.
-   */
-  public void removeFaq(final String faqName) {
-    System.out.println("Removing FAQ: \"" + faqName + "\".");
-    this.faqMap.remove(faqName);
-  }
-  
-  /**
    * Has the bot log in to the server.
    */
   public final void login() {
@@ -176,6 +91,55 @@ public class RathBot {
   public final void logout() {
     System.out.println("Logging out...");
     client.logout();
+  }
+  
+  /**
+   * Gets the commands that are registered for the bot.
+   * 
+   * @return a Set of RBCommands.
+   */
+  public Set<RBCommand> getCommandSet() {
+    return this.commandSet;
+  }
+  
+  /**
+   * Builds a map of Channel Name -> Channel ID.
+   * 
+   * @param client the logged-in client instance.
+   * @return a HashMap of type String -> Long.
+   */
+  private final HashMap<String, Long> buildChannelMap(final IDiscordClient client) {
+    
+    // Log in and wait until ready to receive commands
+    client.login();
+    while (!client.isReady()) {}
+    
+    // Change the playing text to the default
+    client.changePlayingText(DEFAULT_PLAYING_TEXT);
+    
+    // For each channel, add a mapping from its name to its ID
+    final List<IChannel> channels = client.getChannels();
+    final HashMap<String, Long> result = new HashMap<String, Long>();
+    for (IChannel c : channels) {
+      final String name = c.getName();
+      final long id = c.getLongID();
+      System.out.println("Added channel #" + name + " -> " + id + ".");
+      result.put(name, id);
+    }
+    return result;
+  }
+  
+  /**
+   * Builds the help command's entries after all other commands have been registered.
+   * 
+   * @return the built HelpCmd.
+   */
+  private RBCommand buildHelpCommand() {
+    final HelpCmd result = new HelpCmd();
+    for (RBCommand cmd : commandSet) {
+      result.addCommandEntry(cmd);
+    }
+    return result;
   }
   
   /**
@@ -204,7 +168,7 @@ public class RathBot {
     
     // Get commands from terminal
     Scanner cin = new Scanner(System.in);
-    getCommands(bot, cin);
+    getConsoleCommands(bot, cin);
     
     // Clean everything up
     cin.close();
@@ -214,12 +178,12 @@ public class RathBot {
   }
   
   /**
-   * Starts the command line interpreter.
+   * Starts the command line interpreter. Only supported on the local machine this bot is running on.
    * 
    * @param bot reference to the RathBot object.
    * @param cin reference to System.in.
    */
-  private static final void getCommands(final RathBot bot, final Scanner cin) {
+  private static final void getConsoleCommands(final RathBot bot, final Scanner cin) {
     
     // Command interface
     while (cin.hasNextLine()) {
@@ -234,8 +198,8 @@ public class RathBot {
         case "logout":
           System.out.println("Logging out...");
           bot.logout();
-          
         break;
+      
         // Change Now Playing status
         case "np":
           if (tokens.length >= 2) {
@@ -299,7 +263,7 @@ public class RathBot {
   }
   
   /**
-   * Reads the token from the file.
+   * Reads the Discord authentication token from the file.
    * 
    * @param confScan a Scanner already open on the config file.
    * @return the token as a String.

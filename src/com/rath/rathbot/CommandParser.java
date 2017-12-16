@@ -1,6 +1,8 @@
 
 package com.rath.rathbot;
 
+import com.rath.rathbot.cmd.RBCommand;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -12,10 +14,6 @@ import sx.blah.discord.handle.obj.IUser;
  */
 public class CommandParser {
   
-  /** The list of commands displayed when the "help" command is issued. */
-  private static final String COMMAND_LIST = "**Commands**\n  prefix: \"rb!\"\n```"
-      + "help [command] - Shows how to use the given command.```";
-  
   /**
    * Parses and dispatches a command to the proper methods.
    * 
@@ -24,108 +22,28 @@ public class CommandParser {
    * @param author the author of the message as an IAuthor object.
    * @param message the message itself.
    */
-  public static final void parseCommand(final RathBot bot, final IChannel channel,
-      final IUser author, final String message) {
+  public static final void parseCommand(final RathBot bot, final IChannel channel, final IUser author,
+      final String message) {
     
     // Split into tokens separated by spaces, ignoring spaces between quotes
     final String[] tokens = message.split("\"?( |$)(?=(([^\"]*\"){2})*[^\"]*$)\"?");
     
+    // Ensure the message isn't just the prefix
     if (tokens.length <= 1) {
-      sendErrorMessage(bot, channel);
+      return;
     }
     
-    // Check command / args
-    switch (tokens[1]) {
+    // Iterate through each command registered by the bot
+    for (RBCommand cmd : bot.getCommandSet()) {
       
-      // Command list / command help
-      case "help":
-        if (tokens.length == 2) {
-          sendCommandList(bot, channel);
-        } else if (tokens.length == 3) {
-          
-          // Help pages
-          switch (tokens[2]) {
-            
-            // TODO: Write help pages
-            
-          }
-        } else {
-          sendErrorMessage(bot, channel);
-        }
+      // Check the token after the prefix against commands until we find a match
+      if (tokens[1].trim().equalsIgnoreCase(cmd.getCommandName())) {
         
-        // Copypasta (we'll call them FAQs)
-      case "faq":
-        
-        // list, <storedID>
-        if (tokens.length == 3) {
-          
-          if (tokens[2].equals("list")) {
-            bot.postFaqList(channel);
-          } else if (bot.hasFaq(tokens[2])) {
-            bot.postFaq(tokens[2], channel);
-          } else {
-            bot.sendMessage(channel, "No FAQ available for that ID.");
-          }
-          
-          // remove
-        } else if (tokens.length == 4 && tokens[2].equals("remove")) {
-          
-          final String faqName = tokens[3];
-          
-          // Ensure the entry exists
-          if (bot.hasFaq(faqName)) {
-            bot.removeFaq(faqName);
-            bot.sendMessage(channel, "FAQ removed.");
-          } else {
-            bot.sendMessage(channel, "No FAQ available for that ID.");
-          }
-          
-        } else if (tokens.length == 5 && tokens[2].equals("add")) {
-          
-          final String faqName = tokens[3];
-          bot.addFaq(faqName, tokens[4]);
-          
-          // Use a different message for new FAQs.
-          if (bot.hasFaq(faqName)) {
-            bot.sendMessage(channel, "Updated FAQ: \"*" + faqName + "\"*.");
-          } else {
-            bot.sendMessage(channel, "Added FAQ: \"*" + faqName + "\"*.");
-          }
-          
-        } else {
-          sendErrorMessage(bot, channel);
-        }
-        
-      break;
-    
-      // Dice roll
-      case "roll":
-        
-        // Let's just let UB3R-BOT handle that.
-        if (tokens.length >= 3) {
-          bot.sendMessage(channel, ".roll" + tokens[2]);
-        } else {
-          sendErrorMessage(bot, channel);
-        }
-      break;
-      
-      // TODO: Get an osu! API key
-      // TODO: Fetch osu! profile info
-      // TODO: Beatmap analysis system
-      // TODO: pp calculator integration
-      // TODO: pp what-ifs
-      
-      default:
-        sendErrorMessage(bot, channel);
+        // Execute the command that matches
+        cmd.executeCommand(bot, author, channel, tokens);
+        break;
+      }
     }
     
-  }
-  
-  private static final void sendCommandList(final RathBot bot, final IChannel channel) {
-    bot.sendMessage(channel, COMMAND_LIST);
-  }
-  
-  private static final void sendErrorMessage(final RathBot bot, final IChannel channel) {
-    bot.sendMessage(channel, "Unknown command.");
   }
 }

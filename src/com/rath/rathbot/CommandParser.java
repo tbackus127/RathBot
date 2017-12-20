@@ -39,7 +39,7 @@ public class CommandParser {
       if (tokens[1].trim().equalsIgnoreCase(cmd.getCommandName())) {
 
         // Execute the command that matches
-        cmd.executeCommand(bot, author, channel, tokens);
+        cmd.executeCommand(bot, author, channel, tokens, 1);
         break;
       }
     }

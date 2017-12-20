@@ -12,57 +12,37 @@ import sx.blah.discord.handle.obj.IUser;
  * This class forms the skeleton of a command.
  * 
  * @author Tim Backus tbackus127@gmail.com
- *
  */
 public abstract class RBCommand {
-  
-  /** The command name as searched for in chat. */
-  protected final String commandName;
-  
-  /** The description of the command when help is called. */
-  protected final String commandDescription;
-  
-  /** If this command requires the user to be a moderator or higher to use. */
-  protected final boolean needsModStatus;
-  
-  /**
-   * Superclass constructor. Can only be called from child classes.
-   * 
-   * @param name the command name.
-   * @param mod true if this command requires elevated priviliges to use.
-   * @param descr the command description.
-   */
-  protected RBCommand(final String name, final boolean mod, final String descr) {
-    this.commandName = name;
-    this.needsModStatus = mod;
-    this.commandDescription = descr;
-  }
-  
+
   /**
    * Gets the name of this command.
    * 
    * @return the String the bot will respond to.
    */
-  public final String getCommandName() {
-    return this.commandName;
-  }
-  
+  public abstract String getCommandName();
+
   /**
    * Gets this command's description.
    * 
    * @return the full text that will be displayed in this command's help entry as a String.
    */
-  public final String getCommandDescription() {
-    return this.commandDescription;
-  }
-  
+  public abstract String getCommandDescription();
+
+  /**
+   * Whether this command requires the user to be a moderator or higher to use.
+   * 
+   * @return true if elevated permissions are required to use; false if not.
+   */
+  public abstract boolean requiresModStatus();
+
   /**
    * Gets the sub-commands this command has.
    * 
    * @return a Set of RBCommand classes.
    */
   public abstract Set<RBCommand> getSubcommands();
-  
+
   /**
    * Executes the command. Any external data needed must first be added to the child command's class via other
    * non-inherited methods.
@@ -72,8 +52,36 @@ public abstract class RBCommand {
    * @param message the message that executed the command.
    */
   public abstract void executeCommand(final RathBot rb, final IUser author, final IChannel channel,
-      final String[] tokens);
-  
+      final String[] tokens, final int tokenDepth);
+
+  /**
+   * Checks the command's subcommands against the given tokens for a command name match.
+   * 
+   * @param subcommands the command's subcommands.
+   * @param tokens the tokens in the author's message.
+   * @param tokenDepth which token we're checking.
+   * @return the RBCommand that matches the token; null if nothing matches.
+   */
+  protected static final RBCommand checkSubcommands(final Set<RBCommand> subcommands, final String[] tokens,
+      final int tokenDepth) {
+
+    // If there are no subcommands, return null
+    if (subcommands == null) {
+      return null;
+    }
+
+    // Go through each subcommand and check the correct token for a match
+    for (final RBCommand cmd : subcommands) {
+      if (cmd.equals(tokens[tokenDepth])) {
+        return cmd;
+      }
+    }
+
+    // No valid subcommand was found, so return null
+    return null;
+
+  }
+
 }
 
 // @formatter:off

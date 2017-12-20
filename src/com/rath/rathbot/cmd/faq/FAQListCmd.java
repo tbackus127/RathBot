@@ -1,4 +1,3 @@
-
 package com.rath.rathbot.cmd.faq;
 
 import java.util.Set;
@@ -10,18 +9,27 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
 /**
- * Subcommand of 'faq' that allows editing of FAQs.
+ * This subcommand outputs a list of all saved FAQs.
  * 
  * @author Tim Backus tbackus127@gmail.com
  */
-public class FAQEditCmd extends RBCommand {
+public class FAQListCmd extends RBCommand {
 
-  /** The subcommand's name that the bot checks for. */
-  private static final String CMD_NAME = "edit";
+  private static final String CMD_NAME = "list";
 
-  /** The description of this subcommand. */
-  private static final String CMD_DESCR = "Edits the contents of FAQ with name=<NAME> to have contents=<CONTENTS>"
-      + " if the FAQ entry exists. Otherwise, created a new FAQ with name=<NAME> and with contents=<CONTENTS>.";
+  private static final String CMD_DESCR = "Displays a list of all available FAQs.";
+
+  @Override
+  public String getCommandName() {
+
+    return CMD_NAME;
+  }
+
+  @Override
+  public String getCommandDescription() {
+
+    return CMD_DESCR;
+  }
 
   @Override
   public Set<RBCommand> getSubcommands() {
@@ -39,7 +47,7 @@ public class FAQEditCmd extends RBCommand {
     // If a subcommand is not found
     if (cmd == null) {
 
-      // TODO do edit FAQ stuff here
+      // TODO list available FAQs
 
     } else {
       cmd.executeCommand(rb, author, channel, tokens, tokenDepth + 1);
@@ -48,21 +56,9 @@ public class FAQEditCmd extends RBCommand {
   }
 
   @Override
-  public String getCommandName() {
-
-    return CMD_NAME;
-  }
-
-  @Override
-  public String getCommandDescription() {
-
-    return CMD_DESCR;
-  }
-
-  @Override
   public boolean requiresModStatus() {
 
-    return true;
+    return false;
   }
 
 }

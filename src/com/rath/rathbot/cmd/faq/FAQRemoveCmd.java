@@ -1,4 +1,3 @@
-
 package com.rath.rathbot.cmd.faq;
 
 import java.util.Set;
@@ -10,42 +9,17 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
 /**
- * Subcommand of 'faq' that allows editing of FAQs.
+ * This subcommand of the 'faq' command allows mods to remove mappings from the FAQ table.
  * 
  * @author Tim Backus tbackus127@gmail.com
  */
-public class FAQEditCmd extends RBCommand {
+public class FAQRemoveCmd extends RBCommand {
 
-  /** The subcommand's name that the bot checks for. */
-  private static final String CMD_NAME = "edit";
+  /** The name of this command expected by the bot. */
+  private static final String CMD_NAME = "remove";
 
-  /** The description of this subcommand. */
-  private static final String CMD_DESCR = "Edits the contents of FAQ with name=<NAME> to have contents=<CONTENTS>"
-      + " if the FAQ entry exists. Otherwise, created a new FAQ with name=<NAME> and with contents=<CONTENTS>.";
-
-  @Override
-  public Set<RBCommand> getSubcommands() {
-
-    return null;
-  }
-
-  @Override
-  public void executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
-      final int tokenDepth) {
-
-    // Check this command's subcommands for a match, and return the matched command
-    final RBCommand cmd = super.checkSubcommands(getSubcommands(), tokens, tokenDepth);
-
-    // If a subcommand is not found
-    if (cmd == null) {
-
-      // TODO do edit FAQ stuff here
-
-    } else {
-      cmd.executeCommand(rb, author, channel, tokens, tokenDepth + 1);
-    }
-
-  }
+  /** This command's description. */
+  private static final String CMD_DESCR = "Removes a mapping for FAQ name=<NAME>.";
 
   @Override
   public String getCommandName() {
@@ -63,6 +37,30 @@ public class FAQEditCmd extends RBCommand {
   public boolean requiresModStatus() {
 
     return true;
+  }
+
+  @Override
+  public Set<RBCommand> getSubcommands() {
+
+    return null;
+  }
+
+  @Override
+  public void executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
+      final int tokenDepth) {
+
+    // Check this command's subcommands for a match, and return the matched command
+    final RBCommand cmd = super.checkSubcommands(getSubcommands(), tokens, tokenDepth);
+
+    // If a subcommand is not found
+    if (cmd == null) {
+
+      // TODO do remove FAQ stuff here
+
+    } else {
+      cmd.executeCommand(rb, author, channel, tokens, tokenDepth + 1);
+    }
+
   }
 
 }

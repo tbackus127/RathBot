@@ -39,15 +39,6 @@ public class FAQCmd extends RBCommand {
   private static final String FAQ_DESCR = "Allows the storing and recalling of text blocks.";
 
   /**
-   * Default constructor.
-   * 
-   * @param subs the sub-commands this command has in its hierarchy.
-   */
-  public FAQCmd() {
-    super(FAQ_CMD, false, FAQ_DESCR);
-  }
-
-  /**
    * @return
    */
   private static final TreeMap<String, String> initFAQ() {
@@ -64,7 +55,7 @@ public class FAQCmd extends RBCommand {
         e.printStackTrace();
       }
     } else {
-      if(fdat.length() <= 0) {
+      if (fdat.length() <= 0) {
         return new TreeMap<String, String>();
       }
     }
@@ -134,8 +125,6 @@ public class FAQCmd extends RBCommand {
    * Saves the FAQ map to a file.
    */
   private static final void saveFAQMap() {
-
-    // TODO check if file exists. if not, create it
 
     FileOutputStream fos = null;
     ObjectOutputStream oos = null;
@@ -211,9 +200,14 @@ public class FAQCmd extends RBCommand {
    */
   public static final void addFaq(final String faqName, final String message) {
 
-    System.out.println("Adding FAQ: \"" + faqName + "\" -> \"" + message + "\".");
+    if (hasFaq(faqName)) {
+      System.out.println("Editing FAQ: \"" + faqName + "\" to \"" + message + "\".");
+    } else {
+      System.out.println("Adding FAQ: \"" + faqName + "\" -> \"" + message + "\".");
+    }
 
     faqMap.put(faqName, message);
+    saveFAQMap();
   }
 
   /**
@@ -224,17 +218,30 @@ public class FAQCmd extends RBCommand {
    */
   public static final void removeFaq(final String faqName) throws FAQNotFoundException {
 
+    // If the map isn't created yet for some reason, do it.
     if (faqMap == null) {
       initFAQ();
     }
 
     System.out.println("Removing FAQ: \"" + faqName + "\".");
 
+    // Remove the mapping and save
     if (faqMap.containsKey(faqName)) {
       faqMap.remove(faqName);
+      saveFAQMap();
     } else {
       throw new FAQNotFoundException(faqName);
     }
+
+  }
+
+  /**
+   * Removes all mappings from the FAQ map.
+   */
+  public static final void clearFAQMap() {
+
+    faqMap.clear();
+    saveFAQMap();
   }
 
   @Override
@@ -242,16 +249,48 @@ public class FAQCmd extends RBCommand {
 
     final Set<RBCommand> result = new HashSet<RBCommand>();
 
-    // TODO: list
-    // TODO: edit
-    // TODO: remove
+    // All sub-commands of the 'faq' command are registered here.
+    result.add(new FAQListCmd());
+    result.add(new FAQEditCmd());
+    result.add(new FAQRemoveCmd());
 
     return result;
   }
 
   @Override
-  public void executeCommand(RathBot rb, IUser author, IChannel channel, String[] tokens) {
+  public void executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
+      final int tokenDepth) {
 
+    // Check this command's subcommands for a match, and return the matched command
+    final RBCommand cmd = super.checkSubcommands(getSubcommands(), tokens, tokenDepth);
+
+    // If a subcommand is not found
+    if (cmd == null) {
+
+      // TODO send usage message
+
+    } else {
+      cmd.executeCommand(rb, author, channel, tokens, tokenDepth + 1);
+    }
+
+  }
+
+  @Override
+  public String getCommandName() {
+
+    return FAQ_CMD;
+  }
+
+  @Override
+  public String getCommandDescription() {
+
+    return FAQ_DESCR;
+  }
+
+  @Override
+  public boolean requiresModStatus() {
+
+    return false;
   }
 
 }

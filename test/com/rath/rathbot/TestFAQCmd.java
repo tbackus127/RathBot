@@ -1,17 +1,20 @@
 
 package com.rath.rathbot;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import com.rath.rathbot.cmd.faq.FAQCmd;
+import com.rath.rathbot.exceptions.FAQNotFoundException;
 
 public class TestFAQCmd {
 
   @Test
   public void testFAQAdd() {
 
+    FAQCmd.clearFAQMap();
     FAQCmd.addFaq("testa", "test-a-msg");
     FAQCmd.addFaq("testb", "test-b-msg");
     FAQCmd.addFaq("testc", "test-c-msg");
@@ -19,6 +22,13 @@ public class TestFAQCmd {
     final String expected = "FAQ List:\n  testa\n  testb\n  testc\n";
 
     assertTrue(list.equals(expected));
+  }
+
+  @Test
+  public void testFAQHas() {
+
+    FAQCmd.addFaq("testa", "test-a-msg");
+    assertTrue(FAQCmd.hasFaq("testa"));
   }
 
   @Test
@@ -34,4 +44,36 @@ public class TestFAQCmd {
     assertTrue(FAQCmd.getFaq(key2).equals(val2));
   }
 
+  @Test
+  public void testEditFAQ() {
+
+    FAQCmd.addFaq("test1", "old-message");
+    assertTrue(FAQCmd.hasFaq("test1"));
+    assertTrue(FAQCmd.getFaq("test1").equals("old-message"));
+    FAQCmd.addFaq("test1", "new-message");
+    assertTrue(FAQCmd.getFaq("test1").equals("new-message"));
+  }
+
+  @Test
+  public void testRemoveFAQ() {
+
+    FAQCmd.addFaq("test1", "should be gone");
+    assertTrue(FAQCmd.hasFaq("test1"));
+    try {
+      FAQCmd.removeFaq("test1");
+    } catch (FAQNotFoundException e) {
+      e.printStackTrace();
+    }
+    assertFalse(FAQCmd.hasFaq("test1"));
+
+    boolean gotException = false;
+
+    try {
+      FAQCmd.removeFaq("this should not exist");
+    } catch (FAQNotFoundException e) {
+      gotException = true;
+    }
+
+    assertTrue(gotException);
+  }
 }

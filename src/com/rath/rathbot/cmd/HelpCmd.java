@@ -8,26 +8,55 @@ import com.rath.rathbot.RathBot;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
+/**
+ * This command provides a manual for the other commands.
+ * 
+ * @author Tim Backus tbackus127@gmail.com
+ */
 public class HelpCmd extends RBCommand {
-  
-  public HelpCmd() {
-    super("help", false, "Displays help messages for other commands.");
+
+  /** The name of this command. */
+  private static final String CMD_NAME = "help";
+
+  /** The description of this command. */
+  private static final String CMD_DESCR = "Provides information on how to use various commands.";
+
+  @Override
+  public String getCommandName() {
+
+    return CMD_NAME;
   }
-  
-  public final void addCommandEntry(final RBCommand cmd) {
-    
+
+  @Override
+  public String getCommandDescription() {
+
+    return CMD_DESCR;
   }
-  
+
+  @Override
+  public boolean requiresModStatus() {
+
+    return false;
+  }
+
   @Override
   public Set<RBCommand> getSubcommands() {
-    // TODO Auto-generated method stub
+
     return null;
   }
-  
+
   @Override
-  public void executeCommand(RathBot rb, IUser author, IChannel channel, String[] tokens) {
+  public void executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
+      final int tokenDepth) {
+
     // TODO Auto-generated method stub
-    
+
   }
-  
+
+  public void addCommandEntry(RBCommand cmd) {
+
+    // TODO Auto-generated method stub
+
+  }
+
 }

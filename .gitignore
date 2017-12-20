@@ -3,6 +3,7 @@
 
 *.conf
 /lib/
+/dat/
 
 # Compiled class file
 *.class

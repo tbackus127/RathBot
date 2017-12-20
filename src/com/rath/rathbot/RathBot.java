@@ -16,6 +16,7 @@ import com.rath.rathbot.cmd.faq.FAQCmd;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IUser;
 
 /**
  * Main class for RathBot.
@@ -23,22 +24,22 @@ import sx.blah.discord.handle.obj.IChannel;
  * @author Tim Backus tbackus127@gmail.com
  */
 public class RathBot {
-  
+
   /** Relative path to the bot's config file containing the authentication key. */
   private static final String CONFIG_FILE_PATH = "rathbot.conf";
-  
+
   /** The default Playing text under the bot's username. */
   private static final String DEFAULT_PLAYING_TEXT = "\u2606I\u2606MA\u2606SU\u2606GU\u2606";
-  
+
   /** Reference to the client. */
   private final IDiscordClient client;
-  
+
   /** A map from channel name to ID. */
   private final HashMap<String, Long> channelMap;
-  
+
   /** The set of commands this bot responds to. */
   private final Set<RBCommand> commandSet;
-  
+
   /**
    * Default constructor.
    * 
@@ -47,17 +48,17 @@ public class RathBot {
   public RathBot(final IDiscordClient client) {
     this.client = client;
     this.channelMap = buildChannelMap(client);
-    
+
     // Build the command set
     this.commandSet = new HashSet<RBCommand>();
-    
+
     // TODO: Register commands here
     this.commandSet.add(new FAQCmd());
-    
+
     // Build the help command (other commands must have been registered first!)
     this.commandSet.add(buildHelpCommand());
   }
-  
+
   /**
    * Sends a plain text message in the specified channel.
    * 
@@ -65,43 +66,60 @@ public class RathBot {
    * @param msg the message as a String.
    */
   public final void sendMessage(final IChannel channel, final String msg) {
+
     channel.sendMessage(msg);
   }
-  
+
+  /**
+   * Sends a private message to the specified user.
+   * 
+   * @param user the user to send the PM to.
+   * @param msg the message contents.
+   */
+  public final void sendDirectMessage(final IUser user, final String msg) {
+
+    user.getOrCreatePMChannel().sendMessage(msg);
+
+  }
+
   /**
    * Sets the bot's Now Playing message.
    * 
    * @param status the status to set the bot's NP to.
    */
   public final void setPlaying(final String status) {
+
     client.changePlayingText(status);
   }
-  
+
   /**
    * Has the bot log in to the server.
    */
   public final void login() {
+
     System.out.println("Logging in...");
     client.login();
   }
-  
+
   /**
    * Has the bot log out from the server.
    */
   public final void logout() {
+
     System.out.println("Logging out...");
     client.logout();
   }
-  
+
   /**
    * Gets the commands that are registered for the bot.
    * 
    * @return a Set of RBCommands.
    */
   public Set<RBCommand> getCommandSet() {
+
     return this.commandSet;
   }
-  
+
   /**
    * Builds a map of Channel Name -> Channel ID.
    * 
@@ -109,14 +127,14 @@ public class RathBot {
    * @return a HashMap of type String -> Long.
    */
   private final HashMap<String, Long> buildChannelMap(final IDiscordClient client) {
-    
+
     // Log in and wait until ready to receive commands
     client.login();
     while (!client.isReady()) {}
-    
+
     // Change the playing text to the default
     client.changePlayingText(DEFAULT_PLAYING_TEXT);
-    
+
     // For each channel, add a mapping from its name to its ID
     final List<IChannel> channels = client.getChannels();
     final HashMap<String, Long> result = new HashMap<String, Long>();
@@ -128,27 +146,28 @@ public class RathBot {
     }
     return result;
   }
-  
+
   /**
    * Builds the help command's entries after all other commands have been registered.
    * 
    * @return the built HelpCmd.
    */
-  private RBCommand buildHelpCommand() {
+  private HelpCmd buildHelpCommand() {
+
     final HelpCmd result = new HelpCmd();
     for (RBCommand cmd : commandSet) {
-      result.addCommandEntry(cmd);
+      result.addCommandEntry(cmd.getCommandName(), cmd);
     }
     return result;
   }
-  
+
   /**
    * Main method.
    * 
    * @param args runtime arguments (ignored).
    */
   public static final void main(String[] args) {
-    
+
     // Get the authentication token
     final String token = readToken(CONFIG_FILE_PATH);
     System.out.println("Creating bot with token " + token + ".");
@@ -156,27 +175,27 @@ public class RathBot {
       System.err.println("Fetching the authentication token went wrong. Exiting.");
       return;
     }
-    
+
     // Create the client and the bot
     System.out.println("Creating client...");
     final IDiscordClient client = new ClientBuilder().withPingTimeout(5).withToken(token).build();
     final RathBot bot = new RathBot(client);
     client.getDispatcher().registerListener(new EventHandler(bot));
-    
+
     // Log in and create the bot
     System.out.println("Logging in...");
-    
+
     // Get commands from terminal
     Scanner cin = new Scanner(System.in);
     getConsoleCommands(bot, cin);
-    
+
     // Clean everything up
     cin.close();
     if (bot.client.isLoggedIn()) {
       bot.logout();
     }
   }
-  
+
   /**
    * Starts the command line interpreter. Only supported on the local machine this bot is running on.
    * 
@@ -184,22 +203,23 @@ public class RathBot {
    * @param cin reference to System.in.
    */
   private static final void getConsoleCommands(final RathBot bot, final Scanner cin) {
-    
+
     // Command interface
     while (cin.hasNextLine()) {
-      
+
       // Split command into tokens
       final String line = cin.nextLine();
       final String[] tokens = line.split("\\s+");
-      if (tokens.length < 1) continue;
+      if (tokens.length < 1)
+        continue;
       switch (tokens[0]) {
-        
+
         // Logout
         case "logout":
           System.out.println("Logging out...");
           bot.logout();
         break;
-      
+
         // Change Now Playing status
         case "np":
           if (tokens.length >= 2) {
@@ -210,7 +230,7 @@ public class RathBot {
             bot.setPlaying(npMessage);
           }
         break;
-      
+
         // Send a message to a specific channel
         case "say":
           if (tokens.length >= 3) {
@@ -227,7 +247,7 @@ public class RathBot {
       }
     }
   }
-  
+
   /**
    * Handles reading the authentication token from a file.
    * 
@@ -235,20 +255,21 @@ public class RathBot {
    * @return the token itself as a String.
    */
   private static final String readToken(final String confPath) {
+
     final File confFile = new File(confPath);
-    
+
     // Check file existence
     if (!confFile.exists()) {
       System.err.println("Config file \"" + confFile.getAbsolutePath() + "\" does not exist!");
       return null;
     }
-    
+
     // Check if it's actually a file and we can read from it
     if (!confFile.isFile() || !confFile.canRead()) {
       System.err.println("Config file is unreadable!");
       return null;
     }
-    
+
     // Open a scanner on the configuration file
     Scanner fscan = null;
     try {
@@ -261,7 +282,7 @@ public class RathBot {
     }
     return null;
   }
-  
+
   /**
    * Reads the Discord authentication token from the file.
    * 
@@ -269,6 +290,7 @@ public class RathBot {
    * @return the token as a String.
    */
   private static final String readToken(final Scanner confScan) {
+
     if (confScan.hasNextLine()) {
       return confScan.nextLine().split(":")[1];
     } else {
@@ -276,5 +298,5 @@ public class RathBot {
       return null;
     }
   }
-  
+
 }

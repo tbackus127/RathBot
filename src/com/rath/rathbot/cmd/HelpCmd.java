@@ -1,9 +1,12 @@
 
 package com.rath.rathbot.cmd;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.rath.rathbot.RathBot;
+import com.rath.rathbot.msg.MessageHelper;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -20,6 +23,19 @@ public class HelpCmd extends RBCommand {
 
   /** The description of this command. */
   private static final String CMD_DESCR = "Provides information on how to use various commands.";
+
+  /** The set of commands such that help is available. */
+  private static final Map<String, RBCommand> helpCmdMap = new TreeMap<String, RBCommand>();
+
+  /**
+   * Adds a command to the help command set.
+   * 
+   * @param cmd the command to add.
+   */
+  public void addCommandEntry(final String name, final RBCommand cmd) {
+
+    helpCmdMap.put(name, cmd);
+  }
 
   @Override
   public String getCommandName() {
@@ -49,13 +65,20 @@ public class HelpCmd extends RBCommand {
   public void executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
 
-    // TODO Auto-generated method stub
+    // If the bot only receives "rb! help", post the commands list
+    if (tokens.length <= 2) {
+      rb.sendMessage(channel, MessageHelper.buildCmdDescrMsg("Available commands:", helpCmdMap));
+    } else {
 
-  }
+      // If the command sent for the 3rd token is a valid command, post its syntax
+      if (helpCmdMap.containsKey(tokens[2])) {
+        final String cmdDescr = helpCmdMap.get(tokens[2]).getCommandDescription();
+        rb.sendMessage(channel, tokens[2] + " - " + cmdDescr);
+      } else {
+        // TODO: Help entry not found
+      }
 
-  public void addCommandEntry(RBCommand cmd) {
-
-    // TODO Auto-generated method stub
+    }
 
   }
 

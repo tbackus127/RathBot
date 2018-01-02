@@ -14,35 +14,35 @@ import sx.blah.discord.handle.obj.IUser;
  * @author Tim Backus tbackus127@gmail.com
  */
 public abstract class RBCommand {
-
+  
   /**
    * Gets the name of this command.
    * 
    * @return the String the bot will respond to.
    */
   public abstract String getCommandName();
-
+  
   /**
    * Gets this command's description.
    * 
    * @return the full text that will be displayed in this command's help entry as a String.
    */
   public abstract String getCommandDescription();
-
+  
   /**
    * Whether this command requires the user to be a moderator or higher to use.
    * 
    * @return true if elevated permissions are required to use; false if not.
    */
   public abstract boolean requiresModStatus();
-
+  
   /**
    * Gets the sub-commands this command has.
    * 
    * @return a Set of RBCommand classes.
    */
   public abstract Set<RBCommand> getSubcommands();
-
+  
   /**
    * Executes the command. Any external data needed must first be added to the child command's class via other
    * non-inherited methods.
@@ -51,9 +51,26 @@ public abstract class RBCommand {
    * @param channel the channel the command was received from.
    * @param message the message that executed the command.
    */
-  public abstract void executeCommand(final RathBot rb, final IUser author, final IChannel channel,
-      final String[] tokens, final int tokenDepth);
-
+  public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
+      final int tokenDepth) {
+    
+    System.out.println("In executeCommand() for " + this.getCommandName() + "with td=" + tokenDepth);
+    
+    // Check this command's subcommands for a match, and return the matched command
+    final RBCommand cmd = checkSubcommands(getSubcommands(), tokens, tokenDepth);
+    
+    // If a subcommand is not found
+    if (cmd == null) {
+      System.out.println("cmd is null");
+      return false;
+    } else {
+      
+      // Valid subcommand found, so return true
+      cmd.executeCommand(rb, author, channel, tokens, tokenDepth + 1);
+      return true;
+    }
+  }
+  
   /**
    * Checks the command's subcommands against the given tokens for a command name match.
    * 
@@ -64,24 +81,38 @@ public abstract class RBCommand {
    */
   protected static final RBCommand checkSubcommands(final Set<RBCommand> subcommands, final String[] tokens,
       final int tokenDepth) {
-
+    
+    System.out.println("Checking subcommands of " + tokens[tokenDepth] + ":");
+    
     // If there are no subcommands, return null
     if (subcommands == null) {
+      System.out.println("  " + tokens[tokenDepth] + " has no subcommands.");
       return null;
     }
-
+    
+    if (tokenDepth + 1 >= tokens.length) {
+      System.out.println("Tokens exhausted.");
+      return null;
+    }
+    
     // Go through each subcommand and check the correct token for a match
     for (final RBCommand cmd : subcommands) {
-      if (cmd.equals(tokens[tokenDepth])) {
+      
+      System.out.println(
+          "  Checking \"" + tokens[tokenDepth + 1] + "\" against subcommand \"" + cmd.getCommandName() + "\".");
+      if (cmd.getCommandName().equalsIgnoreCase(tokens[tokenDepth + 1])) {
+        
+        System.out.println("  Matched with " + cmd.getCommandName());
         return cmd;
       }
     }
-
+    
     // No valid subcommand was found, so return null
+    System.out.println("  No subcommands found for token.");
     return null;
-
+    
   }
-
+  
 }
 
 // @formatter:off

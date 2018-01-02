@@ -12,7 +12,7 @@ import sx.blah.discord.handle.obj.IUser;
  * @author Tim Backus tbackus127@gmail.com
  */
 public class CommandParser {
-
+  
   /**
    * Parses and dispatches a command to the proper methods.
    * 
@@ -23,21 +23,26 @@ public class CommandParser {
    */
   public static final void parseCommand(final RathBot bot, final IChannel channel, final IUser author,
       final String message) {
-
+    
+    System.out.println("Parsing command: \"" + message + "\".");
+    
     // Split into tokens separated by spaces, ignoring spaces between quotes
     final String[] tokens = message.split("\"?( |$)(?=(([^\"]*\"){2})*[^\"]*$)\"?");
-
+    
     // Ensure the message isn't just the prefix
     if (tokens.length <= 1) {
+      System.out.println("Message length < 2. Stopping dispatch.");
       return;
     }
-
+    
     // Iterate through each command registered by the bot
     for (RBCommand cmd : bot.getCommandSet()) {
-
+      
+      System.out.println("Checking root command \"" + tokens[1].trim() + "\" against command " + cmd.getCommandName());
+      
       // Check the token after the prefix against commands until we find a match
       if (tokens[1].trim().equalsIgnoreCase(cmd.getCommandName())) {
-
+        
         // Execute the command that matches
         cmd.executeCommand(bot, author, channel, tokens, 1);
         break;

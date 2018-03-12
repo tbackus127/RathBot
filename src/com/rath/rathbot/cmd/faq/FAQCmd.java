@@ -197,7 +197,7 @@ public class FAQCmd extends RBCommand {
     
     // If the map isn't created yet for some reason, do it.
     if (faqMap == null) {
-      initFAQ();
+      faqMap = initFAQ();
     }
     
     System.out.println("Removing FAQ: \"" + faqName + "\".");
@@ -270,7 +270,7 @@ public class FAQCmd extends RBCommand {
   
   @Override
   public int permissionLevelRequired() {
-    return RBCommand.PERM_STANDARD;
+    return RBCommand.PERM_ADMIN;
   }
   
   @Override

@@ -2,6 +2,7 @@
 package com.rath.rathbot;
 
 import com.rath.rathbot.cmd.RBCommand;
+import com.rath.rathbot.data.PermissionsTable;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -42,9 +43,18 @@ public class CommandParser {
       
       // Check the token after the prefix against commands until we find a match
       if (tokens[1].trim().equalsIgnoreCase(cmd.getCommandName())) {
-                
-        // Execute the command that matches
-        cmd.executeCommand(bot, author, channel, tokens, 1);
+        
+        // Check permissions for this command.
+        if (PermissionsTable.getLevel(author.getLongID()) >= cmd.permissionLevelRequired()) {
+          
+          // Execute the command that matches
+          cmd.executeCommand(bot, author, channel, tokens, 1);
+        } else {
+          System.out.println("User " + author.getName() + " tried to execute " + cmd.getCommandName()
+              + " with permission level " + PermissionsTable.getLevel(author.getLongID()) + " ("
+              + cmd.permissionLevelRequired() + " required).");
+        }
+        
         break;
       }
     }

@@ -21,7 +21,7 @@ public class PermissionsTable {
   private static final int DEFAULT_PERM_LEVEL = RBCommand.PERM_STANDARD;
   
   /** The permissions table. */
-  private static final TreeMap<Long, Integer> permMap = new TreeMap<Long, Integer>();
+  private static TreeMap<Long, Integer> permMap = null;
   
   /** The handler for saving/loading this class' data. */
   private static final DataLoader<TreeMap<Long, Integer>> loader = new DataLoader<TreeMap<Long, Integer>>(TreeMap.class,
@@ -44,6 +44,12 @@ public class PermissionsTable {
    * @param permLevel the new permissions level this user should receive.
    */
   public static final void updateUser(final long userID, final int permLevel) {
+    
+    if (permMap == null) {
+      System.err.println("Perm map is null!");
+      return;
+    }
+    
     permMap.put(userID, permLevel);
     System.out.println("Updated " + userID + " to " + permLevel + ".");
     System.out.println(userID + " is now " + permMap.get(userID));
@@ -56,6 +62,12 @@ public class PermissionsTable {
    * @param userID the ID of the member to remove.
    */
   public static final void removeUser(final long userID) {
+    
+    if (permMap == null) {
+      System.err.println("Perm map is null!");
+      return;
+    }
+    
     permMap.remove(userID);
     savePerms();
   }
@@ -67,7 +79,18 @@ public class PermissionsTable {
    * @return the permission level as an int, defined in RBCommand.
    */
   public static final int getLevel(final long userID) {
-    return permMap.get(userID);
+    System.out.println("Getting perms for id=" + userID);
+    
+    if (permMap == null) {
+      System.err.println("Perm map is null!");
+      return -1;
+    }
+    
+    final Integer lvl = permMap.get(userID);
+    if (lvl == null) {
+      return -1;
+    }
+    return lvl;
   }
   
   /**
@@ -81,9 +104,10 @@ public class PermissionsTable {
   /**
    * Loads the permission table from the hard disk.
    */
-  public static final TreeMap<Long, Integer> loadPerms() {
+  public static final void loadPerms() {
     System.out.println("Loading permissions map from file.");
-    return loader.loadFromDisk();
+    permMap = loader.loadFromDisk();
+    savePerms();
   }
   
 }

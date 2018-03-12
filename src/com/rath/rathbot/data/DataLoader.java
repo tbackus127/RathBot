@@ -78,6 +78,9 @@ public class DataLoader<T> {
    */
   @SuppressWarnings("unchecked")
   public final T loadFromDisk() {
+    
+    boolean err = false;
+    
     // Initialize data streams
     FileInputStream fis = null;
     ObjectInputStream oin = null;
@@ -91,6 +94,7 @@ public class DataLoader<T> {
         file.createNewFile();
       } catch (IOException e) {
         e.printStackTrace();
+        err = true;
       }
     }
     
@@ -112,24 +116,27 @@ public class DataLoader<T> {
       
     } catch (FileNotFoundException e) {
       e.printStackTrace();
+      err = true;
     } catch (IOException e) {
       e.printStackTrace();
+      err = true;
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
+      err = true;
     }
     
     // If something went wrong, return null
     if (fis == null || oin == null) {
       System.err.println("Data structure load error.");
-      return null;
+      err = true;
     }
     
     // Cast the read object to a TreeMap
-    if (obj instanceof TreeMap) {
+    if (obj instanceof TreeMap && !err) {
       result = (T) obj;
       System.out.println("Read successfully.");
     } else {
-      System.err.println("Type mismatch. Creating new table.");
+      System.err.println("Error with loading. Creating new table.");
       try {
         return buildClass();
       } catch (InstantiationException e) {

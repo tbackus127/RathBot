@@ -15,6 +15,21 @@ import sx.blah.discord.handle.obj.IUser;
  */
 public abstract class RBCommand {
   
+  /** Permission level: Admin */
+  public static final int PERM_ADMIN = 5;
+  
+  /** Permission level: Moderator */
+  public static final int PERM_MODERATOR = 3;
+  
+  /** Permission level: Trusted */
+  public static final int PERM_TRUSTED = 2;
+  
+  /** Permission level: Standard */
+  public static final int PERM_STANDARD = 1;
+  
+  /** Permission level: Basic */
+  public static final int PERM_BASE = 0;
+  
   /**
    * Gets the name of this command.
    * 
@@ -30,11 +45,18 @@ public abstract class RBCommand {
   public abstract String getCommandDescription();
   
   /**
-   * Whether this command requires the user to be a moderator or higher to use.
-   * 
-   * @return true if elevated permissions are required to use; false if not.
+   * Performs various initialization operations for commands, such as loading data from a file, building tables, or
+   * anything else necessary to execute before the command can be issued. If no setup is required, just override this
+   * method and return.
    */
-  public abstract boolean requiresModStatus();
+  public abstract void setupCommand();
+  
+  /**
+   * The permission level of the issuer that must be met or exceeded for the command to execute.
+   * 
+   * @return the permission level as an int. Permission constants are declared in the RBCommand class.
+   */
+  public abstract int permissionLevelRequired();
   
   /**
    * Gets the sub-commands this command has.

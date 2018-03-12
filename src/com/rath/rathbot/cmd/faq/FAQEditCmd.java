@@ -54,9 +54,13 @@ public class FAQEditCmd extends RBCommand {
   }
   
   @Override
-  public boolean requiresModStatus() {
-    
-    return true;
+  public int permissionLevelRequired() {
+    return RBCommand.PERM_MODERATOR;
+  }
+
+  @Override
+  public void setupCommand() {
+    return;
   }
   
 }

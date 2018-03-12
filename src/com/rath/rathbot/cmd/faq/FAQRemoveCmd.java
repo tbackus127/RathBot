@@ -35,12 +35,6 @@ public class FAQRemoveCmd extends RBCommand {
   }
   
   @Override
-  public boolean requiresModStatus() {
-    
-    return true;
-  }
-  
-  @Override
   public Set<RBCommand> getSubcommands() {
     
     return null;
@@ -55,6 +49,16 @@ public class FAQRemoveCmd extends RBCommand {
     }
     return true;
     
+  }
+  
+  @Override
+  public int permissionLevelRequired() {
+    return RBCommand.PERM_MODERATOR;
+  }
+  
+  @Override
+  public void setupCommand() {
+    return;
   }
   
 }

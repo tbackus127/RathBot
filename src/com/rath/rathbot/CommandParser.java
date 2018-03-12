@@ -42,7 +42,7 @@ public class CommandParser {
       
       // Check the token after the prefix against commands until we find a match
       if (tokens[1].trim().equalsIgnoreCase(cmd.getCommandName())) {
-        
+                
         // Execute the command that matches
         cmd.executeCommand(bot, author, channel, tokens, 1);
         break;

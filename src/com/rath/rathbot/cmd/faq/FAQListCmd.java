@@ -51,9 +51,13 @@ public class FAQListCmd extends RBCommand {
   }
   
   @Override
-  public boolean requiresModStatus() {
-    
-    return false;
+  public int permissionLevelRequired() {
+    return RBCommand.PERM_STANDARD;
+  }
+
+  @Override
+  public void setupCommand() {
+    return;
   }
   
 }

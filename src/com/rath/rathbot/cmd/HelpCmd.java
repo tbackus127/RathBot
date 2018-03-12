@@ -50,12 +50,6 @@ public class HelpCmd extends RBCommand {
   }
   
   @Override
-  public boolean requiresModStatus() {
-    
-    return false;
-  }
-  
-  @Override
   public Set<RBCommand> getSubcommands() {
     
     return null;
@@ -81,6 +75,16 @@ public class HelpCmd extends RBCommand {
     }
     
     return true;
+  }
+  
+  @Override
+  public int permissionLevelRequired() {
+    return RBCommand.PERM_BASE;
+  }
+  
+  @Override
+  public void setupCommand() {
+    return;
   }
   
 }

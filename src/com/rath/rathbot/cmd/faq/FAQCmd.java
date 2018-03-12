@@ -14,6 +14,7 @@ import java.util.TreeMap;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
+import com.rath.rathbot.data.DataLoader;
 import com.rath.rathbot.exceptions.FAQNotFoundException;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -27,16 +28,20 @@ import sx.blah.discord.handle.obj.IUser;
 public class FAQCmd extends RBCommand {
   
   /** The path to the saved FAQ Strings. */
-  private static final String FAQ_DATA_PATH = "dat/faq.dat";
+  private static final String FAQ_DATA_PATH = RathBot.DIR_DATA + "faq.dat";
   
   /** A map from FAQ name to its contents. */
-  private static TreeMap<String, String> faqMap = initFAQ();
+  private static TreeMap<String, String> faqMap = null;
   
   /** The command String for this command. */
   private static final String FAQ_CMD = "faq";
   
   /** The command description. */
   private static final String FAQ_DESCR = "Allows the storing and recalling of text blocks.";
+  
+  /** The handler for saving/loading this class' data. */
+  private static final DataLoader<TreeMap<String, String>> loader = new DataLoader<TreeMap<String, String>>(
+      TreeMap.class, faqMap, FAQ_DATA_PATH);
   
   /**
    * Initializes the FAQ map.
@@ -45,12 +50,13 @@ public class FAQCmd extends RBCommand {
    */
   private static final TreeMap<String, String> initFAQ() {
     
-    System.out.println("Init.");
+    System.out.println("faqMap init");
     
     final File fdat = new File(FAQ_DATA_PATH);
     
     // If the file doesn't exist, create it
     if (!fdat.exists()) {
+      System.out.println("  File " + fdat.getAbsolutePath() + " doesn't exist, creating.");
       try {
         fdat.createNewFile();
         return new TreeMap<String, String>();
@@ -61,6 +67,7 @@ public class FAQCmd extends RBCommand {
       
       // If the file is empty, create a new TreeMap for it
       if (fdat.length() <= 0) {
+        System.out.println("  Map data empty. Creating new table.");
         return new TreeMap<String, String>();
       }
     }
@@ -74,56 +81,10 @@ public class FAQCmd extends RBCommand {
    * 
    * @return the previously-serialized HashMap.
    */
-  @SuppressWarnings("unchecked")
   private static final TreeMap<String, String> loadFAQMap(final File file) {
     
     System.out.println("Loading FAQ map from file.");
-    
-    // Initialize data streams
-    FileInputStream fis = null;
-    ObjectInputStream oin = null;
-    TreeMap<String, String> result = null;
-    Object obj = null;
-    try {
-      
-      // Build an input stream for deserialization
-      fis = new FileInputStream(FAQ_DATA_PATH);
-      if (fis.available() > 0) {
-        oin = new ObjectInputStream(fis);
-        
-        // Read the object in and close the streams
-        obj = oin.readObject();
-        oin.close();
-        fis.close();
-        
-      } else {
-        System.err.println("FAQ map data is empty.");
-      }
-      
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    }
-    
-    // If something went wrong, return null
-    if (fis == null || oin == null) {
-      System.err.println("FAQ map load error.");
-      return null;
-    }
-    
-    // Cast the read object to a TreeMap
-    if (obj instanceof TreeMap) {
-      result = (TreeMap<String, String>) obj;
-      System.out.println("Read successfully.");
-    } else {
-      System.err.println("Read object not instance of TreeMap.");
-      return null;
-    }
-    
-    return result;
+    return loader.loadFromDisk();
   }
   
   /**
@@ -131,25 +92,7 @@ public class FAQCmd extends RBCommand {
    */
   private static final void saveFAQMap() {
     
-    FileOutputStream fos = null;
-    ObjectOutputStream oos = null;
-    
-    try {
-      
-      // Build an output stream for serialization
-      fos = new FileOutputStream(FAQ_DATA_PATH);
-      oos = new ObjectOutputStream(fos);
-      
-      // Write the map and close streams
-      oos.writeObject(faqMap);
-      oos.close();
-      fos.close();
-      
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    loader.saveToDisk();
   }
   
   /**
@@ -158,6 +101,13 @@ public class FAQCmd extends RBCommand {
    * @param channel the channel to send the list to. Returns null if the map is empty.
    */
   public static final String getFaqList() {
+    
+    System.out.println("getFaqList");
+    
+    if (faqMap == null) {
+      System.out.println("faqMap is null!");
+      return null;
+    }
     
     // Check that the map has entries in it
     if (faqMap.size() <= 0) {
@@ -180,6 +130,12 @@ public class FAQCmd extends RBCommand {
    */
   public static final boolean hasFaq(final String faq) {
     
+    System.out.println("hasFaq");
+    
+    if (faqMap == null) {
+      System.out.println("faqMap is null!");
+      return false;
+    }
     return faqMap.containsKey(faq);
   }
   
@@ -189,6 +145,13 @@ public class FAQCmd extends RBCommand {
    * @param faq the FAQ ID to fetch the message of.
    */
   public static final String getFaq(final String faq) {
+    
+    System.out.println("getFaq");
+    
+    if (faqMap == null) {
+      System.out.println("faqMap is null!");
+      return null;
+    }
     
     if (faqMap.containsKey(faq)) {
       return faqMap.get(faq);
@@ -204,6 +167,13 @@ public class FAQCmd extends RBCommand {
    * @param message the FAQ's contents.
    */
   public static final void addFaq(final String faqName, final String message) {
+    
+    System.out.println("addFaq");
+    
+    if (faqMap == null) {
+      System.out.println("faqMap is null!");
+      return;
+    }
     
     if (hasFaq(faqName)) {
       System.out.println("Editing FAQ: \"" + faqName + "\" to \"" + message + "\".");
@@ -222,6 +192,8 @@ public class FAQCmd extends RBCommand {
    * @throws FAQNotFoundException if the FAQ entry does not exist.
    */
   public static final void removeFaq(final String faqName) throws FAQNotFoundException {
+    
+    System.out.println("removeFaq");
     
     // If the map isn't created yet for some reason, do it.
     if (faqMap == null) {
@@ -245,6 +217,12 @@ public class FAQCmd extends RBCommand {
    */
   public static final void clearFAQMap() {
     
+    System.out.println("clearFaqMap");
+    
+    if (faqMap == null) {
+      System.out.println("faqMap is null!");
+      return;
+    }
     faqMap.clear();
     saveFAQMap();
   }
@@ -291,9 +269,14 @@ public class FAQCmd extends RBCommand {
   }
   
   @Override
-  public boolean requiresModStatus() {
-    
-    return false;
+  public int permissionLevelRequired() {
+    return RBCommand.PERM_STANDARD;
+  }
+  
+  @Override
+  public void setupCommand() {
+    faqMap = initFAQ();
+    saveFAQMap();
   }
   
 }

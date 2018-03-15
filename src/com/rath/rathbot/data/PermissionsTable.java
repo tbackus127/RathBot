@@ -1,6 +1,13 @@
 
 package com.rath.rathbot.data;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.TreeMap;
 
 import com.rath.rathbot.RathBot;
@@ -20,12 +27,11 @@ public class PermissionsTable {
   /** The default permissions level new users are added with. */
   private static final int DEFAULT_PERM_LEVEL = RBCommand.PERM_STANDARD;
   
+  /** The permissions table file. */
+  private static final File PERM_FILE = new File(PERM_DATA_PATH);
+  
   /** The permissions table. */
   private static TreeMap<Long, Integer> permMap = null;
-  
-  /** The handler for saving/loading this class' data. */
-  private static final DataLoader<TreeMap<Long, Integer>> loader = new DataLoader<TreeMap<Long, Integer>>(TreeMap.class,
-      permMap, PERM_DATA_PATH);
   
   /**
    * Initializes a user with default permissions.
@@ -94,20 +100,103 @@ public class PermissionsTable {
   }
   
   /**
+   * Whether or not an entry exists for a user.
+   * 
+   * @param userID the ID of the user to check for.
+   * @return true if the user exists; false if not.
+   */
+  public static final boolean hasUser(final long userID) {
+    return permMap.containsKey(userID);
+  }
+  
+  /**
    * Saves the permission table to the hard disk.
    */
   public static final void savePerms() {
     System.out.println("Saving permissions map to file.");
-    loader.saveToDisk();
+    
+    FileOutputStream fos = null;
+    ObjectOutputStream oos = null;
+    
+    try {
+      
+      // Build an output stream for serialization
+      fos = new FileOutputStream(PERM_DATA_PATH);
+      oos = new ObjectOutputStream(fos);
+      
+      // Write the map and close streams
+      oos.writeObject(permMap);
+      oos.close();
+      fos.close();
+      
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
   
   /**
    * Loads the permission table from the hard disk.
    */
+  @SuppressWarnings("unchecked")
   public static final void loadPerms() {
+    
     System.out.println("Loading permissions map from file.");
-    permMap = loader.loadFromDisk();
-    savePerms();
+    
+    // Initialize data streams
+    FileInputStream fis = null;
+    ObjectInputStream oin = null;
+    Object obj = null;
+    
+    // Create the file if it doesn't exist.
+    if (!PERM_FILE.exists()) {
+      try {
+        System.out.println("FAQ file doesn't exist. Creating new.");
+        PERM_FILE.createNewFile();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    
+    try {
+      
+      // Build an input stream for deserialization
+      fis = new FileInputStream(PERM_DATA_PATH);
+      if (fis.available() > 0) {
+        oin = new ObjectInputStream(fis);
+        
+        // Read the object in and close the streams
+        obj = oin.readObject();
+        oin.close();
+        fis.close();
+        
+      } else {
+        System.err.println("FAQ map is empty.");
+      }
+      
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    
+    // If something went wrong, return null
+    if (fis == null || oin == null) {
+      System.err.println("FAQ map load error.");
+    }
+    
+    // Cast the read object to a TreeMap
+    if (obj instanceof TreeMap) {
+      permMap = (TreeMap<Long, Integer>) obj;
+      System.out.println("Read successfully.");
+    } else {
+      System.err.println("Error with loading. Creating new table.");
+      permMap = new TreeMap<Long, Integer>();
+    }
+    
   }
   
 }

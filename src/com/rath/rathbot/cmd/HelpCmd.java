@@ -50,6 +50,12 @@ public class HelpCmd extends RBCommand {
   }
   
   @Override
+  public String getCommandUsage() {
+    
+    return null;
+  }
+  
+  @Override
   public Set<RBCommand> getSubcommands() {
     
     return null;
@@ -65,6 +71,7 @@ public class HelpCmd extends RBCommand {
     } else {
       
       // If the command sent for the 3rd token is a valid command, post its syntax
+      // TODO: Do subcommands, too
       if (helpCmdMap.containsKey(tokens[2])) {
         final String cmdDescr = helpCmdMap.get(tokens[2]).getCommandDescription();
         rb.sendMessage(channel, tokens[2] + " - " + cmdDescr);
@@ -79,7 +86,7 @@ public class HelpCmd extends RBCommand {
   
   @Override
   public int permissionLevelRequired() {
-    return RBCommand.PERM_BASE;
+    return RBCommand.PERM_MINIMAL;
   }
   
   @Override

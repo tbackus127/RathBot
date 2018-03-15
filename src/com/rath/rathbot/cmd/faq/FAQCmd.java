@@ -14,7 +14,6 @@ import java.util.TreeMap;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
-import com.rath.rathbot.data.DataLoader;
 import com.rath.rathbot.exceptions.FAQNotFoundException;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -30,49 +29,48 @@ public class FAQCmd extends RBCommand {
   /** The path to the saved FAQ Strings. */
   private static final String FAQ_DATA_PATH = RathBot.DIR_DATA + "faq.dat";
   
-  /** A map from FAQ name to its contents. */
-  private static TreeMap<String, String> faqMap = null;
-  
   /** The command String for this command. */
   private static final String FAQ_CMD = "faq";
   
   /** The command description. */
   private static final String FAQ_DESCR = "Allows the storing and recalling of text blocks.";
   
-  /** The handler for saving/loading this class' data. */
-  private static final DataLoader<TreeMap<String, String>> loader = new DataLoader<TreeMap<String, String>>(
-      TreeMap.class, faqMap, FAQ_DATA_PATH);
+  /** Reference to the faqMap file. */
+  private static final File FAQ_FILE = new File(FAQ_DATA_PATH);
+  
+  /** A map from FAQ name to its contents. */
+  private static TreeMap<String, String> faqMap = new TreeMap<String, String>();
   
   /**
    * Initializes the FAQ map.
    * 
    * @return a TreeMap mapping FAQ ID to its contents.
    */
-  private static final TreeMap<String, String> initFAQ() {
+  private static final void initFAQ() {
     
     System.out.println("faqMap init");
     
-    final File fdat = new File(FAQ_DATA_PATH);
-    
     // If the file doesn't exist, create it
-    if (!fdat.exists()) {
-      System.out.println("  File " + fdat.getAbsolutePath() + " doesn't exist, creating.");
+    if (!FAQ_FILE.exists()) {
+      System.out.println("  File " + FAQ_FILE.getAbsolutePath() + " doesn't exist, creating.");
       try {
-        fdat.createNewFile();
-        return new TreeMap<String, String>();
+        FAQ_FILE.createNewFile();
+        faqMap = new TreeMap<String, String>();
+        return;
       } catch (IOException e) {
         e.printStackTrace();
       }
     } else {
       
       // If the file is empty, create a new TreeMap for it
-      if (fdat.length() <= 0) {
+      if (FAQ_FILE.length() <= 0) {
         System.out.println("  Map data empty. Creating new table.");
-        return new TreeMap<String, String>();
+        faqMap = new TreeMap<String, String>();
+        return;
       }
     }
     
-    return loadFAQMap(fdat);
+    loadFAQMap();
     
   }
   
@@ -81,10 +79,54 @@ public class FAQCmd extends RBCommand {
    * 
    * @return the previously-serialized HashMap.
    */
-  private static final TreeMap<String, String> loadFAQMap(final File file) {
+  @SuppressWarnings("unchecked")
+  private static final TreeMap<String, String> loadFAQMap() {
     
-    System.out.println("Loading FAQ map from file.");
-    return loader.loadFromDisk();
+    // Initialize data streams
+    FileInputStream fis = null;
+    ObjectInputStream oin = null;
+    TreeMap<String, String> result = null;
+    Object obj = null;
+    
+    try {
+      
+      // Build an input stream for deserialization
+      fis = new FileInputStream(FAQ_DATA_PATH);
+      if (fis.available() > 0) {
+        oin = new ObjectInputStream(fis);
+        
+        // Read the object in and close the streams
+        obj = oin.readObject();
+        oin.close();
+        fis.close();
+        
+      } else {
+        System.err.println("FAQ map is empty.");
+      }
+      
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    
+    // If something went wrong, return null
+    if (fis == null || oin == null) {
+      System.err.println("FAQ map load error.");
+    }
+    
+    // Cast the read object to a TreeMap
+    if (obj instanceof TreeMap) {
+      result = (TreeMap<String, String>) obj;
+      System.out.println("Read successfully.");
+    } else {
+      System.err.println("Error with loading. Creating new table.");
+      return new TreeMap<String, String>();
+    }
+    
+    return result;
   }
   
   /**
@@ -92,7 +134,25 @@ public class FAQCmd extends RBCommand {
    */
   private static final void saveFAQMap() {
     
-    loader.saveToDisk();
+    FileOutputStream fos = null;
+    ObjectOutputStream oos = null;
+    
+    try {
+      
+      // Build an output stream for serialization
+      fos = new FileOutputStream(FAQ_DATA_PATH);
+      oos = new ObjectOutputStream(fos);
+      
+      // Write the map and close streams
+      oos.writeObject(faqMap);
+      oos.close();
+      fos.close();
+      
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
   
   /**
@@ -197,7 +257,7 @@ public class FAQCmd extends RBCommand {
     
     // If the map isn't created yet for some reason, do it.
     if (faqMap == null) {
-      faqMap = initFAQ();
+      initFAQ();
     }
     
     System.out.println("Removing FAQ: \"" + faqName + "\".");
@@ -250,6 +310,16 @@ public class FAQCmd extends RBCommand {
       // TODO: Do normal "rb! faq" stuff (post help message)
       System.out.println("Executing faq");
       
+      if (tokens.length <= 2) {
+        rb.sendMessage(channel, "Usage: " + getCommandUsage());
+        return true;
+      }
+      
+      if (faqMap.containsKey(tokens[2])) {
+        rb.sendMessage(channel, faqMap.get(tokens[2]));
+      } else {
+        rb.sendMessage(channel, "FAQ \"" + tokens[2] + "\" doesn't exist.");
+      }
     }
     
     return true;
@@ -269,13 +339,20 @@ public class FAQCmd extends RBCommand {
   }
   
   @Override
+  public String getCommandUsage() {
+    return "rb! faq <faqName> <message>";
+  }
+  
+  @Override
   public int permissionLevelRequired() {
+    
+    // TODO: Change this to moderator when done testing permissions
     return RBCommand.PERM_ADMIN;
   }
   
   @Override
   public void setupCommand() {
-    faqMap = initFAQ();
+    initFAQ();
     saveFAQMap();
   }
   

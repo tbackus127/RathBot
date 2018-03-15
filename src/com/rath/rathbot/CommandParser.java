@@ -44,15 +44,23 @@ public class CommandParser {
       // Check the token after the prefix against commands until we find a match
       if (tokens[1].trim().equalsIgnoreCase(cmd.getCommandName())) {
         
+        final long userID = author.getLongID();
+        
+        // If the user doesn't have an entry on the permissions table, initialize them and save
+        if (!PermissionsTable.hasUser(userID)) {
+          PermissionsTable.initUser(userID);
+        }
+        
         // Check permissions for this command.
-        if (PermissionsTable.getLevel(author.getLongID()) >= cmd.permissionLevelRequired()) {
+        if (PermissionsTable.getLevel(userID) >= cmd.permissionLevelRequired()) {
           
           // Execute the command that matches
           cmd.executeCommand(bot, author, channel, tokens, 1);
         } else {
-          System.out.println("User " + author.getName() + " tried to execute " + cmd.getCommandName()
-              + " with permission level " + PermissionsTable.getLevel(author.getLongID()) + " ("
-              + cmd.permissionLevelRequired() + " required).");
+          System.out.println(
+              "User " + author.getName() + " tried to execute " + cmd.getCommandName() + " with permission level "
+                  + PermissionsTable.getLevel(userID) + " (" + cmd.permissionLevelRequired() + " required).");
+          bot.sendMessage(channel, "You do not have the required permissions for that command.");
         }
         
         break;

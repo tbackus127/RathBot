@@ -22,8 +22,14 @@ public class ReportCmd extends RBCommand {
   }
   
   @Override
+  public String getCommandUsage() {
+    // TODO Auto-generated method stub
+    return "USAGE GOES HERE";
+  }
+  
+  @Override
   public int permissionLevelRequired() {
-    return RBCommand.PERM_BASE;
+    return RBCommand.PERM_MINIMAL;
   }
   
   @Override

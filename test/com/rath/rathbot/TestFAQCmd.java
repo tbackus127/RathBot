@@ -22,7 +22,6 @@ public class TestFAQCmd {
   public void testFAQAdd() {
     
     System.out.println("Testing FAQ.add");
-    FAQCmd.clearFAQMap();
     FAQCmd.addFaq("testa", "test-a-msg");
     FAQCmd.addFaq("testb", "test-b-msg");
     FAQCmd.addFaq("testc", "test-c-msg");

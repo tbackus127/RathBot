@@ -35,6 +35,12 @@ public class FAQRemoveCmd extends RBCommand {
   }
   
   @Override
+  public String getCommandUsage() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
   public Set<RBCommand> getSubcommands() {
     
     return null;

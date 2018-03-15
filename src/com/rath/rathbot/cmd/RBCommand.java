@@ -15,20 +15,26 @@ import sx.blah.discord.handle.obj.IUser;
  */
 public abstract class RBCommand {
   
+  /** Permission level: Sudo */
+  public static final int PERM_SUDO = 6;
+  
   /** Permission level: Admin */
   public static final int PERM_ADMIN = 5;
   
   /** Permission level: Moderator */
-  public static final int PERM_MODERATOR = 3;
+  public static final int PERM_MODERATOR = 4;
   
   /** Permission level: Trusted */
-  public static final int PERM_TRUSTED = 2;
+  public static final int PERM_TRUSTED = 3;
   
   /** Permission level: Standard */
-  public static final int PERM_STANDARD = 1;
+  public static final int PERM_STANDARD = 2;
   
-  /** Permission level: Basic */
-  public static final int PERM_BASE = 0;
+  /** Permission level: Minimal */
+  public static final int PERM_MINIMAL = 1;
+  
+  /** Permission level: Forbid */
+  public static final int PERM_FORBID = 0;
   
   /**
    * Gets the name of this command.
@@ -43,6 +49,13 @@ public abstract class RBCommand {
    * @return the full text that will be displayed in this command's help entry as a String.
    */
   public abstract String getCommandDescription();
+  
+  /**
+   * Gets this command's usage syntax in case an error was made.
+   * 
+   * @return the command's usage text as a String.
+   */
+  public abstract String getCommandUsage();
   
   /**
    * Performs various initialization operations for commands, such as loading data from a file, building tables, or

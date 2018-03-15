@@ -52,7 +52,7 @@ public class EventHandler {
     final String author = evt.getAuthor().getName();
     final String channel = evt.getChannel().getName();
     final String message = evt.getMessage().getContent();
-    System.out.println("Received message from " + author + " in #" + channel + ":");
-    System.out.println("\"" + message + "\"");
+    // System.out.println("Received message from " + author + " in #" + channel + ":");
+    // System.out.println("\"" + message + "\"");
   }
 }

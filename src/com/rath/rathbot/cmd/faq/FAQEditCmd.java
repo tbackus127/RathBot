@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
+import com.rath.rathbot.msg.MessageHelper;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -35,6 +36,11 @@ public class FAQEditCmd extends RBCommand {
     
     if (!super.executeCommand(rb, author, channel, tokens, tokenDepth)) {
       System.out.println("Executing faq.edit");
+      
+      final String message = MessageHelper.concatenateTokens(tokens, 4);
+      
+      FAQCmd.addFaq(tokens[3], message);
+      rb.sendMessage(channel, "FAQ " + tokens[3] + " updated.");
     }
     
     return true;
@@ -54,10 +60,16 @@ public class FAQEditCmd extends RBCommand {
   }
   
   @Override
+  public String getCommandUsage() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
+  @Override
   public int permissionLevelRequired() {
     return RBCommand.PERM_MODERATOR;
   }
-
+  
   @Override
   public void setupCommand() {
     return;

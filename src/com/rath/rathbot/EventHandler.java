@@ -34,7 +34,7 @@ public class EventHandler {
    */
   @EventSubscriber
   public void onMessageReceived(MessageReceivedEvent event) {
-    logMessageDetails(event);
+    // logMessageDetails(event);
     final String message = event.getMessage().getContent();
     if (message.startsWith(COMMAND_PREFIX)) {
       CommandParser.parseCommand(this.bot, event.getChannel(), event.getAuthor(), message);
@@ -52,7 +52,7 @@ public class EventHandler {
     final String author = evt.getAuthor().getName();
     final String channel = evt.getChannel().getName();
     final String message = evt.getMessage().getContent();
-    // System.out.println("Received message from " + author + " in #" + channel + ":");
-    // System.out.println("\"" + message + "\"");
+    System.out.println("Received message from " + author + " in #" + channel + ":");
+    System.out.println("\"" + message + "\"");
   }
 }

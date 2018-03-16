@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
+import com.rath.rathbot.exceptions.FAQNotFoundException;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -39,7 +40,7 @@ public class FAQRemoveCmd extends RBCommand {
     // TODO Auto-generated method stub
     return null;
   }
-
+  
   @Override
   public Set<RBCommand> getSubcommands() {
     
@@ -52,6 +53,24 @@ public class FAQRemoveCmd extends RBCommand {
     
     if (!super.executeCommand(rb, author, channel, tokens, tokenDepth)) {
       System.out.println("Executing faq.remove");
+      
+      // Prevent ArrayIndexOutOfBoundsExceptions
+      if (tokens.length <= 3) return true;
+      
+      // Get the FAQ name and check if it exists
+      final String faqName = tokens[3];
+      if (FAQCmd.hasFaq(faqName)) {
+        try {
+          
+          // Remove and send confirmation
+          FAQCmd.removeFaq(faqName);
+          rb.sendMessage(channel, "FAQ \"" + faqName + "\" removed.");
+        } catch (FAQNotFoundException e) {
+          
+          // Inform that it doesn't exist
+          rb.sendMessage(channel, "This FAQ doesn't exist.");
+        }
+      }
     }
     return true;
     

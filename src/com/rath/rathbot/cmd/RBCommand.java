@@ -4,6 +4,7 @@ package com.rath.rathbot.cmd;
 import java.util.Set;
 
 import com.rath.rathbot.RathBot;
+import com.rath.rathbot.data.PermissionsTable;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -100,9 +101,24 @@ public abstract class RBCommand {
       return false;
     } else {
       
-      // Valid subcommand found, so return true
-      cmd.executeCommand(rb, author, channel, tokens, tokenDepth + 1);
-      return true;
+      final long userID = author.getLongID();
+      
+      // Check permissions for this command.
+      if (PermissionsTable.getLevel(userID) >= cmd.permissionLevelRequired()) {
+        
+        // Valid subcommand found, so return true
+        cmd.executeCommand(rb, author, channel, tokens, tokenDepth + 1);
+        return true;
+        
+      } else {
+        System.out.println(
+            "User " + author.getName() + " tried to execute " + cmd.getCommandName() + " with permission level "
+                + PermissionsTable.getLevel(userID) + " (" + cmd.permissionLevelRequired() + " required).");
+        rb.sendMessage(channel, "You do not have the required permissions for that command.");
+        
+        return true;
+      }
+      
     }
   }
   

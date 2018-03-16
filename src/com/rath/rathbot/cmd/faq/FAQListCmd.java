@@ -37,7 +37,7 @@ public class FAQListCmd extends RBCommand {
     // TODO Auto-generated method stub
     return null;
   }
-
+  
   @Override
   public Set<RBCommand> getSubcommands() {
     
@@ -50,6 +50,8 @@ public class FAQListCmd extends RBCommand {
     
     if (!super.executeCommand(rb, author, channel, tokens, tokenDepth)) {
       System.out.println("Executing faq.list");
+      
+      rb.sendMessage(channel, FAQCmd.getFaqList());
     }
     
     return true;
@@ -60,7 +62,7 @@ public class FAQListCmd extends RBCommand {
   public int permissionLevelRequired() {
     return RBCommand.PERM_STANDARD;
   }
-
+  
   @Override
   public void setupCommand() {
     return;

@@ -80,12 +80,11 @@ public class FAQCmd extends RBCommand {
    * @return the previously-serialized HashMap.
    */
   @SuppressWarnings("unchecked")
-  private static final TreeMap<String, String> loadFAQMap() {
+  private static final void loadFAQMap() {
     
     // Initialize data streams
     FileInputStream fis = null;
     ObjectInputStream oin = null;
-    TreeMap<String, String> result = null;
     Object obj = null;
     
     try {
@@ -119,14 +118,12 @@ public class FAQCmd extends RBCommand {
     
     // Cast the read object to a TreeMap
     if (obj instanceof TreeMap) {
-      result = (TreeMap<String, String>) obj;
+      faqMap = (TreeMap<String, String>) obj;
       System.out.println("Read successfully.");
     } else {
       System.err.println("Error with loading. Creating new table.");
-      return new TreeMap<String, String>();
+      faqMap = new TreeMap<String, String>();
     }
-    
-    return result;
   }
   
   /**
@@ -156,7 +153,7 @@ public class FAQCmd extends RBCommand {
   }
   
   /**
-   * Posts the list of FAQs that are currently set.
+   * Gets a list of FAQs that are currently set.
    * 
    * @param channel the channel to send the list to. Returns null if the map is empty.
    */
@@ -171,7 +168,7 @@ public class FAQCmd extends RBCommand {
     
     // Check that the map has entries in it
     if (faqMap.size() <= 0) {
-      return null;
+      return "There are no saved FAQs.";
     }
     
     // Construct the FAQ list message
@@ -347,7 +344,7 @@ public class FAQCmd extends RBCommand {
   public int permissionLevelRequired() {
     
     // TODO: Change this to moderator when done testing permissions
-    return RBCommand.PERM_ADMIN;
+    return RBCommand.PERM_STANDARD;
   }
   
   @Override

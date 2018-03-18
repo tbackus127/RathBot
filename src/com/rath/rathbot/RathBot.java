@@ -39,6 +39,10 @@ public class RathBot {
   /** The default Playing text under the bot's username. */
   private static final String DEFAULT_PLAYING_TEXT = "\u2606I\u2606MA\u2606SU\u2606GU\u2606";
   
+  // TODO: Add more here as they become available.
+  /** A list of commands to initialize. */
+  private static final RBCommand[] commandList = { new FAQCmd() };
+  
   /** A map from channel name to ID. */
   public static HashMap<String, IChannel> channelMap;
   
@@ -47,10 +51,6 @@ public class RathBot {
   
   /** The set of commands this bot responds to. */
   private final Set<RBCommand> commandSet;
-  
-  /** A list of commands to initialize. */
-  private static final RBCommand[] commandList = { new FAQCmd(), new ReportCmd() };
-  // TODO: Add more here as they become available.
   
   /**
    * Default constructor.
@@ -113,6 +113,16 @@ public class RathBot {
   }
   
   /**
+   * Gets the commands that are registered for the bot.
+   * 
+   * @return a Set of RBCommands.
+   */
+  public Set<RBCommand> getCommandSet() {
+    
+    return this.commandSet;
+  }
+  
+  /**
    * Has the bot log in to the server.
    */
   public final void login() {
@@ -129,16 +139,6 @@ public class RathBot {
     System.out.println("Logging out...");
     client.logout();
     MessageLogger.closeStreams();
-  }
-  
-  /**
-   * Gets the commands that are registered for the bot.
-   * 
-   * @return a Set of RBCommands.
-   */
-  public Set<RBCommand> getCommandSet() {
-    
-    return this.commandSet;
   }
   
   /**
@@ -221,7 +221,6 @@ public class RathBot {
         
         // Logout
         case "logout":
-          System.out.println("Logging out...");
           bot.logout();
         break;
       

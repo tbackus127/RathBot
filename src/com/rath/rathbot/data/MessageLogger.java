@@ -62,7 +62,7 @@ public class MessageLogger {
           System.err.println("Cannot write to file!");
         }
         
-        final PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(file, true)));
+        final PrintStream ps = new PrintStream(new FileOutputStream(file, true));
         result.put(chMap.get(s), ps);
         
       } catch (FileNotFoundException e) {
@@ -83,11 +83,10 @@ public class MessageLogger {
    */
   public static final void logMessage(final IMessage msg) {
     
+    // Do not log if it's not ready
     if (!isLoggerReady) {
       return;
     }
-    
-    System.out.println("Logging.");
     
     // Unpack IMessage object
     final IChannel channel = msg.getChannel();

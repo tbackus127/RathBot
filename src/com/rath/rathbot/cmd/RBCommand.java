@@ -17,13 +17,16 @@ import sx.blah.discord.handle.obj.IUser;
 public abstract class RBCommand {
   
   /** Permission level: Sudo */
-  public static final int PERM_SUDO = 6;
+  public static final int PERM_SUDO = 7;
   
   /** Permission level: Admin */
-  public static final int PERM_ADMIN = 5;
+  public static final int PERM_ADMIN = 6;
   
   /** Permission level: Moderator */
-  public static final int PERM_MODERATOR = 4;
+  public static final int PERM_MODERATOR = 5;
+  
+  /** Permission level: Sub-mod */
+  public static final int PERM_SUBMOD = 4;
   
   /** Permission level: Trusted */
   public static final int PERM_TRUSTED = 3;

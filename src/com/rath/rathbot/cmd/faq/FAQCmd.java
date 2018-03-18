@@ -304,14 +304,15 @@ public class FAQCmd extends RBCommand {
     // If there are no subcommands for this command
     if (!super.executeCommand(rb, author, channel, tokens, tokenDepth)) {
       
-      // TODO: Do normal "rb! faq" stuff (post help message)
       System.out.println("Executing faq");
       
+      // Print the usage info if there aren't any arguments
       if (tokens.length <= 2) {
         rb.sendMessage(channel, "Usage: " + getCommandUsage());
         return true;
       }
       
+      // Either post the FAQ contents, or that it doesn't exist
       if (faqMap.containsKey(tokens[2])) {
         rb.sendMessage(channel, faqMap.get(tokens[2]));
       } else {
@@ -343,7 +344,6 @@ public class FAQCmd extends RBCommand {
   @Override
   public int permissionLevelRequired() {
     
-    // TODO: Change this to moderator when done testing permissions
     return RBCommand.PERM_STANDARD;
   }
   

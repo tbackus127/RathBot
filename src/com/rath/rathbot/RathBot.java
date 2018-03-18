@@ -13,6 +13,7 @@ import com.rath.rathbot.cmd.HelpCmd;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.cmd.admin.ReportCmd;
 import com.rath.rathbot.cmd.faq.FAQCmd;
+import com.rath.rathbot.data.MessageLogger;
 import com.rath.rathbot.data.PermissionsTable;
 
 import sx.blah.discord.api.ClientBuilder;
@@ -39,10 +40,10 @@ public class RathBot {
   private static final String DEFAULT_PLAYING_TEXT = "\u2606I\u2606MA\u2606SU\u2606GU\u2606";
   
   /** A map from channel name to ID. */
-  public final HashMap<String, Long> channelMap;
+  public static HashMap<String, IChannel> channelMap;
   
   /** Reference to the client. */
-  private final IDiscordClient client;
+  private static IDiscordClient client = null;
   
   /** The set of commands this bot responds to. */
   private final Set<RBCommand> commandSet;
@@ -57,10 +58,14 @@ public class RathBot {
    * @param client an instance of the IDiscordClient object, already built.
    */
   public RathBot(final IDiscordClient client) {
-    this.client = client;
-    this.channelMap = buildChannelMap(client);
     
-    // Load the permissions table
+    RathBot.client = client;
+    
+    // Log in and build the channel map
+    RathBot.channelMap = buildChannelMap(client);
+    
+    // Load and initialize everything
+    MessageLogger.initPrintStreamMap(channelMap);
     PermissionsTable.loadPerms();
     
     // Build the command set and initialize the commands
@@ -136,28 +141,38 @@ public class RathBot {
   }
   
   /**
+   * Gets the reference to the Discord client.
+   * 
+   * @return the reference to the Discord client.
+   */
+  public static final IDiscordClient getClient() {
+    return client;
+  }
+  
+  /**
    * Builds a map of Channel Name -> Channel ID.
    * 
    * @param client the logged-in client instance.
    * @return a HashMap of type String -> Long.
    */
-  private final HashMap<String, Long> buildChannelMap(final IDiscordClient client) {
+  private final HashMap<String, IChannel> buildChannelMap(final IDiscordClient client) {
     
     // Log in and wait until ready to receive commands
-    client.login();
+    System.out.print("Logging in... ");
+    login();
     while (!client.isReady()) {}
+    System.out.println("DONE");
     
     // Change the playing text to the default
     client.changePresence(StatusType.ONLINE, ActivityType.PLAYING, DEFAULT_PLAYING_TEXT);
     
     // For each channel, add a mapping from its name to its ID
     final List<IChannel> channels = client.getChannels();
-    final HashMap<String, Long> result = new HashMap<String, Long>();
+    final HashMap<String, IChannel> result = new HashMap<String, IChannel>();
     for (IChannel c : channels) {
       final String name = c.getName();
-      final long id = c.getLongID();
-      System.out.println("Added channel #" + name + " -> " + id + ".");
-      result.put(name, id);
+      System.out.println("Added channel #" + name + " -> " + c.getLongID() + ".");
+      result.put(name, c);
     }
     return result;
   }
@@ -184,41 +199,6 @@ public class RathBot {
   private void addAndInitializeCommand(final RBCommand cmd) {
     cmd.setupCommand();
     commandSet.add(cmd);
-  }
-  
-  /**
-   * Main method.
-   * 
-   * @param args runtime arguments (ignored).
-   */
-  public static final void main(String[] args) {
-    
-    // Get the authentication token
-    final String token = readToken(CONFIG_FILE_PATH);
-    System.out.println("Creating bot with token " + token + ".");
-    if (token == null) {
-      System.err.println("Fetching the authentication token went wrong. Exiting.");
-      return;
-    }
-    
-    // Create the client and the bot
-    System.out.println("Creating client...");
-    final IDiscordClient client = new ClientBuilder().withPingTimeout(5).withToken(token).build();
-    final RathBot bot = new RathBot(client);
-    client.getDispatcher().registerListener(new EventHandler(bot));
-    
-    // Log in and create the bot
-    System.out.println("Logging in...");
-    
-    // Get commands from terminal
-    Scanner cin = new Scanner(System.in);
-    getConsoleCommands(bot, cin);
-    
-    // Clean everything up
-    cin.close();
-    if (bot.client.isLoggedIn()) {
-      bot.logout();
-    }
   }
   
   /**
@@ -263,14 +243,14 @@ public class RathBot {
             for (int i = 3; i < tokens.length; i++) {
               npMessage += " " + tokens[i];
             }
-            bot.sendMessage(bot.client.getChannelByID(bot.channelMap.get(channel)), npMessage);
+            bot.sendMessage(RathBot.channelMap.get(channel), npMessage);
           }
         break;
       
         // Get userIDs for users that match the next argument
         case "uid":
           if (tokens.length == 2) {
-            final List<IUser> users = bot.client.getUsersByName(tokens[1], true);
+            final List<IUser> users = RathBot.client.getUsersByName(tokens[1], true);
             for (final IUser u : users) {
               System.out.println(u.getName() + ": " + u.getLongID());
             }
@@ -353,6 +333,39 @@ public class RathBot {
     } else {
       System.err.println("Scanner couldn't get token from config file.");
       return null;
+    }
+  }
+  
+  /**
+   * Main method.
+   * 
+   * @param args runtime arguments (ignored).
+   */
+  public static final void main(String[] args) {
+    
+    // Get the authentication token
+    final String token = readToken(CONFIG_FILE_PATH);
+    System.out.println("Creating bot with token " + token + ".");
+    if (token == null) {
+      System.err.println("Fetching the authentication token went wrong. Exiting.");
+      return;
+    }
+    
+    // Create the client and the bot
+    System.out.print("Creating client... ");
+    final IDiscordClient client = new ClientBuilder().withPingTimeout(5).withToken(token).build();
+    final RathBot bot = new RathBot(client);
+    client.getDispatcher().registerListener(new EventHandler(bot));
+    System.out.println("DONE");
+    
+    // Get commands from terminal
+    Scanner cin = new Scanner(System.in);
+    getConsoleCommands(bot, cin);
+    
+    // Clean everything up
+    cin.close();
+    if (RathBot.client.isLoggedIn()) {
+      bot.logout();
     }
   }
   

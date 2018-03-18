@@ -1,8 +1,11 @@
 
 package com.rath.rathbot;
 
+import com.rath.rathbot.data.MessageLogger;
+
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.handle.obj.IMessage;
 
 /**
  * This class handles bot events, such as reading messages and responsing to them.
@@ -34,13 +37,17 @@ public class EventHandler {
    */
   @EventSubscriber
   public void onMessageReceived(MessageReceivedEvent event) {
-    // logMessageDetails(event);
-    final String message = event.getMessage().getContent();
-    if (message.startsWith(COMMAND_PREFIX)) {
-      CommandParser.parseCommand(this.bot, event.getChannel(), event.getAuthor(), message);
+    logMessageDetails(event);
+    
+    final IMessage message = event.getMessage();
+    final String messageString = message.getContent();
+    if (messageString.startsWith(COMMAND_PREFIX)) {
+      CommandParser.parseCommand(this.bot, event.getChannel(), event.getAuthor(), messageString);
     }
     
     // TODO: do spam filtering stuff here
+    
+    // TODO: do message logging here
   }
   
   /**

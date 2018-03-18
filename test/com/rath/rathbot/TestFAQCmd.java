@@ -25,10 +25,13 @@ public class TestFAQCmd {
     FAQCmd.addFaq("testa", "test-a-msg");
     FAQCmd.addFaq("testb", "test-b-msg");
     FAQCmd.addFaq("testc", "test-c-msg");
-    final String list = FAQCmd.getFaqList();
-    final String expected = "FAQ List:\n  testa\n  testb\n  testc\n";
     
-    assertTrue(list.equals(expected));
+    int count = 0;
+    if (FAQCmd.hasFaq("testa")) count++;
+    if (FAQCmd.hasFaq("testb")) count++;
+    if (FAQCmd.hasFaq("testc")) count++;
+    
+    assertTrue(count == 3);
   }
   
   @Test

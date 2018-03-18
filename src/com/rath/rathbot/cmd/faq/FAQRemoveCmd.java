@@ -1,8 +1,6 @@
 
 package com.rath.rathbot.cmd.faq;
 
-import java.util.Set;
-
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.exceptions.FAQNotFoundException;
@@ -42,37 +40,29 @@ public class FAQRemoveCmd extends RBCommand {
   }
   
   @Override
-  public Set<RBCommand> getSubcommands() {
-    
-    return null;
-  }
-  
-  @Override
   public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
     
-    if (!super.executeCommand(rb, author, channel, tokens, tokenDepth)) {
-      System.out.println("Executing faq.remove");
-      
-      // Prevent ArrayIndexOutOfBoundsExceptions
-      if (tokens.length <= 3) return true;
-      
-      // Get the FAQ name and check if it exists
-      final String faqName = tokens[3];
-      if (FAQCmd.hasFaq(faqName)) {
-        try {
-          
-          // Remove and send confirmation
-          FAQCmd.removeFaq(faqName);
-          rb.sendMessage(channel, "FAQ \"" + faqName + "\" removed.");
-        } catch (FAQNotFoundException e) {
-          
-          // Inform that it doesn't exist
-          rb.sendMessage(channel, "This FAQ doesn't exist.");
-        }
+    System.out.println("Executing faq.remove");
+    
+    // Prevent ArrayIndexOutOfBoundsExceptions
+    if (tokens.length <= 3) return true;
+    
+    // Get the FAQ name and check if it exists
+    final String faqName = tokens[3];
+    if (FAQCmd.hasFaq(faqName)) {
+      try {
+        
+        // Remove and send confirmation
+        FAQCmd.removeFaq(faqName);
+        rb.sendMessage(channel, "FAQ \"" + faqName + "\" removed.");
+      } catch (FAQNotFoundException e) {
+        
+        // Inform that it doesn't exist
+        rb.sendMessage(channel, "This FAQ doesn't exist.");
       }
     }
-    return true;
+    return RBCommand.STOP_CMD_SEARCH;
     
   }
   
@@ -82,8 +72,8 @@ public class FAQRemoveCmd extends RBCommand {
   }
   
   @Override
-  public void setupCommand() {
-    return;
+  public boolean requiresDirectMessage() {
+    return false;
   }
   
 }

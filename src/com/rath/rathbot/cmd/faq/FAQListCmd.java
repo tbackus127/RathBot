@@ -1,8 +1,6 @@
 
 package com.rath.rathbot.cmd.faq;
 
-import java.util.Set;
-
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 
@@ -39,22 +37,13 @@ public class FAQListCmd extends RBCommand {
   }
   
   @Override
-  public Set<RBCommand> getSubcommands() {
-    
-    return null;
-  }
-  
-  @Override
   public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
     
-    if (!super.executeCommand(rb, author, channel, tokens, tokenDepth)) {
-      System.out.println("Executing faq.list");
-      
-      rb.sendMessage(channel, FAQCmd.getFaqList());
-    }
+    System.out.println("Executing faq.list");
+    rb.sendMessage(channel, FAQCmd.getFaqList());
     
-    return true;
+    return RBCommand.STOP_CMD_SEARCH;
     
   }
   
@@ -64,8 +53,8 @@ public class FAQListCmd extends RBCommand {
   }
   
   @Override
-  public void setupCommand() {
-    return;
+  public boolean requiresDirectMessage() {
+    return false;
   }
   
 }

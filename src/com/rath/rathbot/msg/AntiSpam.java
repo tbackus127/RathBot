@@ -14,6 +14,21 @@ import sx.blah.discord.handle.obj.IMessage;
  */
 public class AntiSpam {
   
+  /** Whether or not to ignore messages containing only a single image (for dumps). */
+  public static final boolean IGNORE_IMAGE_POSTS = true;
+  
+  /** Cooldown between spam warnings, in seconds. */
+  public static final int WARN_COOLDOWN_SEC = 5;
+  // TODO: ^ Impliment this.
+  
+  /** Mute durations, in seconds. 10s, 5m, 1hr, 24hr */
+  public static final int[] MUTE_DURATIONS = { 10, 300, 3600, 86400 };
+  // TODO: ^ And this. When muted, their messages are immediately deleted.
+  
+  /** How many messages a user needs to send while muted to be kicked. */
+  public static final int MUTE_KICK_THRESHOLD = 8;
+  // TODO: ^ If they keep spamming, they get kicked.
+  
   /**
    * How many messages trigger spam protection for the amount of time indicated by the same index of
    * TRIGGER_RATE_TIMEOUT_SECS.

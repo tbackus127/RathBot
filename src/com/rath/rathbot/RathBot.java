@@ -11,7 +11,7 @@ import java.util.Set;
 
 import com.rath.rathbot.cmd.HelpCmd;
 import com.rath.rathbot.cmd.RBCommand;
-import com.rath.rathbot.cmd.admin.ReportCmd;
+import com.rath.rathbot.cmd.admin.UIDCmd;
 import com.rath.rathbot.cmd.faq.FAQCmd;
 import com.rath.rathbot.data.MessageLogger;
 import com.rath.rathbot.data.PermissionsTable;
@@ -41,7 +41,7 @@ public class RathBot {
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
-  private static final RBCommand[] commandList = { new FAQCmd() };
+  private static final RBCommand[] commandList = { new FAQCmd(), new UIDCmd() };
   
   /** A map from channel name to ID. */
   public static HashMap<String, IChannel> channelMap;
@@ -126,8 +126,6 @@ public class RathBot {
    * Has the bot log in to the server.
    */
   public final void login() {
-    
-    System.out.println("Logging in...");
     client.login();
   }
   
@@ -159,7 +157,7 @@ public class RathBot {
   private final HashMap<String, IChannel> buildChannelMap(final IDiscordClient client) {
     
     // Log in and wait until ready to receive commands
-    System.out.print("Logging in... ");
+    System.out.println("Logging in... ");
     login();
     while (!client.isReady()) {}
     System.out.println("DONE");
@@ -198,8 +196,10 @@ public class RathBot {
    * @param cmd the RBCommand to add.
    */
   private void addAndInitializeCommand(final RBCommand cmd) {
+    System.out.print("Initializing command " + cmd.getCommandName() + "...");
     cmd.setupCommand();
     commandSet.add(cmd);
+    System.out.println("DONE");
   }
   
   /**

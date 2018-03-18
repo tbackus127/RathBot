@@ -21,6 +21,7 @@ public class EventHandler {
   /** The prefix for all commands. */
   private static final String COMMAND_PREFIX = "rb!";
   
+  
   /** A reference to the bot. */
   private final RathBot bot;
   

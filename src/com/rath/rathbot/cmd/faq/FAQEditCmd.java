@@ -1,8 +1,6 @@
 
 package com.rath.rathbot.cmd.faq;
 
-import java.util.Set;
-
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.msg.MessageHelper;
@@ -24,26 +22,21 @@ public class FAQEditCmd extends RBCommand {
   private static final String CMD_DESCR = "Edits the contents of FAQ with name=<NAME> to have contents=<CONTENTS>"
       + " if the FAQ entry exists. Otherwise, created a new FAQ with name=<NAME> and with contents=<CONTENTS>.";
   
-  @Override
-  public Set<RBCommand> getSubcommands() {
-    
-    return null;
-  }
+  /** The usage message when the command has a syntactic or semantic error. */
+  private static final String CMD_USAGE = "rb! faq edit <faqName> <contents>";
   
   @Override
   public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
     
-    if (!super.executeCommand(rb, author, channel, tokens, tokenDepth)) {
-      System.out.println("Executing faq.edit");
-      
-      final String message = MessageHelper.concatenateTokens(tokens, 4);
-      
-      FAQCmd.addFaq(tokens[3], message);
-      rb.sendMessage(channel, "FAQ " + tokens[3] + " updated.");
-    }
+    System.out.println("Executing faq.edit");
     
-    return true;
+    final String message = MessageHelper.concatenateTokens(tokens, 4);
+    
+    FAQCmd.addFaq(tokens[3], message);
+    rb.sendMessage(channel, "FAQ " + tokens[3] + " updated.");
+    
+    return RBCommand.STOP_CMD_SEARCH;
     
   }
   
@@ -61,8 +54,7 @@ public class FAQEditCmd extends RBCommand {
   
   @Override
   public String getCommandUsage() {
-    // TODO Auto-generated method stub
-    return null;
+    return CMD_USAGE;
   }
   
   @Override
@@ -71,8 +63,8 @@ public class FAQEditCmd extends RBCommand {
   }
   
   @Override
-  public void setupCommand() {
-    return;
+  public boolean requiresDirectMessage() {
+    return false;
   }
   
 }

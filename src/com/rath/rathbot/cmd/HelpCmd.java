@@ -2,7 +2,6 @@
 package com.rath.rathbot.cmd;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import com.rath.rathbot.RathBot;
@@ -52,13 +51,7 @@ public class HelpCmd extends RBCommand {
   @Override
   public String getCommandUsage() {
     
-    return null;
-  }
-  
-  @Override
-  public Set<RBCommand> getSubcommands() {
-    
-    return null;
+    return "rb! help <command> [sub-commands..]";
   }
   
   @Override
@@ -81,7 +74,7 @@ public class HelpCmd extends RBCommand {
       
     }
     
-    return true;
+    return RBCommand.STOP_CMD_SEARCH;
   }
   
   @Override
@@ -90,8 +83,8 @@ public class HelpCmd extends RBCommand {
   }
   
   @Override
-  public void setupCommand() {
-    return;
+  public boolean requiresDirectMessage() {
+    return false;
   }
   
 }

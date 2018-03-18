@@ -1,8 +1,6 @@
 
 package com.rath.rathbot.cmd.admin;
 
-import java.util.Set;
-
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 
@@ -18,13 +16,16 @@ public class ReportCmd extends RBCommand {
   
   @Override
   public String getCommandDescription() {
-    return "Reports a user to the moderation team with a reason for the report.";
+    return "**REQUIRES A DIRECT MESSAGE** Reports a user to the moderation team with a reason for the report. "
+        + "You will need the member's internal ID. Get it using the \"uid <Discord username>\" command. "
+        + "The uid command also requires a direct message."
+        + "Note that this is NOT their nickname for the server, but the username you see when you open their profile."
+        + "For example, Kami's Discord username is \"Danni293\".";
   }
   
   @Override
   public String getCommandUsage() {
-    // TODO Auto-generated method stub
-    return "USAGE GOES HERE";
+    return "rb! report <uid> <Reason..>";
   }
   
   @Override
@@ -33,26 +34,20 @@ public class ReportCmd extends RBCommand {
   }
   
   @Override
-  public Set<RBCommand> getSubcommands() {
-    return null;
-  }
-  
-  @Override
   public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
     
     System.out.println("Executing report");
     
-    // TODO: Delete reporter's message
+    // TODO: Reply that the report has been received
     // TODO: Log report
     // TODO: Post to #report
     
-    return true;
+    return RBCommand.STOP_CMD_SEARCH;
   }
   
   @Override
-  public void setupCommand() {
-    // TODO Auto-generated method stub
-    
+  public boolean requiresDirectMessage() {
+    return true;
   }
 }

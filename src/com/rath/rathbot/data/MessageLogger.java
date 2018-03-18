@@ -1,7 +1,6 @@
 
 package com.rath.rathbot.data;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

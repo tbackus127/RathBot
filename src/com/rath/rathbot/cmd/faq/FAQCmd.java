@@ -35,6 +35,9 @@ public class FAQCmd extends RBCommand {
   /** The command description. */
   private static final String FAQ_DESCR = "Allows the storing and recalling of text blocks.";
   
+  /** The usage message when the command has a syntactic or semantic error. */
+  private static final String FAQ_USAGE = "rb! faq <faqName>";
+  
   /** Reference to the faqMap file. */
   private static final File FAQ_FILE = new File(FAQ_DATA_PATH);
   
@@ -309,7 +312,7 @@ public class FAQCmd extends RBCommand {
       // Print the usage info if there aren't any arguments
       if (tokens.length <= 2) {
         rb.sendMessage(channel, "Usage: " + getCommandUsage());
-        return true;
+        return RBCommand.STOP_CMD_SEARCH;
       }
       
       // Either post the FAQ contents, or that it doesn't exist
@@ -320,7 +323,7 @@ public class FAQCmd extends RBCommand {
       }
     }
     
-    return true;
+    return RBCommand.STOP_CMD_SEARCH;
     
   }
   
@@ -338,7 +341,7 @@ public class FAQCmd extends RBCommand {
   
   @Override
   public String getCommandUsage() {
-    return "rb! faq <faqName> <message>";
+    return FAQ_USAGE;
   }
   
   @Override
@@ -351,6 +354,11 @@ public class FAQCmd extends RBCommand {
   public void setupCommand() {
     initFAQ();
     saveFAQMap();
+  }
+  
+  @Override
+  public boolean requiresDirectMessage() {
+    return false;
   }
   
 }

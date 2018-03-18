@@ -128,6 +128,7 @@ public class RathBot {
     
     System.out.println("Logging out...");
     client.logout();
+    MessageLogger.closeStreams();
   }
   
   /**

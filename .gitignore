@@ -4,6 +4,7 @@
 *.conf
 /lib/
 /dat/
+/logs/
 
 # Compiled class file
 *.class

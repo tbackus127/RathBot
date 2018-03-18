@@ -48,6 +48,7 @@ public class EventHandler {
     // TODO: do spam filtering stuff here
     
     // TODO: do message logging here
+    MessageLogger.logMessage(message);
   }
   
   /**

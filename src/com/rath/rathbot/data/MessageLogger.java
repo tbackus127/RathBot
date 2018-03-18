@@ -2,8 +2,10 @@
 package com.rath.rathbot.data;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 
@@ -30,6 +32,9 @@ public class MessageLogger {
   /** Maps a channel to its PrintStream. */
   private static HashMap<IChannel, PrintStream> printStreamMap = null;
   
+  /** If the logger is initialized yet. */
+  private static boolean isLoggerReady = false;
+  
   /**
    * Populates the PrintStream map.
    * 
@@ -47,16 +52,28 @@ public class MessageLogger {
       try {
         
         // Create a new PrintStream with its correct channel name and map it from its IChannel
-        final PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(filePath, true)));
+        final File file = new File(filePath);
+        if (!file.exists()) {
+          System.out.println("Creating new file " + filePath);
+          file.createNewFile();
+        }
+        
+        if (!file.canWrite()) {
+          System.err.println("Cannot write to file!");
+        }
+        
+        final PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(file, true)));
         result.put(chMap.get(s), ps);
         
       } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
         e.printStackTrace();
       }
     }
     
     printStreamMap = result;
-    
+    isLoggerReady = true;
   }
   
   /**
@@ -65,6 +82,12 @@ public class MessageLogger {
    * @param msg the IMessage event caught by the EventHandler.
    */
   public static final void logMessage(final IMessage msg) {
+    
+    if (!isLoggerReady) {
+      return;
+    }
+    
+    System.out.println("Logging.");
     
     // Unpack IMessage object
     final IChannel channel = msg.getChannel();

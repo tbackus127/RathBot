@@ -110,6 +110,15 @@ public class PermissionsTable {
   }
   
   /**
+   * Gets the reference to the permissions table.
+   * 
+   * @return the permissions table as a TreeMap.
+   */
+  public static final TreeMap<Long, Integer> getPermMap() {
+    return permMap;
+  }
+  
+  /**
    * Saves the permission table to the hard disk.
    */
   public static final void savePerms() {
@@ -191,7 +200,6 @@ public class PermissionsTable {
     // Cast the read object to a TreeMap
     if (obj instanceof TreeMap) {
       permMap = (TreeMap<Long, Integer>) obj;
-      System.out.println("Read successfully.");
     } else {
       System.err.println("Error with loading. Creating new table.");
       permMap = new TreeMap<Long, Integer>();

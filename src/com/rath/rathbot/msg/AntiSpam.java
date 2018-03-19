@@ -18,7 +18,7 @@ public class AntiSpam {
   public static final boolean IGNORE_IMAGE_POSTS = true;
   
   /** Cooldown between spam warnings, in seconds. */
-  public static final int WARN_COOLDOWN_SEC = 5;
+  public static final int WARN_COOLDOWN_SEC = 8;
   // TODO: ^ Impliment this.
   
   /** Mute durations, in seconds. 10s, 5m, 1hr, 24hr */
@@ -26,19 +26,19 @@ public class AntiSpam {
   // TODO: ^ And this. When muted, their messages are immediately deleted.
   
   /** How many messages a user needs to send while muted to be kicked. */
-  public static final int MUTE_KICK_THRESHOLD = 8;
+  public static final int MUTE_KICK_THRESHOLD = 10;
   // TODO: ^ If they keep spamming, they get kicked.
   
   /**
    * How many messages trigger spam protection for the amount of time indicated by the same index of
    * TRIGGER_RATE_TIMEOUT_SECS.
    */
-  private static final int[] TRIGGER_RATE_MSG_COUNTS = { 15, 12 }; // 15, 12
+  private static final int[] TRIGGER_RATE_MSG_COUNTS = { 15, 12 };
   
   /**
    * The amount of time that anti-spam can trigger for the counts defined in the same index of TRIGGER_RATE_MSG_COUNTS.
    */
-  private static final int[] TRIGGER_RATE_TIMEOUT_SECS = { 3, 5 }; // 3, 5
+  private static final int[] TRIGGER_RATE_TIMEOUT_SECS = { 3, 5 };
   
   /**
    * The maximum number of messages to keep in a user's history. This should be the maximum value in

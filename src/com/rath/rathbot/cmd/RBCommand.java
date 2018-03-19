@@ -275,5 +275,7 @@ Required permission levels are in parentheses preceded by 'P': "(P4)" means the 
 * Mod/Admin-only commands
 ** Must be done through a private message to RathBot
 
+:: Other Things to Implement ::
+> Track emoji use (for pruning unused ones)
 */
 // @formatter:on

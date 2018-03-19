@@ -3,7 +3,9 @@ package com.rath.rathbot.data;
 
 import java.util.TreeMap;
 
-public class UserInfractions {
+import com.rath.rathbot.disc.InfractionData;
+
+public class InfractionsTable {
   
   private static TreeMap<Long, InfractionData> infractionMap = new TreeMap<Long, InfractionData>();
   

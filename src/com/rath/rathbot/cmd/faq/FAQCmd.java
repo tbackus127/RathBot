@@ -51,8 +51,6 @@ public class FAQCmd extends RBCommand {
    */
   private static final void initFAQ() {
     
-    System.out.println("faqMap init");
-    
     // If the file doesn't exist, create it
     if (!FAQ_FILE.exists()) {
       System.out.println("  File " + FAQ_FILE.getAbsolutePath() + " doesn't exist, creating.");
@@ -122,7 +120,6 @@ public class FAQCmd extends RBCommand {
     // Cast the read object to a TreeMap
     if (obj instanceof TreeMap) {
       faqMap = (TreeMap<String, String>) obj;
-      System.out.println("Read successfully.");
     } else {
       System.err.println("Error with loading. Creating new table.");
       faqMap = new TreeMap<String, String>();

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.rath.rathbot.cmd.HelpCmd;
 import com.rath.rathbot.cmd.RBCommand;
@@ -160,19 +161,21 @@ public class RathBot {
     System.out.println("Logging in... ");
     login();
     while (!client.isReady()) {}
-    System.out.println("DONE");
+    System.out.println("Successfully logged in.");
     
     // Change the playing text to the default
     client.changePresence(StatusType.ONLINE, ActivityType.PLAYING, DEFAULT_PLAYING_TEXT);
     
     // For each channel, add a mapping from its name to its ID
+    System.out.println("Building channel map...");
     final List<IChannel> channels = client.getChannels();
     final HashMap<String, IChannel> result = new HashMap<String, IChannel>();
     for (IChannel c : channels) {
       final String name = c.getName();
-      System.out.println("Added channel #" + name + " -> " + c.getLongID() + ".");
+      System.out.println("  Added channel #" + name + " -> " + c.getLongID() + ".");
       result.put(name, c);
     }
+    System.out.println("Channel map successfully built.");
     return result;
   }
   
@@ -196,7 +199,7 @@ public class RathBot {
    * @param cmd the RBCommand to add.
    */
   private void addAndInitializeCommand(final RBCommand cmd) {
-    System.out.print("Initializing command " + cmd.getCommandName() + "...");
+    System.out.print("Initializing command " + cmd.getCommandName() + "... ");
     cmd.setupCommand();
     commandSet.add(cmd);
     System.out.println("DONE");
@@ -209,6 +212,8 @@ public class RathBot {
    * @param cin reference to System.in.
    */
   private static final void getConsoleCommands(final RathBot bot, final Scanner cin) {
+    
+    System.out.println("Now receiving commands.");
     
     // Command interface
     while (cin.hasNextLine()) {
@@ -279,8 +284,19 @@ public class RathBot {
           }
         break;
       
+        // List permissions
+        case "perms":
+          if (tokens.length == 1) {
+            final TreeMap<Long, Integer> permMap = PermissionsTable.getPermMap();
+            for (final long uid : permMap.keySet()) {
+              System.out.println(RathBot.getClient().getUserByID(uid).getName() + ": " + permMap.get(uid));
+            }
+          }
+        break;
+      
         default:
           System.out.println("Command not recognized.");
+          
       }
     }
   }
@@ -356,7 +372,7 @@ public class RathBot {
     final IDiscordClient client = new ClientBuilder().withPingTimeout(5).withToken(token).build();
     final RathBot bot = new RathBot(client);
     client.getDispatcher().registerListener(new EventHandler(bot));
-    System.out.println("DONE");
+    System.out.println("Startup complete!");
     
     // Get commands from terminal
     Scanner cin = new Scanner(System.in);

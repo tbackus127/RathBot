@@ -12,6 +12,7 @@ import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.cmd.admin.UIDCmd;
 import com.rath.rathbot.cmd.faq.FAQCmd;
+import com.rath.rathbot.disc.Infractions;
 import com.rath.rathbot.log.MessageLogger;
 
 import sx.blah.discord.api.ClientBuilder;
@@ -41,11 +42,11 @@ public class RathBot {
   /** A list of commands to initialize. */
   private static final RBCommand[] commandList = { new FAQCmd(), new UIDCmd() };
   
-  /** A map from channel name to ID. */
-  public static TreeMap<String, IChannel> channelMap;
-  
   /** Reference to the client. */
   private static IDiscordClient client = null;
+  
+  /** A map from channel name to ID. */
+  private static TreeMap<String, IChannel> channelMap;
   
   /** The set of commands this bot responds to. */
   private final TreeMap<String, RBCommand> commandMap;
@@ -57,14 +58,15 @@ public class RathBot {
    */
   public RathBot(final IDiscordClient client) {
     
-    RathBot.client = client;
-    
     // Log in and build the channel map
+    RathBot.client = client;
     RathBot.channelMap = buildChannelMap(client);
     
     // Load and initialize everything
+    // TODO: Add more stuff here
     MessageLogger.initPrintStreamMap(channelMap);
     PermissionsTable.loadPerms();
+    Infractions.loadFromFile();
     
     // Build the command set and initialize the commands
     this.commandMap = new TreeMap<String, RBCommand>();

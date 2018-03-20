@@ -57,8 +57,12 @@ public class InfractionData implements Serializable {
   
   /**
    * Increments the user's warn count.
+   * 
+   * @param time the epoch time the user was warned.
+   * @param reason the reason the user is being warned.
    */
-  public final void warn() {
+  public final void warn(final long time, final String reason) {
+    this.history.add(new InfractionEntry(PunishmentType.WARN, time, reason));
     this.warnCount++;
   }
   
@@ -116,16 +120,24 @@ public class InfractionData implements Serializable {
   
   /**
    * Sets a user's muted status to true and increments the mute count.
+   * 
+   * @param time the epoch time the user was muted.
+   * @param reason the reason the user is being muted.
    */
-  public final void mute() {
+  public final void mute(final long time, final String reason) {
+    this.history.add(new InfractionEntry(PunishmentType.MUTE, time, reason));
     this.muteCount++;
     setMuted(true);
   }
   
   /**
    * Increments a user's kick count.
+   * 
+   * @param time the epoch time the user was kicked.
+   * @param the reason the user is being kicked.
    */
-  public final void kick() {
+  public final void kick(final long time, final String reason) {
+    this.history.add(new InfractionEntry(PunishmentType.KICK, time, reason));
     this.kickCount++;
   }
   
@@ -147,8 +159,12 @@ public class InfractionData implements Serializable {
   
   /**
    * Sets a user's banned status to true and increments the ban count.
+   * 
+   * @param time the epoch time the user was banned.
+   * @param reason the reason the user is being banned.
    */
-  public final void ban() {
+  public final void ban(final long time, final String reason) {
+    this.history.add(new InfractionEntry(PunishmentType.BAN, time, reason));
     this.banCount++;
     setBanned(true);
   }

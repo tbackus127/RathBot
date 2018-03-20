@@ -22,7 +22,7 @@ public class Infractions {
   private static final String INFRACTIONS_DATA_PATH = RathBot.DIR_DATA + INFRACTIONS_DATA_FILENAME;
   
   /** The infractions table for each user. */
-  private static TreeMap<Long, InfractionData> infractionMap = new TreeMap<Long, InfractionData>();
+  private static TreeMap<Long, InfractionData> infractionMap = null;
   
   /** Reference to the infractions map file. */
   private static final File INFRACTIONS_FILE = new File(INFRACTIONS_DATA_PATH);
@@ -51,9 +51,12 @@ public class Infractions {
    * Sets the user's warn status and increments their warn count.
    * 
    * @param user the Discord unique long ID.
+   * @param time the epoch time the user was warned.
+   * @param reason the reason the user is being warned.
    */
-  public static final void warnUser(final long user) {
-    infractionMap.get(user).warn();
+  public static final void warnUser(final long user, final long time, final String reason) {
+    infractionMap.get(user).warn(time, reason);
+    saveToFile();
   }
   
   /**
@@ -84,15 +87,19 @@ public class Infractions {
    */
   public static final void setMuted(final long user, final boolean b) {
     infractionMap.get(user).setMuted(b);
+    saveToFile();
   }
   
   /**
    * Sets a the user's muted status to true and increments their mute count.
    * 
    * @param user the Discord unique long ID.
+   * @param time the epoch time the user was muted.
+   * @param reason the reason the user is being muted.
    */
-  public static final void muteUser(final long user) {
-    infractionMap.get(user).mute();
+  public static final void muteUser(final long user, final long time, final String reason) {
+    infractionMap.get(user).mute(time, reason);
+    saveToFile();
   }
   
   /**
@@ -109,9 +116,12 @@ public class Infractions {
    * Setsu the user's kicked status to true and increments their kick count.
    * 
    * @param user the Discord unique long ID.
+   * @param time the epoch time the user was kicked.
+   * @param reason the reason the user is being kicked.
    */
-  public static final void kickUser(final long user) {
-    infractionMap.get(user).kick();
+  public static final void kickUser(final long user, final long time, final String reason) {
+    infractionMap.get(user).kick(time, reason);
+    saveToFile();
   }
   
   /**
@@ -142,21 +152,26 @@ public class Infractions {
    */
   public static final void setBanned(final long user, final boolean b) {
     infractionMap.get(user).setBanned(b);
+    saveToFile();
   }
   
   /**
    * Sets the user's banned status to true and increments their ban count.
    * 
    * @param user the Discord unique long ID.
+   * @param time the epoch time the user was banned.
+   * @param reason the reason the user is being banned.
    */
-  public static final void banUser(final long user) {
-    infractionMap.get(user).ban();
+  public static final void banUser(final long user, final long time, final String reason) {
+    infractionMap.get(user).ban(time, reason);
+    saveToFile();
   }
   
   /**
    * Saves the infractions table to disk.
    */
   public static final void saveToFile() {
+    
     System.out.println("Saving infractions map to file.");
     
     FileOutputStream fos = null;

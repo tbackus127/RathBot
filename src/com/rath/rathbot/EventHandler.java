@@ -1,6 +1,7 @@
 
 package com.rath.rathbot;
 
+import com.rath.rathbot.disc.Infractions;
 import com.rath.rathbot.log.MessageLogger;
 import com.rath.rathbot.msg.AntiSpam;
 import com.rath.rathbot.msg.SpamTrigger;
@@ -9,6 +10,7 @@ import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IUser;
 
 /**
  * This class handles bot events, such as reading messages and responsing to them.
@@ -20,7 +22,6 @@ public class EventHandler {
   
   /** The prefix for all commands. */
   private static final String COMMAND_PREFIX = "rb!";
-  
   
   /** A reference to the bot. */
   private final RathBot bot;
@@ -44,11 +45,23 @@ public class EventHandler {
     
     final IMessage message = event.getMessage();
     final IChannel channel = event.getChannel();
+    final IUser author = event.getAuthor();
     MessageLogger.logMessage(message);
     
     // Let's not respond to bots
-    if (event.getAuthor().isBot()) {
+    if (author.isBot()) {
       return;
+    }
+    
+    // Immediately delete muted users' messages
+    final long uid = author.getLongID();
+    if (Infractions.isMuted(uid)) {
+      
+      // TODO: If the mute time is over, unmute and let the user post again
+      // TODO: Else message.delete();
+      // Use AntiSpam.MUTE_DURATIONS[Infractions.getMuteCount(uid) - 1];
+      
+      message.delete();
     }
     
     // Spam filtering

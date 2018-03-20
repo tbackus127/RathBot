@@ -159,8 +159,6 @@ public class FAQCmd extends RBCommand {
    */
   public static final String getFaqList() {
     
-    System.out.println("getFaqList");
-    
     if (faqMap == null) {
       System.out.println("faqMap is null!");
       return null;

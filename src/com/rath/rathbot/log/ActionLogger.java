@@ -1,5 +1,5 @@
 
-package com.rath.rathbot.data;
+package com.rath.rathbot.log;
 
 /**
  * This class will log actions taken by the bot.

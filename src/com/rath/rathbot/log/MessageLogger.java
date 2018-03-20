@@ -1,5 +1,5 @@
 
-package com.rath.rathbot.data;
+package com.rath.rathbot.log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
@@ -37,14 +38,14 @@ public class MessageLogger {
   /**
    * Populates the PrintStream map.
    * 
-   * @param chMap a HashMap from IChannels to their respective PrintStreams.
+   * @param channelMap a HashMap from IChannels to their respective PrintStreams.
    */
-  public static final void initPrintStreamMap(final HashMap<String, IChannel> chMap) {
+  public static final void initPrintStreamMap(final TreeMap<String, IChannel> channelMap) {
     
     final HashMap<IChannel, PrintStream> result = new HashMap<IChannel, PrintStream>();
     
     // For every entry in the channel map
-    for (final String s : chMap.keySet()) {
+    for (final String s : channelMap.keySet()) {
       
       // Build log file path
       final String filePath = PATH_LOGS + LOG_PREFIX + s + LOG_SUFFIX;
@@ -57,12 +58,14 @@ public class MessageLogger {
           file.createNewFile();
         }
         
+        // Check if the log file is unwritable
         if (!file.canWrite()) {
           System.err.println("Cannot write to file!");
+          return;
         }
         
         final PrintStream ps = new PrintStream(new FileOutputStream(file, true));
-        result.put(chMap.get(s), ps);
+        result.put(channelMap.get(s), ps);
         
       } catch (FileNotFoundException e) {
         e.printStackTrace();

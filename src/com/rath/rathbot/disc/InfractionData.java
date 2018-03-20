@@ -51,8 +51,15 @@ public class InfractionData implements Serializable {
    * 
    * @return an int.
    */
-  public int getWarnCount() {
+  public final int getWarnCount() {
     return this.warnCount;
+  }
+  
+  /**
+   * Increments the user's warn count.
+   */
+  public final void warn() {
+    this.warnCount++;
   }
   
   /**
@@ -60,7 +67,7 @@ public class InfractionData implements Serializable {
    * 
    * @return an int.
    */
-  public int getMuteCount() {
+  public final int getMuteCount() {
     return this.muteCount;
   }
   
@@ -69,7 +76,7 @@ public class InfractionData implements Serializable {
    * 
    * @return an int.
    */
-  public int getKickCount() {
+  public final int getKickCount() {
     return this.kickCount;
   }
   
@@ -87,7 +94,7 @@ public class InfractionData implements Serializable {
    * 
    * @return an ArrayList of InfractionEntry's.
    */
-  public ArrayList<InfractionEntry> getHistory() {
+  public final ArrayList<InfractionEntry> getHistory() {
     return this.history;
   }
   
@@ -96,8 +103,30 @@ public class InfractionData implements Serializable {
    * 
    * @return a boolean.
    */
-  public boolean isMuted() {
-    return isMuted;
+  public final boolean isMuted() {
+    return this.isMuted;
+  }
+  
+  /**
+   * Sets the user's muted status.
+   */
+  public final void setMuted(final boolean b) {
+    this.isMuted = b;
+  }
+  
+  /**
+   * Sets a user's muted status to true and increments the mute count.
+   */
+  public final void mute() {
+    this.muteCount++;
+    setMuted(true);
+  }
+  
+  /**
+   * Increments a user's kick count.
+   */
+  public final void kick() {
+    this.kickCount++;
   }
   
   /**
@@ -105,7 +134,23 @@ public class InfractionData implements Serializable {
    * 
    * @return a boolean.
    */
-  public boolean isBanned() {
-    return isBanned;
+  public final boolean isBanned() {
+    return this.isBanned;
   }
+  
+  /**
+   * Sets the user's banned status.
+   */
+  public final void setBanned(final boolean b) {
+    this.isBanned = b;
+  }
+  
+  /**
+   * Sets a user's banned status to true and increments the ban count.
+   */
+  public final void ban() {
+    this.banCount++;
+    setBanned(true);
+  }
+  
 }

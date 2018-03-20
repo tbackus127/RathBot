@@ -3,19 +3,16 @@ package com.rath.rathbot;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.TreeMap;
 
 import com.rath.rathbot.cmd.HelpCmd;
+import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.cmd.admin.UIDCmd;
 import com.rath.rathbot.cmd.faq.FAQCmd;
-import com.rath.rathbot.data.MessageLogger;
-import com.rath.rathbot.data.PermissionsTable;
+import com.rath.rathbot.log.MessageLogger;
 
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
@@ -45,13 +42,13 @@ public class RathBot {
   private static final RBCommand[] commandList = { new FAQCmd(), new UIDCmd() };
   
   /** A map from channel name to ID. */
-  public static HashMap<String, IChannel> channelMap;
+  public static TreeMap<String, IChannel> channelMap;
   
   /** Reference to the client. */
   private static IDiscordClient client = null;
   
   /** The set of commands this bot responds to. */
-  private final Set<RBCommand> commandSet;
+  private final TreeMap<String, RBCommand> commandMap;
   
   /**
    * Default constructor.
@@ -70,7 +67,7 @@ public class RathBot {
     PermissionsTable.loadPerms();
     
     // Build the command set and initialize the commands
-    this.commandSet = new HashSet<RBCommand>();
+    this.commandMap = new TreeMap<String, RBCommand>();
     for (int i = 0; i < commandList.length; i++) {
       addAndInitializeCommand(commandList[i]);
     }
@@ -118,9 +115,9 @@ public class RathBot {
    * 
    * @return a Set of RBCommands.
    */
-  public Set<RBCommand> getCommandSet() {
+  public TreeMap<String, RBCommand> getCommandMap() {
     
-    return this.commandSet;
+    return this.commandMap;
   }
   
   /**
@@ -155,7 +152,7 @@ public class RathBot {
    * @param client the logged-in client instance.
    * @return a HashMap of type String -> Long.
    */
-  private final HashMap<String, IChannel> buildChannelMap(final IDiscordClient client) {
+  private final TreeMap<String, IChannel> buildChannelMap(final IDiscordClient client) {
     
     // Log in and wait until ready to receive commands
     System.out.println("Logging in... ");
@@ -166,11 +163,13 @@ public class RathBot {
     // Change the playing text to the default
     client.changePresence(StatusType.ONLINE, ActivityType.PLAYING, DEFAULT_PLAYING_TEXT);
     
-    // For each channel, add a mapping from its name to its ID
+    // Initialize channel structures
     System.out.println("Building channel map...");
     final List<IChannel> channels = client.getChannels();
-    final HashMap<String, IChannel> result = new HashMap<String, IChannel>();
-    for (IChannel c : channels) {
+    final TreeMap<String, IChannel> result = new TreeMap<String, IChannel>();
+    
+    // For each channel, add a mapping from its name to its ID
+    for (final IChannel c : channels) {
       final String name = c.getName();
       System.out.println("  Added channel #" + name + " -> " + c.getLongID() + ".");
       result.put(name, c);
@@ -187,8 +186,8 @@ public class RathBot {
   private HelpCmd buildHelpCommand() {
     
     final HelpCmd result = new HelpCmd();
-    for (RBCommand cmd : commandSet) {
-      result.addCommandEntry(cmd.getCommandName(), cmd);
+    for (String cmdName : commandMap.keySet()) {
+      result.addCommandEntry(cmdName, commandMap.get(cmdName));
     }
     return result;
   }
@@ -201,7 +200,7 @@ public class RathBot {
   private void addAndInitializeCommand(final RBCommand cmd) {
     System.out.print("Initializing command " + cmd.getCommandName() + "... ");
     cmd.setupCommand();
-    commandSet.add(cmd);
+    this.commandMap.put(cmd.getCommandName(), cmd);
     System.out.println("DONE");
   }
   

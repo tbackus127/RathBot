@@ -1,5 +1,5 @@
 
-package com.rath.rathbot.data;
+package com.rath.rathbot.cmd;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +11,6 @@ import java.io.ObjectOutputStream;
 import java.util.TreeMap;
 
 import com.rath.rathbot.RathBot;
-import com.rath.rathbot.cmd.RBCommand;
 
 /**
  * This class holds each user's permission level. Certain commands require a specific level to execute.
@@ -22,7 +21,10 @@ import com.rath.rathbot.cmd.RBCommand;
 public class PermissionsTable {
   
   /** The filename for the permission data. */
-  private static final String PERM_DATA_PATH = RathBot.DIR_DATA + "perms.dat";
+  private static final String PERM_DATA_FILENAME = "perms.dat";
+  
+  /** The path for the permission data. */
+  private static final String PERM_DATA_PATH = RathBot.DIR_DATA + PERM_DATA_FILENAME;
   
   /** The default permissions level new users are added with. */
   private static final int DEFAULT_PERM_LEVEL = RBCommand.PERM_STANDARD;
@@ -161,7 +163,7 @@ public class PermissionsTable {
     // Create the file if it doesn't exist.
     if (!PERM_FILE.exists()) {
       try {
-        System.out.println("FAQ file doesn't exist. Creating new.");
+        System.out.println("Permissions file doesn't exist. Creating new.");
         PERM_FILE.createNewFile();
       } catch (IOException e) {
         e.printStackTrace();
@@ -181,7 +183,7 @@ public class PermissionsTable {
         fis.close();
         
       } else {
-        System.err.println("FAQ map is empty.");
+        System.err.println("Permissions map is empty.");
       }
       
     } catch (FileNotFoundException e) {
@@ -194,7 +196,7 @@ public class PermissionsTable {
     
     // If something went wrong, return null
     if (fis == null || oin == null) {
-      System.err.println("FAQ map load error.");
+      System.err.println("Permissions map load error.");
     }
     
     // Cast the read object to a TreeMap

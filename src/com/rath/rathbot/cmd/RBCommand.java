@@ -6,7 +6,6 @@ package com.rath.rathbot.cmd;
 import java.util.Set;
 
 import com.rath.rathbot.RathBot;
-import com.rath.rathbot.data.PermissionsTable;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -95,7 +94,7 @@ public abstract class RBCommand {
   public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
     
-    System.out.println("In executeCommand() for " + this.getCommandName() + "with td=" + tokenDepth);
+    System.out.println("In executeCommand() for " + this.getCommandName() + " with td=" + tokenDepth);
     
     // Check this command's subcommands for a match, and return the matched command
     final RBCommand cmd = checkSubcommands(getSubcommands(), tokens, tokenDepth);

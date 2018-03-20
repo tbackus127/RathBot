@@ -87,36 +87,29 @@ public class AntiSpam {
    */
   public static final boolean checkMessageRate(final IMessage msg) {
     
-    // System.out.println("Checking message rate.");
-    
+    // Get the author's message history
     final long authorID = msg.getAuthor().getLongID();
     final ArrayList<MessageTrackerEntry> messageHistory = trackerEntries.get(authorID);
     
+    // Iterate through their history
     for (int i = 0; i < TRIGGER_RATE_MSG_COUNTS.length; i++) {
-      
-      // System.out.println(" For " + TRIGGER_RATE_MSG_COUNTS[i] + "x in " + TRIGGER_RATE_TIMEOUT_SECS[i] + "s");
       
       // Check if there are enough messages to check the rate thresholds
       final int historySize = messageHistory.size();
       if (historySize >= TRIGGER_RATE_MSG_COUNTS[i]) {
         
-        // System.out.println(" " + historySize + ":" + TRIGGER_RATE_MSG_COUNTS[i]);
-        
         // Compute number of seconds between message counts for each trigger
         final long start = messageHistory.get(TRIGGER_RATE_MSG_COUNTS[i] - 1).getTime();
         final long end = messageHistory.get(0).getTime();
-        // System.out.println(" Start = " + start);
-        // System.out.println(" End = " + end);
-        // System.out.println(" Delta = " + (end - start));
         
         // If the delta is greater than the threshold, trigger the spam protection
         if ((end - start) < TRIGGER_RATE_TIMEOUT_SECS[i]) {
-          // System.out.println(" !! Triggered !!");
           return true;
         }
       }
     }
     
+    // Protection did not trigger
     return false;
   }
   

@@ -1,8 +1,8 @@
 
 package com.rath.rathbot;
 
+import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
-import com.rath.rathbot.data.PermissionsTable;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -32,39 +32,36 @@ public class CommandParser {
     
     // Ensure the message isn't just the prefix
     if (tokens.length <= 1) {
-      System.out.println("Message length < 2. Stopping dispatch.");
       return;
     }
     
-    // Iterate through each command registered by the bot
-    for (RBCommand cmd : bot.getCommandSet()) {
-      
-      System.out.println("Checking root command \"" + tokens[1].trim() + "\" against command " + cmd.getCommandName());
-      
-      // Check the token after the prefix against commands until we find a match
-      if (tokens[1].trim().equalsIgnoreCase(cmd.getCommandName())) {
-        
-        final long userID = author.getLongID();
-        
-        // If the user doesn't have an entry on the permissions table, initialize them and save
-        if (!PermissionsTable.hasUser(userID)) {
-          PermissionsTable.initUser(userID);
-        }
-        
-        // Check permissions for this command.
-        if (PermissionsTable.getLevel(userID) >= cmd.permissionLevelRequired()) {
-          
-          // Execute the command that matches
-          cmd.executeCommand(bot, author, channel, tokens, 1);
-        } else {
-          System.out.println(
-              "User " + author.getName() + " tried to execute " + cmd.getCommandName() + " with permission level "
-                  + PermissionsTable.getLevel(userID) + " (" + cmd.permissionLevelRequired() + " required).");
-          bot.sendMessage(channel, "You do not have the required permissions for that command.");
-        }
-        
-        break;
-      }
+    // Extract the command name and command reference
+    final String cmdName = tokens[1].trim().toLowerCase();
+    final RBCommand cmd = bot.getCommandMap().get(cmdName);
+    
+    // If no command exists
+    if (cmd == null) {
+      // TODO: Post invalid command message
+      return;
     }
+    
+    // If the user doesn't have an entry on the permissions table, initialize them and save
+    final long userID = author.getLongID();
+    if (!PermissionsTable.hasUser(userID)) {
+      PermissionsTable.initUser(userID);
+    }
+    
+    // Check permissions for this command.
+    if (PermissionsTable.getLevel(userID) >= cmd.permissionLevelRequired()) {
+      
+      // Execute the command that matches
+      cmd.executeCommand(bot, author, channel, tokens, 1);
+    } else {
+      System.out
+          .println("User " + author.getName() + " tried to execute " + cmd.getCommandName() + " with permission level "
+              + PermissionsTable.getLevel(userID) + " (" + cmd.permissionLevelRequired() + " required).");
+      bot.sendMessage(channel, "You do not have the required permissions for that command.");
+    }
+    
   }
 }

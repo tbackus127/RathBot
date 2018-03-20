@@ -1,7 +1,7 @@
 
 package com.rath.rathbot;
 
-import com.rath.rathbot.data.MessageLogger;
+import com.rath.rathbot.log.MessageLogger;
 import com.rath.rathbot.msg.AntiSpam;
 import com.rath.rathbot.msg.SpamTrigger;
 

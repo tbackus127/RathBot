@@ -28,6 +28,25 @@ public class Infractions {
   private static final File INFRACTIONS_FILE = new File(INFRACTIONS_DATA_PATH);
   
   /**
+   * Gets whether the table has an entry for the given member.
+   * 
+   * @param user the Discord unique long ID.
+   * @return true if an entry exists; false if not.
+   */
+  public static final boolean hasMember(final long user) {
+    return infractionMap.containsKey(user);
+  }
+  
+  /**
+   * Populates the table with a new entry for the given user.
+   * 
+   * @param user the Discord unique long ID.
+   */
+  public static final void initMember(final long user) {
+    infractionMap.put(user, new InfractionData());
+  }
+  
+  /**
    * Gets the user's infraction history.
    * 
    * @param user the Discord unique long ID.
@@ -242,8 +261,11 @@ public class Infractions {
     }
     
     // If something went wrong, return null
-    if (fis == null || oin == null) {
+    if (obj == null || fis == null || oin == null) {
       System.err.println("Infractions map load error.");
+      infractionMap = new TreeMap<Long, InfractionData>();
+      saveToFile();
+      return;
     }
     
     // Cast the read object to a TreeMap

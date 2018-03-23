@@ -12,6 +12,8 @@ import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.cmd.admin.UIDCmd;
 import com.rath.rathbot.cmd.faq.FAQCmd;
+import com.rath.rathbot.cmd.userpunishments.MuteCmd;
+import com.rath.rathbot.cmd.userpunishments.UnmuteCmd;
 import com.rath.rathbot.disc.Infractions;
 import com.rath.rathbot.log.MessageLogger;
 
@@ -40,7 +42,7 @@ public class RathBot {
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
-  private static final RBCommand[] commandList = { new FAQCmd(), new UIDCmd() };
+  private static final RBCommand[] commandList = { new FAQCmd(), new UIDCmd(), new MuteCmd(), new UnmuteCmd() };
   
   /** Reference to the client. */
   private static IDiscordClient client = null;
@@ -149,6 +151,15 @@ public class RathBot {
   }
   
   /**
+   * Gets the reference to the channel map.
+   * 
+   * @return a TreeMap from String -> IChannel.
+   */
+  public static final TreeMap<String, IChannel> getChannelMap() {
+    return channelMap;
+  }
+  
+  /**
    * Builds a map of Channel Name -> Channel ID.
    * 
    * @param client the logged-in client instance.
@@ -185,7 +196,7 @@ public class RathBot {
    * 
    * @return the built HelpCmd.
    */
-  private HelpCmd buildHelpCommand() {
+  private final HelpCmd buildHelpCommand() {
     
     final HelpCmd result = new HelpCmd();
     for (String cmdName : commandMap.keySet()) {
@@ -204,102 +215,6 @@ public class RathBot {
     cmd.setupCommand();
     this.commandMap.put(cmd.getCommandName(), cmd);
     System.out.println("DONE");
-  }
-  
-  /**
-   * Starts the command line interpreter. Only supported on the local machine this bot is running on.
-   * 
-   * @param bot reference to the RathBot object.
-   * @param cin reference to System.in.
-   */
-  private static final void getConsoleCommands(final RathBot bot, final Scanner cin) {
-    
-    System.out.println("Now receiving commands.");
-    
-    // Command interface
-    while (cin.hasNextLine()) {
-      
-      // Split command into tokens
-      final String line = cin.nextLine();
-      final String[] tokens = line.split("\"?( |$)(?=(([^\"]*\"){2})*[^\"]*$)\"?");
-      if (tokens.length < 1) continue;
-      switch (tokens[0]) {
-        
-        // Logout
-        case "logout":
-          bot.logout();
-        break;
-      
-        // Change Now Playing status
-        case "np":
-          if (tokens.length >= 2) {
-            String npMessage = tokens[1];
-            for (int i = 2; i < tokens.length; i++) {
-              npMessage += " " + tokens[i];
-            }
-            bot.setPlaying(npMessage);
-          }
-        break;
-      
-        // Send a message to a specific channel
-        case "say":
-          if (tokens.length >= 3) {
-            final String channel = tokens[1];
-            String npMessage = tokens[2];
-            for (int i = 3; i < tokens.length; i++) {
-              npMessage += " " + tokens[i];
-            }
-            bot.sendMessage(RathBot.channelMap.get(channel), npMessage);
-          }
-        break;
-      
-        // Get userIDs for users that match the next argument
-        case "uid":
-          if (tokens.length == 2) {
-            final List<IUser> users = RathBot.client.getUsersByName(tokens[1], true);
-            for (final IUser u : users) {
-              System.out.println(u.getName() + ": " + u.getLongID());
-            }
-          }
-        break;
-      
-        // Manually set permissions for commands
-        case "perm":
-          if (tokens.length == 3) {
-            
-            long id = -1;
-            try {
-              id = Long.parseLong(tokens[1]);
-            } catch (NumberFormatException nfe) {
-              nfe.printStackTrace();
-            }
-            
-            int lvl = -1;
-            try {
-              lvl = Integer.parseInt(tokens[2]);
-            } catch (NumberFormatException nfe) {
-              nfe.printStackTrace();
-            }
-            
-            if (id > 0 && lvl > 0) PermissionsTable.updateUser(id, lvl);
-          }
-        break;
-      
-        // List permissions
-        case "perms":
-          if (tokens.length == 1) {
-            final TreeMap<Long, Integer> permMap = PermissionsTable.getPermMap();
-            for (final long uid : permMap.keySet()) {
-              System.out.println(RathBot.getClient().getUserByID(uid).getName() + ": " + permMap.get(uid));
-            }
-          }
-        break;
-      
-        default:
-          System.out.println("Command not recognized.");
-          
-      }
-    }
   }
   
   /**
@@ -377,7 +292,7 @@ public class RathBot {
     
     // Get commands from terminal
     Scanner cin = new Scanner(System.in);
-    getConsoleCommands(bot, cin);
+    ConsoleHandler.getConsoleCommands(bot, cin);
     
     // Clean everything up
     cin.close();

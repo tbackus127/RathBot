@@ -1,6 +1,9 @@
 
 package com.rath.rathbot;
 
+import java.util.List;
+
+import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.disc.Infractions;
 import com.rath.rathbot.log.MessageLogger;
 import com.rath.rathbot.msg.AntiSpam;
@@ -9,6 +12,8 @@ import com.rath.rathbot.msg.SpamTrigger;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IEmbed;
+import sx.blah.discord.handle.obj.IEmbed.IEmbedImage;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -43,50 +48,59 @@ public class EventHandler {
   @EventSubscriber
   public void onMessageReceived(MessageReceivedEvent event) {
     
-    final IMessage message = event.getMessage();
-    final IChannel channel = event.getChannel();
-    final IUser author = event.getAuthor();
-    MessageLogger.logMessage(message);
-    
     // Let's not respond to bots
+    final IUser author = event.getAuthor();
     if (author.isBot()) {
       return;
     }
     
-    // Immediately delete muted users' messages
+    // Unpack and log message
+    final IMessage message = event.getMessage();
+    MessageLogger.logMessage(message);
+    
+    // If the user isn't in the infractions table, initialize them
     final long uid = author.getLongID();
-    if (Infractions.isMuted(uid)) {
-      
-      // TODO: If the mute time is over, unmute and let the user post again
-      // TODO: Else message.delete();
-      // Use AntiSpam.MUTE_DURATIONS[Infractions.getMuteCount(uid) - 1];
-      
-      message.delete();
+    if (!Infractions.hasMember(uid)) {
+      Infractions.initMember(uid);
     }
     
-    // Spam filtering
-    final SpamTrigger trig = checkSpamType(message);
-    if (trig != null) {
-      switch (trig) {
+    // If the author is an owner, bypass anti-spam measures
+    if (PermissionsTable.getLevel(uid) < AntiSpam.PERM_LVL_IGNORE) {
+      
+      // Immediately delete muted users' messages
+      if (Infractions.isMuted(uid)) {
         
-        case MESSAGE_RATE:
+        // TODO: If the mute time is over, unmute and let the user post again
+        // TODO: Else message.delete();
+        // Use AntiSpam.MUTE_DURATIONS[Infractions.getMuteCount(uid) - 1];
+        
+        message.delete();
+        return;
+      }
+      
+      // Spam filtering
+      final IChannel channel = event.getChannel();
+      final SpamTrigger trig = checkSpamType(message);
+      if (trig != null) {
+        switch (trig) {
           
-          // TODO: Actually do stuff
-          this.bot.sendMessage(channel, "Message rate abuse triggered for " + message.getAuthor().getName()
-              + ". This doesn't do anything now, but will in the future.");
-          
-        break;
-        case REPEAT_MESSAGES:
-        
-        // TODO: Repeat messages warning and punishment
-        
-        break;
-        case JUNK_MESSAGES:
-        
-        // TODO: Junk messages warning and punishment
-        
-        break;
-        default:
+          case MESSAGE_RATE:
+            
+            // TODO: Actually do stuff
+            this.bot.sendMessage(channel, "Message rate abuse triggered for " + message.getAuthor().getName()
+                + ". This doesn't do anything now, but will in the future.");
+            
+          break;
+          case REPEAT_MESSAGES:
+            
+            // TODO: Actually do stuff
+            this.bot.sendMessage(channel, "Repeat message abuse triggered for " + message.getAuthor().getName()
+                + ". This doesn't do anything now, but will in the future.");
+            
+          break;
+          default:
+        }
+        return;
       }
     }
     
@@ -109,10 +123,23 @@ public class EventHandler {
   private final SpamTrigger checkSpamType(final IMessage msg) {
     
     AntiSpam.addEntry(msg);
+    
+    // Check if the post is just an image
+    final List<IEmbed> embeds = msg.getEmbeds();
+    if (embeds.size() == 1) {
+      
+      // Get the image, and if it's not null, it's an image post.
+      final IEmbedImage img = embeds.get(0).getImage();
+      if (img != null) {
+        return null;
+      }
+    }
+    
+    // Check message triggers
     if (AntiSpam.checkMessageRate(msg)) return SpamTrigger.MESSAGE_RATE;
     if (AntiSpam.checkRepeatMessages(msg)) return SpamTrigger.REPEAT_MESSAGES;
-    if (AntiSpam.checkJunkMessages(msg)) return SpamTrigger.JUNK_MESSAGES;
     
+    // If nothing triggered, return null
     return null;
   }
   

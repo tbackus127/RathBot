@@ -8,5 +8,5 @@ package com.rath.rathbot.msg;
  *
  */
 public enum SpamTrigger {
-  MESSAGE_RATE, REPEAT_MESSAGES, JUNK_MESSAGES
+  MESSAGE_RATE, REPEAT_MESSAGES
 }

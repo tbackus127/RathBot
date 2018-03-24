@@ -1,5 +1,5 @@
 
-package test.rath.rathbot.cmd.msg.faq;
+package test.rath.rathbot.cmd;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

@@ -35,7 +35,8 @@
 8. Ensure that JUnit is included in the project's build path, and create tests for it (Google "test-driven
    development" for more information). Place your tests in the same package name as your command, but replace "com"
    with "test". For example, if your class is located in "com.rath.rathbot.msg", your test will be located in
-   "test.rath.rathbot.msg". You can find the test packages in the "test" folder in the project root.
+   "test.rath.rathbot.msg". You can find the test packages in the "test" folder in the project root. If nothing
+   is possible to test, that's alright.
    
 9. Once you have a reasonable amount of test coverage where you can, begin coding your command. Don't forget to add
    helpful comments and document your command by filling out the Javadoc for your class itself, each of its fields,

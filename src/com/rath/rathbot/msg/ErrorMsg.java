@@ -22,9 +22,9 @@ public class ErrorMsg {
    */
   public static final void sendInvalidCmdMsg(final RathBot rb, final IChannel ch, final String cmd) {
     if (cmd == null) {
-      rb.sendMessage(ch, "Invalid command.");
+      RathBot.sendMessage(ch, "Invalid command.");
     } else {
-      rb.sendMessage(ch, "Invalid command: \"" + cmd + "\".");
+      RathBot.sendMessage(ch, "Invalid command: \"" + cmd + "\".");
     }
   }
   
@@ -35,7 +35,7 @@ public class ErrorMsg {
    * @param ch the channel to post the message on.
    */
   public static final void sendPermDeniedMsg(final RathBot rb, final IChannel ch) {
-    rb.sendMessage(ch, "You do not have permission to use that command.");
+    RathBot.sendMessage(ch, "You do not have permission to use that command.");
   }
   
 }

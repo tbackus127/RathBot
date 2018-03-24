@@ -1,0 +1,49 @@
+
+:: Planned Commands (prefix: "rb!") ::
+
+Required permission levels are in parentheses preceded by 'P': "(P4)" means the command requires level 4+.
+
+> Fun
+[ ] poll
+  [ ] (P3) create <title> <time> <exc(lusive)/multi(-choice)> {options[;,]}: Creates a poll with the specified title
+      for the specified length of time ("3m20s" would be 3 minutes and 20 seconds). Poll options are
+      semicolon-separated and there must be at least two choices. Choices will be numbered for easy voting.
+  [ ] (P1) vote <choices,>: Casts a vote for a choice or multiple comma-separated choices if enabled
+  [ ] (P2) close: closes the currently open poll
+[ ] (P2) sachis <user>: Posts how many Sachis $user has (server's currency, because Sachi is Best Grisaia Girl)
+  [ ] (P4) add* <user> <amount>: Adds $amount Sachis to $user's account.
+  [ ] (P2) give <user> <amount>: Transfers $amount Sachis to
+  [ ] (P5) allowance* <user> <amount>: Changes the daily Sachi allowance for $member to $amount
+[ ] (P2) react <name>: Posts the reaction image named $name. Due to the possibility of registering potentially large
+    images, Rath will add these manually. They can be hot-swapped while the bot is running.
+
+> Info
+[X] (P1) help [command]: Posts the commands list if $command is not given; otherwise, posts the help text for $command.
+[X] (P2) faq <name>: posts the contents of the $name FAQ
+  [X] (P2) list: lists all stored FAQs
+  [X] (P3) edit* <name> <content..>: Edits the contents of FAQ $name to $content, or creates it if it does not exist
+  [X] (P4) remove* <name>: Removes a FAQ from memory.
+[ ] (P1) uid**: Gets the internal ID for a user. This is needed for anonymous reports.
+[ ] memstats
+  [ ] (P2) memtime <user>: Post how long $user has been a member of this server.
+
+> Administrative
+[ ] (P1) report** <UID> <reason..>: Only accepted through a PM. Reports the member with UID = $uid for $reason. The
+    report will get posted in #report and will be logged.
+[ ] (P4) kick* <username> <reason..>: Kicks $username
+[ ] (P5) ban* <username> <time+> <reason..>: Bans $username.
+[ ] (P4) mute* <username> <time+> <reason..>: $username's new messages will be immediately deleted for $time. Posting
+    too many messages during this time will result in a kick. A $reason may be given.
+[ ] (P1) rule <X.Y.Z>: Posts rule X.Y.Z. Example: "rb! rule 14.1" will post "14.1: The Discord EULA overrides all rules
+    set forth by this server."
+
+> Bot-related
+[ ] (P6) perm* <uid> <level>: Sets the user with UID=$uid to $level.
+[ ] (P7) shutdown: Shuts the bot down as a last resort in case something goes haywire.
+[ ] (P7) restart: Shuts the bot down and starts it back up.
+[ ] (P7) rebuild: Deletes all saved data structures and rebuilds them.
+[ ] (P3) running: Posts how long the bot has been running.
+
+
+* Mod/Admin-only commands
+** Must be done through a private message to RathBot

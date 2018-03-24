@@ -15,10 +15,9 @@ public class ConsoleHandler {
   /**
    * Starts the command line interpreter. Only supported on the local machine this bot is running on.
    * 
-   * @param bot reference to the RathBot object.
    * @param cin reference to System.in.
    */
-  public static final void getConsoleCommands(final RathBot bot, final Scanner cin) {
+  public static final void getConsoleCommands(final Scanner cin) {
     
     System.out.println("Now receiving commands.");
     
@@ -33,7 +32,7 @@ public class ConsoleHandler {
         
         // Logout
         case "logout":
-          bot.logout();
+          RathBot.logout();
         break;
       
         // Change Now Playing status
@@ -43,7 +42,7 @@ public class ConsoleHandler {
             for (int i = 2; i < tokens.length; i++) {
               npMessage += " " + tokens[i];
             }
-            bot.setPlaying(npMessage);
+            RathBot.setPlaying(npMessage);
           }
         break;
       
@@ -55,7 +54,7 @@ public class ConsoleHandler {
             for (int i = 3; i < tokens.length; i++) {
               npMessage += " " + tokens[i];
             }
-            bot.sendMessage(RathBot.getChannelMap().get(channel), npMessage);
+            RathBot.sendMessage(RathBot.getChannelMap().get(channel), npMessage);
           }
         break;
       

@@ -1,0 +1,21 @@
+
+:: Command Package Descriptions ::
+
+Please keep the packages in alphabetical order.
+
+
+
+cmd.admin
+  Commands that act on member statistics, internal variable manipulation, and other administrative actions.
+
+cmd.disc
+  Commands that relate to server rules and handle disciplinary actions against users.
+  
+  cmd.disc.actions
+    Commands that handle disciplinary actions.
+  
+cmd.msg
+  Commands that interact with or handle messages.
+  
+cmd.users
+  Commands that store and manipulate user-specific data.

@@ -1,5 +1,5 @@
 
-package com.rath.rathbot.cmd.faq;
+package com.rath.rathbot.cmd.msg.faq;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
@@ -40,7 +40,17 @@ public class FAQRemoveCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
+  public int permissionLevelRequired() {
+    return RBCommand.PERM_MODERATOR;
+  }
+  
+  @Override
+  public boolean requiresDirectMessage() {
+    return false;
+  }
+  
+  @Override
+  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
     
     System.out.println("Executing faq.remove");
@@ -55,25 +65,15 @@ public class FAQRemoveCmd extends RBCommand {
         
         // Remove and send confirmation
         FAQCmd.removeFaq(faqName);
-        rb.sendMessage(channel, "FAQ \"" + faqName + "\" removed.");
+        RathBot.sendMessage(channel, "FAQ \"" + faqName + "\" removed.");
       } catch (FAQNotFoundException e) {
         
         // Inform that it doesn't exist
-        rb.sendMessage(channel, "This FAQ doesn't exist.");
+        RathBot.sendMessage(channel, "This FAQ doesn't exist.");
       }
     }
     return RBCommand.STOP_CMD_SEARCH;
     
-  }
-  
-  @Override
-  public int permissionLevelRequired() {
-    return RBCommand.PERM_MODERATOR;
-  }
-  
-  @Override
-  public boolean requiresDirectMessage() {
-    return false;
   }
   
 }

@@ -1,10 +1,11 @@
 
-package com.rath.rathbot.cmd;
+package com.rath.rathbot.cmd.msg;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 import com.rath.rathbot.RathBot;
+import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.msg.MessageHelper;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -55,29 +56,6 @@ public class HelpCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
-      final int tokenDepth) {
-    
-    // If the bot only receives "rb! help", post the commands list
-    if (tokens.length <= 2) {
-      rb.sendMessage(channel, MessageHelper.buildCmdDescrMsg("Available commands:", helpCmdMap));
-    } else {
-      
-      // If the command sent for the 3rd token is a valid command, post its syntax
-      // TODO: Do subcommands, too
-      if (helpCmdMap.containsKey(tokens[2])) {
-        final String cmdDescr = helpCmdMap.get(tokens[2]).getCommandDescription();
-        rb.sendMessage(channel, tokens[2] + " - " + cmdDescr);
-      } else {
-        // TODO: Help entry not found
-      }
-      
-    }
-    
-    return RBCommand.STOP_CMD_SEARCH;
-  }
-  
-  @Override
   public int permissionLevelRequired() {
     return RBCommand.PERM_MINIMAL;
   }
@@ -85,6 +63,29 @@ public class HelpCmd extends RBCommand {
   @Override
   public boolean requiresDirectMessage() {
     return false;
+  }
+  
+  @Override
+  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
+      final int tokenDepth) {
+    
+    // If the bot only receives "rb! help", post the commands list
+    if (tokens.length <= 2) {
+      RathBot.sendMessage(channel, MessageHelper.buildCmdDescrMsg("Available commands:", helpCmdMap));
+    } else {
+      
+      // If the command sent for the 3rd token is a valid command, post its syntax
+      // TODO: Do subcommands, too
+      if (helpCmdMap.containsKey(tokens[2])) {
+        final String cmdDescr = helpCmdMap.get(tokens[2]).getCommandDescription();
+        RathBot.sendMessage(channel, tokens[2] + " - " + cmdDescr);
+      } else {
+        // TODO: Help entry not found
+      }
+      
+    }
+    
+    return RBCommand.STOP_CMD_SEARCH;
   }
   
 }

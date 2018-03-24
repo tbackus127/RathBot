@@ -1,5 +1,5 @@
 
-package com.rath.rathbot;
+package test.rath.rathbot.cmd.msg.faq;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.rath.rathbot.cmd.faq.FAQCmd;
+import com.rath.rathbot.cmd.msg.faq.FAQCmd;
 import com.rath.rathbot.exceptions.FAQNotFoundException;
 
 public class TestFAQCmd {

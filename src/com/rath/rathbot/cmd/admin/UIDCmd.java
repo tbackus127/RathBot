@@ -54,7 +54,7 @@ public class UIDCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
+  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
     
     // If there aren't enough commands, notify and stop
@@ -75,7 +75,7 @@ public class UIDCmd extends RBCommand {
     
     // Build the list and send the message
     final String matchesStr = MessageHelper.buildListString("Matches for " + userSearch + ":", matchList, true);
-    rb.sendMessage(channel, matchesStr);
+    RathBot.sendMessage(channel, matchesStr);
     
     return RBCommand.STOP_CMD_SEARCH;
   }

@@ -1,5 +1,5 @@
 
-package com.rath.rathbot.cmd.userpunishments;
+package com.rath.rathbot.cmd.disc.actions;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
@@ -51,12 +51,12 @@ public class UnmuteCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
+  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
     
     // Ensure proper token length
     if (tokens.length != 3) {
-      rb.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
+      RathBot.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
       return true;
     }
     
@@ -65,12 +65,12 @@ public class UnmuteCmd extends RBCommand {
     try {
       member = Long.parseLong(tokens[2]);
     } catch (NumberFormatException nfe) {
-      rb.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
+      RathBot.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
     Infractions.setMuted(member, false);
-    rb.sendMessage(channel, rb.getClient().getUserByID(member).getName() + " has been unmuted.");
+    RathBot.sendMessage(channel, RathBot.getClient().getUserByID(member).getName() + " has been unmuted.");
     
     return RBCommand.STOP_CMD_SEARCH;
   }

@@ -1,0 +1,25 @@
+
+Follow these coding conventions for this repository. If you make a pull request and your code doesn't follow these,
+  I will not accept the merge until you fix it.
+
+1. Curly braces go on the same line
+  Do this:
+  public int getInt() {
+    ...
+  }
+  
+  Not this:
+  public int getInt()
+  {
+    ...
+  }
+  
+  
+2. Do not use the tab character; use spaces in place of tabs.
+3. Set your tab width to 2 spaces.
+4. All classes, methods, fields, enums, interfaces, etc. must have Javadoc.
+5. Code should be well-commented. Explaining the code's purpose is better than explaining what it's doing; we can
+   read what it does. That being said, don't go overboard on the comments.
+6. Constants should be in all caps with underscores separating words.
+7. All methods and variables should be declared final unless they will be overriden or change.
+8. Use descriptive identifiers for methods, classes, variables, etc.

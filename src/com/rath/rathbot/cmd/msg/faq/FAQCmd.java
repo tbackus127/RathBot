@@ -1,5 +1,5 @@
 
-package com.rath.rathbot.cmd.faq;
+package com.rath.rathbot.cmd.msg.faq;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -296,25 +296,25 @@ public class FAQCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
+  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
     
     // If there are no subcommands for this command
-    if (!super.executeCommand(rb, author, channel, tokens, tokenDepth)) {
+    if (!super.executeCommand(author, channel, tokens, tokenDepth)) {
       
       System.out.println("Executing faq");
       
       // Print the usage info if there aren't any arguments
       if (tokens.length <= 2) {
-        rb.sendMessage(channel, "Usage: " + getCommandUsage());
+        RathBot.sendMessage(channel, "Usage: " + getCommandUsage());
         return RBCommand.STOP_CMD_SEARCH;
       }
       
       // Either post the FAQ contents, or that it doesn't exist
       if (faqMap.containsKey(tokens[2])) {
-        rb.sendMessage(channel, faqMap.get(tokens[2]));
+        RathBot.sendMessage(channel, faqMap.get(tokens[2]));
       } else {
-        rb.sendMessage(channel, "FAQ \"" + tokens[2] + "\" doesn't exist.");
+        RathBot.sendMessage(channel, "FAQ \"" + tokens[2] + "\" doesn't exist.");
       }
     }
     

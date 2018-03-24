@@ -1,7 +1,6 @@
 
-package com.rath.rathbot.cmd.admin;
+package com.rath.rathbot.cmd.disc;
 
-import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -34,7 +33,7 @@ public class ReportCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
+  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
     
     System.out.println("Executing report");

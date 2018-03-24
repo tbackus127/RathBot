@@ -1,5 +1,5 @@
 
-package com.rath.rathbot.cmd.faq;
+package com.rath.rathbot.cmd.msg.faq;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
@@ -37,17 +37,6 @@ public class FAQListCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
-      final int tokenDepth) {
-    
-    System.out.println("Executing faq.list");
-    rb.sendMessage(channel, FAQCmd.getFaqList());
-    
-    return RBCommand.STOP_CMD_SEARCH;
-    
-  }
-  
-  @Override
   public int permissionLevelRequired() {
     return RBCommand.PERM_STANDARD;
   }
@@ -55,6 +44,17 @@ public class FAQListCmd extends RBCommand {
   @Override
   public boolean requiresDirectMessage() {
     return false;
+  }
+  
+  @Override
+  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
+      final int tokenDepth) {
+    
+    System.out.println("Executing faq.list");
+    RathBot.sendMessage(channel, FAQCmd.getFaqList());
+    
+    return RBCommand.STOP_CMD_SEARCH;
+    
   }
   
 }

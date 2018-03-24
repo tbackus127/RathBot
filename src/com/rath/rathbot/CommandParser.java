@@ -17,13 +17,11 @@ public class CommandParser {
   /**
    * Parses and dispatches a command to the proper methods.
    * 
-   * @param bot reference to the RathBot instance.
    * @param channel the IChannel the bot received the message on.
    * @param author the author of the message as an IAuthor object.
    * @param message the message itself.
    */
-  public static final void parseCommand(final RathBot bot, final IChannel channel, final IUser author,
-      final String message) {
+  public static final void parseCommand(final IChannel channel, final IUser author, final String message) {
     
     System.out.println("Parsing command: \"" + message + "\".");
     
@@ -37,7 +35,7 @@ public class CommandParser {
     
     // Extract the command name and command reference
     final String cmdName = tokens[1].trim().toLowerCase();
-    final RBCommand cmd = bot.getCommandMap().get(cmdName);
+    final RBCommand cmd = RathBot.getCommandMap().get(cmdName);
     
     // If no command exists
     if (cmd == null) {
@@ -55,12 +53,12 @@ public class CommandParser {
     if (PermissionsTable.getLevel(userID) >= cmd.permissionLevelRequired()) {
       
       // Execute the command that matches
-      cmd.executeCommand(bot, author, channel, tokens, 1);
+      cmd.executeCommand(author, channel, tokens, 1);
     } else {
       System.out
           .println("User " + author.getName() + " tried to execute " + cmd.getCommandName() + " with permission level "
               + PermissionsTable.getLevel(userID) + " (" + cmd.permissionLevelRequired() + " required).");
-      bot.sendMessage(channel, "You do not have the required permissions for that command.");
+      RathBot.sendMessage(channel, "You do not have the required permissions for that command.");
     }
     
   }

@@ -1,5 +1,5 @@
 
-package com.rath.rathbot.cmd.lib;
+package com.rath.rathbot.cmd.msg.lib;
 
 /**
  * This command handles MadLib style copypasta.

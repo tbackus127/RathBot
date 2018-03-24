@@ -1,0 +1,11 @@
+
+:: Permission Levels ::
+
+7 - Sudo: Rath & Kami 
+6 - Admin: Administrators
+5 - Moderator: Moderators
+4 - Sub-mod: Moderators that are in a probationary period.
+3 - Trusted: Users who have shown they can be mature and won't abuse the more advanced features of the bot.
+2 - Standard: Normal users
+1 - Minimal: Users who require a restricted command set because of command abuse.
+0 - Forbid: Users who cannot use the bot.

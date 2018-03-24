@@ -1,0 +1,2 @@
+
+* Track emoji use (for pruning unused ones)

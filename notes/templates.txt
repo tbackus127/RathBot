@@ -1,0 +1,17 @@
+:: Command Templates ::
+
+> If the command has subcommands, you will need to add this method:
+@Override
+public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens, final int tokDepth) {
+  if (!super.executeCommand(author, channel, tokens, tokDepth)) {
+    [COMMAND BODY -- Executes if there are no sub-commands]
+  }  
+  return RBCommand.STOP_CMD_SEARCH;
+}
+
+> If the command does not have subcommands, you use this one:
+@Override
+public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens, final int tokDepth) {
+  [COMMAND BODY -- Executes unconditionally]
+  return RBCommand.STOP_CMD_SEARCH;
+}

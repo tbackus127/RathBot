@@ -1,5 +1,5 @@
 
-package com.rath.rathbot.cmd.userpunishments;
+package com.rath.rathbot.cmd.disc.actions;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.PermissionsTable;
@@ -54,12 +54,12 @@ public class MuteCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final RathBot rb, final IUser author, final IChannel channel, final String[] tokens,
+  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {
     
     // Ensure proper token length
     if (tokens.length != 4) {
-      rb.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
+      RathBot.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
       return true;
     }
     
@@ -68,18 +68,18 @@ public class MuteCmd extends RBCommand {
     try {
       member = Long.parseLong(tokens[2]);
     } catch (NumberFormatException nfe) {
-      rb.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
+      RathBot.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
     // If the issuer's permissions level is lower than or equal to the target's disallow the mute
     if (PermissionsTable.getLevel(author.getLongID()) <= PermissionsTable.getLevel(member)) {
-      rb.sendMessage(channel, "Cannot mute a member with a higher permission level.");
+      RathBot.sendMessage(channel, "Cannot mute a member with a higher permission level.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
     Infractions.setMuted(member, true);
-    rb.sendMessage(channel, rb.getClient().getUserByID(member).getName() + " has been muted.");
+    RathBot.sendMessage(channel, RathBot.getClient().getUserByID(member).getName() + " has been muted.");
     
     return RBCommand.STOP_CMD_SEARCH;
   }

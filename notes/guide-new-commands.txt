@@ -1,0 +1,45 @@
+
+:: How to Create and Add a New Command ::
+
+1. Decide which package your command belongs in. See notes/commands.txt for package descriptions. If your command
+   can be grouped with another similar command, you may create a sub-package within the correct command package.
+   If you believe your command doesn't fit any package listed or don't know which one it should be in, ask me and
+   I'll either tell you where it goes or suggest a new package name.
+     
+     Ex: You want to create a command that posts a lmgtfy.com link from the arguments. Since the entire purpose of
+         this command is to have the bot post a link, it is a message service. Thus, the correct package to place
+         your new command in is com.rath.rathbot.cmd.msg
+         
+2. Decide if your command will have any sub-commands. Sub-commands are commands contained within your command.
+   For example, 'edit' is a sub-command of 'faq' because 'faq edit' is the command to edit a saved FAQ. If your
+   command will have sub-commands, create a new package within the correct command package with your command's
+   name at the end.
+    
+3. Right click the package you will create your command in. Select New -> Class. Enter your command the bot will
+   respond to with its first letter capitalized, followed by "Cmd". For example, if your command is "lmgtfy", your
+   class will be called "LmgtfyCmd". If your command is also an acronym, it can also be capitalized, minus the
+   "Cmd" part. This isn't necessary, but I'd like to keep everything consistent.
+   
+4. Edit your class to inherit from RBCommand. Override all abstract methods in the parent class, and read the
+   Javadoc associated with them if you don't know what they do.
+   
+5. If your command has sub-commands, override getSubcommands(). This overridden method will need to return a Set
+   of RBCommand's, where each element is a reference to the sub-command's instantiation. A HashSet should be used
+   instead of a TreeSet since RBCommand is not comparable.
+   
+6. If your command requires a setup step, override setupCommand(). This method is called during the bot's startup,
+   so if there is any data that needs to be loaded from disk, do that here.
+   
+7. Override executeCommand() by copying a template from notes/templates.txt.
+
+8. Ensure that JUnit is included in the project's build path, and create tests for it (Google "test-driven
+   development" for more information). Place your tests in the same package name as your command, but replace "com"
+   with "test". For example, if your class is located in "com.rath.rathbot.msg", your test will be located in
+   "test.rath.rathbot.msg". You can find the test packages in the "test" folder in the project root.
+   
+9. Once you have a reasonable amount of test coverage where you can, begin coding your command. Don't forget to add
+   helpful comments and document your command by filling out the Javadoc for your class itself, each of its fields,
+   methods, and constructors. I will not accept a pull request if your code is not commented.
+
+
+

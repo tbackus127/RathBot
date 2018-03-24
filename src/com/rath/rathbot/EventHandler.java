@@ -28,18 +28,6 @@ public class EventHandler {
   /** The prefix for all commands. */
   private static final String COMMAND_PREFIX = "rb!";
   
-  /** A reference to the bot. */
-  private final RathBot bot;
-  
-  /**
-   * Default constructor.
-   * 
-   * @param bot a reference to an already-built RathBot.
-   */
-  public EventHandler(final RathBot bot) {
-    this.bot = bot;
-  }
-  
   /**
    * Message received handler.
    * 
@@ -87,14 +75,14 @@ public class EventHandler {
           case MESSAGE_RATE:
             
             // TODO: Actually do stuff
-            this.bot.sendMessage(channel, "Message rate abuse triggered for " + message.getAuthor().getName()
+            RathBot.sendMessage(channel, "Message rate abuse triggered for " + message.getAuthor().getName()
                 + ". This doesn't do anything now, but will in the future.");
             
           break;
           case REPEAT_MESSAGES:
             
             // TODO: Actually do stuff
-            this.bot.sendMessage(channel, "Repeat message abuse triggered for " + message.getAuthor().getName()
+            RathBot.sendMessage(channel, "Repeat message abuse triggered for " + message.getAuthor().getName()
                 + ". This doesn't do anything now, but will in the future.");
             
           break;
@@ -109,7 +97,7 @@ public class EventHandler {
     if (messageString.startsWith(COMMAND_PREFIX)) {
       
       // TODO: Spin up a new thread here so we can accept new commands while we process
-      CommandParser.parseCommand(this.bot, event.getChannel(), event.getAuthor(), messageString);
+      CommandParser.parseCommand(event.getChannel(), event.getAuthor(), messageString);
     }
     
   }

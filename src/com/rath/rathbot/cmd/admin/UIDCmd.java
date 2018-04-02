@@ -26,7 +26,7 @@ public class UIDCmd extends RBCommand {
   private static final String CMD_DESC = "Gets a member's unique internal ID, used for reports.";
   
   /** The command syntax. */
-  private static final String CMD_USAGE = "rb! uid <MEMBER NAME>";
+  private static final String CMD_USAGE = "rb! uid <MEMBER NAME (in quotes for names with spaces)>";
   
   @Override
   public String getCommandName() {

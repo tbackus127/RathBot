@@ -44,112 +44,14 @@ public class FAQCmd extends RBCommand {
   /** A map from FAQ name to its contents. */
   private static TreeMap<String, String> faqMap = new TreeMap<String, String>();
   
-  /**
-   * Initializes the FAQ map.
-   * 
-   * @return a TreeMap mapping FAQ ID to its contents.
-   */
-  private static final void initFAQ() {
-    
-    // If the file doesn't exist, create it
-    if (!FAQ_FILE.exists()) {
-      System.out.println("  File " + FAQ_FILE.getAbsolutePath() + " doesn't exist, creating.");
-      try {
-        FAQ_FILE.createNewFile();
-        faqMap = new TreeMap<String, String>();
-        return;
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    } else {
-      
-      // If the file is empty, create a new TreeMap for it
-      if (FAQ_FILE.length() <= 0) {
-        System.out.println("  Map data empty. Creating new table.");
-        faqMap = new TreeMap<String, String>();
-        return;
-      }
-    }
-    
-    loadFAQMap();
-    
-  }
+  /** Whether or not to actually save the FAQ table to disk (for testing purposes). */
+  private static boolean saveToDisk = true;
   
   /**
-   * Loads the FAQ map from file.
-   * 
-   * @return the previously-serialized HashMap.
+   * Disables saving the FAQ table to disk.
    */
-  @SuppressWarnings("unchecked")
-  private static final void loadFAQMap() {
-    
-    // Initialize data streams
-    FileInputStream fis = null;
-    ObjectInputStream oin = null;
-    Object obj = null;
-    
-    try {
-      
-      // Build an input stream for deserialization
-      fis = new FileInputStream(FAQ_DATA_PATH);
-      if (fis.available() > 0) {
-        oin = new ObjectInputStream(fis);
-        
-        // Read the object in and close the streams
-        obj = oin.readObject();
-        oin.close();
-        fis.close();
-        
-      } else {
-        System.err.println("FAQ map is empty.");
-      }
-      
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    }
-    
-    // If something went wrong, return null
-    if (fis == null || oin == null) {
-      System.err.println("FAQ map load error.");
-    }
-    
-    // Cast the read object to a TreeMap
-    if (obj instanceof TreeMap) {
-      faqMap = (TreeMap<String, String>) obj;
-    } else {
-      System.err.println("Error with loading. Creating new table.");
-      faqMap = new TreeMap<String, String>();
-    }
-  }
-  
-  /**
-   * Saves the FAQ map to a file.
-   */
-  private static final void saveFAQMap() {
-    
-    FileOutputStream fos = null;
-    ObjectOutputStream oos = null;
-    
-    try {
-      
-      // Build an output stream for serialization
-      fos = new FileOutputStream(FAQ_DATA_PATH);
-      oos = new ObjectOutputStream(fos);
-      
-      // Write the map and close streams
-      oos.writeObject(faqMap);
-      oos.close();
-      fos.close();
-      
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  public static final void disableSaveToDisk() {
+    saveToDisk = false;
   }
   
   /**
@@ -354,6 +256,118 @@ public class FAQCmd extends RBCommand {
   @Override
   public boolean requiresDirectMessage() {
     return false;
+  }
+  
+  /**
+   * Initializes the FAQ map.
+   * 
+   * @return a TreeMap mapping FAQ ID to its contents.
+   */
+  private static final void initFAQ() {
+    
+    // If the file doesn't exist, create it
+    if (!FAQ_FILE.exists()) {
+      System.out.println("  File " + FAQ_FILE.getAbsolutePath() + " doesn't exist, creating.");
+      try {
+        FAQ_FILE.createNewFile();
+        faqMap = new TreeMap<String, String>();
+        return;
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } else {
+      
+      // If the file is empty, create a new TreeMap for it
+      if (FAQ_FILE.length() <= 0) {
+        System.out.println("  Map data empty. Creating new table.");
+        faqMap = new TreeMap<String, String>();
+        return;
+      }
+    }
+    
+    loadFAQMap();
+    
+  }
+  
+  /**
+   * Loads the FAQ map from file.
+   * 
+   * @return the previously-serialized HashMap.
+   */
+  @SuppressWarnings("unchecked")
+  private static final void loadFAQMap() {
+    
+    // Initialize data streams
+    FileInputStream fis = null;
+    ObjectInputStream oin = null;
+    Object obj = null;
+    
+    try {
+      
+      // Build an input stream for deserialization
+      fis = new FileInputStream(FAQ_DATA_PATH);
+      if (fis.available() > 0) {
+        oin = new ObjectInputStream(fis);
+        
+        // Read the object in and close the streams
+        obj = oin.readObject();
+        oin.close();
+        fis.close();
+        
+      } else {
+        System.err.println("FAQ map is empty.");
+      }
+      
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    
+    // If something went wrong, return null
+    if (fis == null || oin == null) {
+      System.err.println("FAQ map load error.");
+    }
+    
+    // Cast the read object to a TreeMap
+    if (obj instanceof TreeMap) {
+      faqMap = (TreeMap<String, String>) obj;
+    } else {
+      System.err.println("Error with loading. Creating new table.");
+      faqMap = new TreeMap<String, String>();
+    }
+  }
+  
+  /**
+   * Saves the FAQ map to a file.
+   */
+  private static final void saveFAQMap() {
+    
+    if (!saveToDisk) {
+      return;
+    }
+    
+    FileOutputStream fos = null;
+    ObjectOutputStream oos = null;
+    
+    try {
+      
+      // Build an output stream for serialization
+      fos = new FileOutputStream(FAQ_DATA_PATH);
+      oos = new ObjectOutputStream(fos);
+      
+      // Write the map and close streams
+      oos.writeObject(faqMap);
+      oos.close();
+      fos.close();
+      
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
   
 }

@@ -42,6 +42,9 @@ public class RathBot {
   /** The default Playing text under the bot's username. */
   private static final String DEFAULT_PLAYING_TEXT = "\u2606I\u2606MA\u2606SU\u2606GU\u2606";
   
+  /** The channel where reports and actions will be posted. */
+  private static final String REPORT_CHANNEL_NAME = "#report";
+  
   /** The osu! University guild ID. */
   private static final long GUILD_ID = 291067429596168193L;
   
@@ -57,6 +60,9 @@ public class RathBot {
   
   /** A map from channel name to ID. */
   private static TreeMap<String, IChannel> channelMap;
+  
+  /** The IGuild object used by the Discord API. */
+  private static IGuild guild;
   
   /**
    * Sends a plain text message in the specified channel.
@@ -88,9 +94,9 @@ public class RathBot {
    * @param reason the reason a warn was issued as a String.
    */
   public static final void warnUser(final IMessage message, final String reason) {
-    // TODO: Uncomment when finished.
-    // Infractions.warnUser(message.getAuthor().getLongID(), message.getTimestamp().getEpochSecond(), reason);
-    sendMessage(message.getChannel(), "Warned for reason: " + reason);
+    Infractions.warnUser(message.getAuthor().getLongID(), message.getTimestamp().getEpochSecond(), reason);
+    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
+        message.getAuthor().getName() + " has been warned for reason: \"" + reason + "\".");
   }
   
   /**
@@ -102,9 +108,10 @@ public class RathBot {
    */
   public static final void muteUser(final IMessage message, final int muteDuration, final String reason) {
     final IUser author = message.getAuthor();
-    // TODO: Uncomment when finished.
-    // Infractions.muteUser(author.getLongID(), message.getTimestamp().getEpochSecond(), muteDuration, reason);
+    Infractions.muteUser(author.getLongID(), message.getTimestamp().getEpochSecond(), muteDuration, reason);
     sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.MUTE, muteDuration));
+    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
+        message.getAuthor().getName() + " has been muted for reason: \"" + reason + "\".");
   }
   
   /**
@@ -114,6 +121,7 @@ public class RathBot {
    */
   public static final void unmuteUser(final IUser user) {
     Infractions.setMuted(user.getLongID(), false);
+    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME), user.getName() + " has been ummuted.");
   }
   
   /**
@@ -124,11 +132,11 @@ public class RathBot {
    */
   public static final void kickUser(final IMessage message, final String reason) {
     final IUser author = message.getAuthor();
-    // TODO: Uncomment when finished.
     sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.KICK, -1));
-    // Infractions.kickUser(author.getLongID(), message.getTimestamp().getEpochSecond(), reason);
-    // TODO: Actually kick the user
-    // guild.kickUser(author, reason);
+    Infractions.kickUser(author.getLongID(), message.getTimestamp().getEpochSecond(), reason);
+    guild.kickUser(author, reason);
+    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
+        message.getAuthor().getName() + " has been kicked for reason: \"" + reason + "\".");
   }
   
   /**
@@ -140,10 +148,10 @@ public class RathBot {
   public static final void banUser(final IMessage message, final String reason) {
     final IUser author = message.getAuthor();
     sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.BAN, -1));
-    // TODO: Uncomment when finished.
-    // Infractions.banUser(author.getLongID(), message.getTimestamp().getEpochSecond(), reason);
-    // TODO: Actually ban the user
-    // guild.banUser(author, reason);
+    Infractions.banUser(author.getLongID(), message.getTimestamp().getEpochSecond(), reason);
+    guild.banUser(author, reason);
+    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
+        message.getAuthor().getName() + " has been banned for reason: \"" + reason + "\".");
   }
   
   /**
@@ -229,6 +237,7 @@ public class RathBot {
     // Create the client and the bot
     System.out.print("Creating client... ");
     final IDiscordClient client = new ClientBuilder().withPingTimeout(5).withToken(token).build();
+    guild = client.getGuildByID(GUILD_ID);
     
     return client;
   }
@@ -248,7 +257,7 @@ public class RathBot {
     MessageLogger.initPrintStreamMap(channelMap);
     PermissionsTable.loadPerms();
     Infractions.loadFromFile();
-    // TODO: Add more tables here when needed
+    // TODO: Add more tables here when/if needed
   }
   
   /**

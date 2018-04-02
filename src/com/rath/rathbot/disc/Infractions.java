@@ -27,6 +27,16 @@ public class Infractions {
   /** Reference to the infractions map file. */
   private static final File INFRACTIONS_FILE = new File(INFRACTIONS_DATA_PATH);
   
+  /** Whether or not to actually save the table to disk (for testing). */
+  private static boolean saveToDisk = true;
+  
+  /**
+   * Disables saving the table to disk.
+   */
+  public static final void disableSaveToDisk() {
+    saveToDisk = false;
+  }
+  
   /**
    * Gets whether the table has an entry for the given member.
    * 
@@ -203,6 +213,11 @@ public class Infractions {
    */
   public static final void saveToFile() {
     
+    // Don't actually save if we're just testing
+    if (!saveToDisk) {
+      return;
+    }
+    
     System.out.println("Saving infractions map to file.");
     
     FileOutputStream fos = null;
@@ -231,6 +246,7 @@ public class Infractions {
    */
   @SuppressWarnings("unchecked")
   public static final void loadFromFile() {
+    
     System.out.println("Loading Infractions map from file.");
     
     // Initialize data streams

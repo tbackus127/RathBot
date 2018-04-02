@@ -35,14 +35,26 @@ public class PermissionsTable {
   /** The permissions table. */
   private static TreeMap<Long, Integer> permMap = null;
   
+  /** Whether or not to actually save the table to disk (disable for testing purposes). */
+  private static boolean saveToDisk = true;
+  
+  /**
+   * Disables saving the table to disk.
+   */
+  public static final void disableSaveToDisk() {
+    saveToDisk = false;
+  }
+  
   /**
    * Initializes a user with default permissions.
    * 
    * @param userID the ID of the member to initialize.
+   * @return false if there was an error.
    */
-  public static final void initUser(final long userID) {
-    updateUser(userID, DEFAULT_PERM_LEVEL);
+  public static final boolean initUser(final long userID) {
+    boolean ret = updateUser(userID, DEFAULT_PERM_LEVEL);
     savePerms();
+    return ret;
   }
   
   /**
@@ -50,41 +62,45 @@ public class PermissionsTable {
    * 
    * @param userID the ID of the member to update.
    * @param permLevel the new permissions level this user should receive.
+   * @return false if there was an error.
    */
-  public static final void updateUser(final long userID, final int permLevel) {
+  public static final boolean updateUser(final long userID, final int permLevel) {
     
     if (permMap == null) {
       System.err.println("Perm map is null!");
-      return;
+      return false;
     }
     
     permMap.put(userID, permLevel);
     System.out.println("Updated " + userID + " to " + permLevel + ".");
     System.out.println(userID + " is now " + permMap.get(userID));
     savePerms();
+    return true;
   }
   
   /**
    * Removes the entry for a given user (if they leave, are banned, or purged).
    * 
    * @param userID the ID of the member to remove.
+   * @return false if there was an error.
    */
-  public static final void removeUser(final long userID) {
+  public static final boolean removeUser(final long userID) {
     
     if (permMap == null) {
       System.err.println("Perm map is null!");
-      return;
+      return false;
     }
     
     permMap.remove(userID);
     savePerms();
+    return true;
   }
   
   /**
    * Gets the permission level for the given user.
    * 
    * @param userID the ID of the member we're getting the permission level for.
-   * @return the permission level as an int, defined in RBCommand.
+   * @return the permission level as an int, defined in RBCommand. If there is an error, -1 will be returned.
    */
   public static final int getLevel(final long userID) {
     // System.out.println("Getting perms for id=" + userID);
@@ -105,9 +121,14 @@ public class PermissionsTable {
    * Whether or not an entry exists for a user.
    * 
    * @param userID the ID of the user to check for.
-   * @return true if the user exists; false if not.
+   * @return true if the user exists; false if not. If the table is null, false will be returned.
    */
   public static final boolean hasUser(final long userID) {
+    
+    if (permMap == null) {
+      return false;
+    }
+    
     return permMap.containsKey(userID);
   }
   
@@ -121,9 +142,21 @@ public class PermissionsTable {
   }
   
   /**
+   * Clears the permissions table, but does not save it to disk. USE WITH CAUTION.
+   */
+  public static final void clearTable() {
+    permMap = new TreeMap<Long, Integer>();
+  }
+  
+  /**
    * Saves the permission table to the hard disk.
    */
   public static final void savePerms() {
+    
+    if (!saveToDisk) {
+      return;
+    }
+    
     System.out.println("Saving permissions map to file.");
     
     FileOutputStream fos = null;

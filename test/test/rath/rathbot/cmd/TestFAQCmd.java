@@ -14,6 +14,7 @@ public class TestFAQCmd {
   
   @BeforeClass
   public static void setupFAQTest() {
+    FAQCmd.disableSaveToDisk();
     final FAQCmd fq = new FAQCmd();
     fq.setupCommand();
   }

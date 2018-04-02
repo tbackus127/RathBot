@@ -87,7 +87,7 @@ public class PermissionsTable {
    * @return the permission level as an int, defined in RBCommand.
    */
   public static final int getLevel(final long userID) {
-    System.out.println("Getting perms for id=" + userID);
+    // System.out.println("Getting perms for id=" + userID);
     
     if (permMap == null) {
       System.err.println("Perm map is null!");

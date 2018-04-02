@@ -113,11 +113,13 @@ public class Infractions {
    * Sets a the user's muted status to true and increments their mute count.
    * 
    * @param user the Discord unique long ID.
-   * @param time the epoch time the user was muted.
+   * @param issueTime the epoch time the user was muted.
+   * @param muteDuration the amount of time in seconds the user should be muted for.
    * @param reason the reason the user is being muted.
    */
-  public static final void muteUser(final long user, final long time, final String reason) {
-    infractionMap.get(user).mute(time, reason);
+  public static final void muteUser(final long user, final long issueTime, final int muteDuration,
+      final String reason) {
+    infractionMap.get(user).mute(issueTime, muteDuration, reason);
     saveToFile();
   }
   
@@ -183,6 +185,16 @@ public class Infractions {
    */
   public static final void banUser(final long user, final long time, final String reason) {
     infractionMap.get(user).ban(time, reason);
+    saveToFile();
+  }
+  
+  /**
+   * Clears the infractions records for the specified user.
+   * 
+   * @param user the Discord unique long ID.
+   */
+  public static final void clearInfractions(final long user) {
+    infractionMap.put(user, new InfractionData());
     saveToFile();
   }
   

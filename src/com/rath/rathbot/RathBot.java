@@ -13,12 +13,16 @@ import com.rath.rathbot.cmd.disc.actions.UnmuteCmd;
 import com.rath.rathbot.cmd.msg.HelpCmd;
 import com.rath.rathbot.cmd.msg.faq.FAQCmd;
 import com.rath.rathbot.disc.Infractions;
+import com.rath.rathbot.disc.PunishmentType;
 import com.rath.rathbot.log.MessageLogger;
+import com.rath.rathbot.msg.MessageHelper;
 
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.StatusType;
 
@@ -37,6 +41,9 @@ public class RathBot {
   
   /** The default Playing text under the bot's username. */
   private static final String DEFAULT_PLAYING_TEXT = "\u2606I\u2606MA\u2606SU\u2606GU\u2606";
+  
+  /** The osu! University guild ID. */
+  private static final long GUILD_ID = 291067429596168193L;
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
@@ -72,6 +79,80 @@ public class RathBot {
     
     user.getOrCreatePMChannel().sendMessage(msg);
     
+  }
+  
+  /**
+   * Warns the user of the given message for a reason.
+   * 
+   * @param message the IMessage object that warranted a warn.
+   * @param reason the reason a warn was issued as a String.
+   */
+  public static final void warnUser(final IMessage message, final String reason) {
+    // TODO: Uncomment when finished.
+    // Infractions.warnUser(message.getAuthor().getLongID(), message.getTimestamp().getEpochSecond(), reason);
+    sendMessage(message.getChannel(), "Warned for reason: " + reason);
+  }
+  
+  /**
+   * Mutes the user of the given message for a reason.
+   * 
+   * @param message the IMessage object that warranted a mute.
+   * @param muteDuration the amount of time the user will be unable to chat, in seconds.
+   * @param reason the reason a mute was issued as a String.
+   */
+  public static final void muteUser(final IMessage message, final int muteDuration, final String reason) {
+    final IUser author = message.getAuthor();
+    // TODO: Uncomment when finished.
+    // Infractions.muteUser(author.getLongID(), message.getTimestamp().getEpochSecond(), muteDuration, reason);
+    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.MUTE, muteDuration));
+  }
+  
+  /**
+   * Unmutes the given user.
+   * 
+   * @param user the user to be muted as an IUser object.
+   */
+  public static final void unmuteUser(final IUser user) {
+    Infractions.setMuted(user.getLongID(), false);
+  }
+  
+  /**
+   * Kicks the user of the given message for a reason.
+   * 
+   * @param message the IMessage object that warranted a kick.
+   * @param reason the reason a kick was issued as a String.
+   */
+  public static final void kickUser(final IMessage message, final String reason) {
+    final IUser author = message.getAuthor();
+    // TODO: Uncomment when finished.
+    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.KICK, -1));
+    // Infractions.kickUser(author.getLongID(), message.getTimestamp().getEpochSecond(), reason);
+    // TODO: Actually kick the user
+    // guild.kickUser(author, reason);
+  }
+  
+  /**
+   * Bans the user of the given message for a reason.
+   * 
+   * @param message the IMessage object that warranted a ban.
+   * @param reason the reason a ban was issued as a String.
+   */
+  public static final void banUser(final IMessage message, final String reason) {
+    final IUser author = message.getAuthor();
+    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.BAN, -1));
+    // TODO: Uncomment when finished.
+    // Infractions.banUser(author.getLongID(), message.getTimestamp().getEpochSecond(), reason);
+    // TODO: Actually ban the user
+    // guild.banUser(author, reason);
+  }
+  
+  /**
+   * Unbans the user.
+   * 
+   * @param user the IUser to unban.
+   */
+  public static final void unbanUser(final IUser user) {
+    Infractions.setBanned(user.getLongID(), false);
   }
   
   /**
@@ -148,6 +229,7 @@ public class RathBot {
     // Create the client and the bot
     System.out.print("Creating client... ");
     final IDiscordClient client = new ClientBuilder().withPingTimeout(5).withToken(token).build();
+    
     return client;
   }
   

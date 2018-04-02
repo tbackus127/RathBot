@@ -2,43 +2,60 @@
 package com.rath.rathbot.msg;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
+import com.rath.rathbot.RathBot;
+import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.disc.InfractionEntry;
 import com.rath.rathbot.disc.Infractions;
 
+import sx.blah.discord.handle.obj.IEmbed;
+import sx.blah.discord.handle.obj.IEmbed.IEmbedImage;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IUser;
 
 /**
- * This class contains anti-spam checks for the bot.
+ * This class contains anti-spam checks for the bot, which are unnecessary because I didn't know Discord has its own.
  * 
  * @author Tim Backus tbackus127@gmail.com
  *
  */
 public class AntiSpam {
   
+  /** The reason that will be entered in infraction entries when the message rate is abused. */
+  public static final String REASON_MSG_RATE_ABUSE = "RB rate abuse";
+  
+  /** The reason that will be entered in infraction entries when repeat messages are abused. */
+  public static final String REASON_REPEAT_MSG_ABUSE = "RB repeat abuse";
+  
   /** Permissions level required to bypass spam filtering. */
-  public static final int PERM_LVL_IGNORE = 9;
+  private static final int PERM_LVL_IGNORE = 9;
+  // TODO: Change this back to RBCommand.PERM_LVL_SUDO
   
   /** Whether or not to ignore messages containing only a single image (for dumps). */
-  public static final boolean IGNORE_IMAGE_POSTS = true;
+  private static final boolean IGNORE_IMAGE_POSTS = true;
+  
+  /** Mute durations, in seconds. 1m, 5m, 30m, 1hr, 24hr */
+  private static final int[] MUTE_DURATIONS = { 60, 300, 1800, 3600, 86400 };
+  
+  /** How many messages a user needs to send while muted to be kicked. */
+  @SuppressWarnings("unused")
+  private static final int MUTE_KICK_THRESHOLD = 10;
+  // TODO: ^ If they keep posting after being muted, they get kicked.
+  // TODO: Have the bot PM them with minutes left every N minutes. N depends on muted time left.
+  
+  /** How many warns it takes for the bot to mute a user. */
+  private static final int WARNS_TO_MUTE = 5;
+  
+  /** How many mutes it takes for the bot to kick a user. */
+  private static final int MUTES_TO_KICK = MUTE_DURATIONS.length;
+  
+  /** How many kicks it takes for the bot to ban a user. */
+  private static final int KICKS_TO_BAN = 3;
   
   /** Cooldown between spam warnings, in seconds. */
   private static final int WARN_COOLDOWN_SEC = 8;
-  
-  /** Mute durations, in seconds. 10s, 5m, 1hr, 24hr */
-  public static final int[] MUTE_DURATIONS = { 10, 300, 3600, 86400 };
-  // TODO: This. When muted, their messages are immediately deleted.
-  
-  /** How many messages a user needs to send while muted to be kicked. */
-  private static final int MUTE_KICK_THRESHOLD = 10;
-  // TODO: ^ If they keep spamming, they get kicked.
-  
-  /** The reason that will be entered in infraction entries when the message rate is abused. */
-  private static final String REASON_MSG_RATE_ABUSE = "RB rate abuse";
-  
-  /** The reason that will be entered in infraction entries when repeat messages are abused. */
-  private static final String REASON_REPEAT_MSG_ABUSE = "RB repeat abuse";
   
   /** If messages begin with these characters, do not count them in repeat message flagging. */
   private static final String[] REPEAT_PREFIX_EXCEPTIONS = { ".", "rb!", "=", ">", "t!", "+", ";;" };
@@ -47,31 +64,96 @@ public class AntiSpam {
    * How many messages trigger spam protection for the amount of time indicated by the same index of
    * TRIGGER_RATE_TIMEOUT_SECS.
    */
-  private static final int[] TRIGGER_RATE_MSG_COUNTS = { 15, 12 };
+  private static final int[] TRIGGER_RATE_MSG_COUNTS = { 5, 20 };
   
   /**
    * The amount of time that anti-spam can trigger for the counts defined in the same index of TRIGGER_RATE_MSG_COUNTS.
    */
-  private static final int[] TRIGGER_RATE_TIMEOUT_SECS = { 3, 5 };
+  private static final int[] TRIGGER_RATE_TIMEOUT_SECS = { 3, 8 };
   
   /** The number of sequential, duplicate messages required to trigger repeat message abuse. */
-  private static final int TRIGGER_DUPLICATE_MSG_COUNT = 5;
+  private static final int TRIGGER_DUPLICATE_MSG_COUNT = 7;
   
   /**
    * The maximum number of messages to keep in a user's history. This should be the maximum value in
    * TRIGGER_RATE_MSG_COUNTS.
    */
-  private static final int MAX_HISTORY_LENGTH = 15;
+  private static final int MAX_HISTORY_LENGTH = 18;
   
-  /** A set of all tracked users. */
+  /** A table of all tracked users to their chat history. */
   private static final TreeMap<Long, ArrayList<MessageTrackerEntry>> trackerEntries = new TreeMap<Long, ArrayList<MessageTrackerEntry>>();
+  
+  /**
+   * Performs message filtering for spam and muted users.
+   * 
+   * @param message the IMessage the event handler received.
+   */
+  public static final boolean filterMessage(final IMessage message) {
+    
+    // If the user isn't in the infractions table, initialize them
+    final IUser author = message.getAuthor();
+    final long uid = author.getLongID();
+    if (!Infractions.hasMember(uid)) {
+      Infractions.initMember(uid);
+    }
+    
+    // If the author is an owner, bypass anti-spam measures
+    if (PermissionsTable.getLevel(uid) < AntiSpam.PERM_LVL_IGNORE) {
+      return false;
+    }
+    
+    // If the author's mute time is up, unmute them
+    // TODO: ^ This. Use MUTE_DURATIONS, MUTE_KICK_THRESHOLD
+    
+    // If the author is muted, immediately delete muted users' messages
+    if (Infractions.isMuted(uid)) {
+      message.delete();
+      return true;
+    }
+    
+    // Check for spam and return a type if a flag is raised
+    final SpamTrigger trig = checkSpamType(message);
+    
+    // If spam filtering flagged this message
+    if (trig != null) {
+      
+      // Check if the bot needs to ban the user
+      final int kickCount = Infractions.getKickCount(uid);
+      final int muteCount = Infractions.getMuteCount(uid);
+      final int warnCount = Infractions.getWarnCount(uid);
+      if (kickCount >= KICKS_TO_BAN) {
+        
+        // Issue the ban
+        RathBot.banUser(message, trig.getReason());
+        
+      } else if (muteCount >= MUTES_TO_KICK) {
+        
+        // Issue the kick
+        RathBot.kickUser(message, trig.getReason());
+        
+      } else if (warnCount >= WARNS_TO_MUTE) {
+        
+        // Issue the mute
+        RathBot.muteUser(message, MUTE_DURATIONS[muteCount], trig.getReason());
+        
+      } else {
+        
+        // Issue the warn
+        RathBot.warnUser(message, trig.getReason());
+        
+      }
+      
+      return true;
+    }
+    return false;
+  }
   
   /**
    * Adds a message and timestamp for the given user.
    * 
    * @param msg the IMessage container to add an entry from.
    */
-  public static final void addEntry(final IMessage msg) {
+  public static final void addMessageHistoryEntry(final IMessage msg) {
     
     // Create a new entry if the author doesn't exist
     final long authorID = msg.getAuthor().getLongID();
@@ -94,6 +176,37 @@ public class AntiSpam {
     // Insert the new message at the beginning of the list
     messageHistory.add(0, new MessageTrackerEntry(msg.getContent(), msg.getTimestamp().getEpochSecond()));
     
+  }
+  
+  /**
+   * Tests if a message triggers an anti-spam mechanism.
+   * 
+   * @param msg the IMessage event.
+   * @return true if spam; false if not.
+   */
+  public static final SpamTrigger checkSpamType(final IMessage msg) {
+    
+    addMessageHistoryEntry(msg);
+    
+    // Check if the post is just an image, if enabled
+    if (IGNORE_IMAGE_POSTS) {
+      final List<IEmbed> embeds = msg.getEmbeds();
+      if (embeds.size() == 1) {
+        
+        // Get the image, and if it's not null, it's an image post.
+        final IEmbedImage img = embeds.get(0).getImage();
+        if (img != null) {
+          return null;
+        }
+      }
+    }
+    
+    // Check message triggers
+    if (AntiSpam.checkMessageRate(msg)) return SpamTrigger.MESSAGE_RATE;
+    if (AntiSpam.checkRepeatMessages(msg)) return SpamTrigger.REPEAT_MESSAGES;
+    
+    // If nothing triggered, return null
+    return null;
   }
   
   /**
@@ -154,8 +267,6 @@ public class AntiSpam {
    */
   public static final boolean checkRepeatMessages(final IMessage msg) {
     
-    System.out.println("Checking for repeats.");
-    
     // Ignore bot commands
     final String message = msg.getContent();
     for (int i = 0; i < REPEAT_PREFIX_EXCEPTIONS.length; i++) {
@@ -172,12 +283,9 @@ public class AntiSpam {
     // If the member has an infraction history
     if (infrHistory.size() >= 1) {
       
-      System.out.println("  Has infraction history.");
-      
       // If the last infraction was for repeat message abuse, check if the cooldown has passed
       final InfractionEntry entry = infrHistory.get(0);
       if ((entry.getReason().equals(REASON_REPEAT_MSG_ABUSE) && (msgTime - entry.getTimestamp() < WARN_COOLDOWN_SEC))) {
-        System.out.println("  On cooldown.");
         return false;
       }
       
@@ -190,8 +298,6 @@ public class AntiSpam {
     final int historySize = messageHistory.size();
     if (historySize >= TRIGGER_DUPLICATE_MSG_COUNT) {
       
-      System.out.println("  Checking message history.");
-      
       // Count the number of duplicate messages
       int count = 0;
       String currMsg = msg.getContent();
@@ -202,11 +308,9 @@ public class AntiSpam {
         
         // If we encounter a message that isn't a duplicate, stop searching and return false
         if (!entryMsg.equals(currMsg)) {
-          System.out.println("  Different message found, aborting.");
           return false;
         }
         
-        System.out.println("  Duplicate message detected.");
         currMsg = entryMsg;
         count++;
         
@@ -218,8 +322,6 @@ public class AntiSpam {
         return true;
       }
       
-    } else {
-      System.out.println("  History not large enough yet.");
     }
     
     // Protection did not trigger

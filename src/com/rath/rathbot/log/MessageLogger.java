@@ -29,8 +29,17 @@ public class MessageLogger {
   /** The suffix for all log files. */
   private static final String LOG_SUFFIX = ".txt";
   
+  /**
+   * The channel label for private message logging. Discord channels cannot contain spaces, so it should be impossible
+   * to accidentally log here.
+   */
+  private static final String PM_LOG_FILEPATH = PATH_LOGS + "_PM History" + LOG_SUFFIX;
+  
   /** Maps a channel to its PrintStream. */
   private static HashMap<IChannel, PrintStream> printStreamMap = null;
+  
+  /** The direct message PrintStream. */
+  private static PrintStream pmStream = null;
   
   /** If the logger is initialized yet. */
   private static boolean isLoggerReady = false;
@@ -73,8 +82,18 @@ public class MessageLogger {
         e.printStackTrace();
       }
     }
-    
     printStreamMap = result;
+    
+    // Set up the PM logging PrintStream
+    final File pmLog = new File(PM_LOG_FILEPATH);
+    try {
+      pmLog.createNewFile();
+      pmStream = new PrintStream(pmLog);
+    } catch (IOException e) {
+      System.err.println("Error initializing PM log file! Disabling logging.");
+      return;
+    }
+    
     isLoggerReady = true;
   }
   
@@ -97,8 +116,14 @@ public class MessageLogger {
     final String timestamp = msg.getTimestamp().toString();
     
     // Build and append the string to the log file
-    final PrintStream ps = printStreamMap.get(channel);
+    PrintStream ps = printStreamMap.get(channel);
     final String logString = author + " @ " + timestamp + ": " + messageString;
+    
+    // If it was a direct message, log it with the PM logger
+    if (ps == null) {
+      ps = pmStream;
+    }
+    
     ps.println(logString);
     
   }

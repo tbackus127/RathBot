@@ -26,6 +26,9 @@ public class InfractionData implements Serializable {
   /** How many times the user has been banned. */
   private int banCount;
   
+  /** How long the user is muted for. */
+  private int muteDuration;
+  
   /** If the user is currently muted. */
   private boolean isMuted;
   
@@ -43,6 +46,7 @@ public class InfractionData implements Serializable {
     this.muteCount = 0;
     this.kickCount = 0;
     this.banCount = 0;
+    this.muteDuration = 0;
     this.history = new ArrayList<InfractionEntry>();
   }
   
@@ -121,11 +125,13 @@ public class InfractionData implements Serializable {
   /**
    * Sets a user's muted status to true and increments the mute count.
    * 
-   * @param time the epoch time the user was muted.
+   * @param issueTime the epoch time the user was muted.
+   * @param muteDuration the amount of seconds the user is muted for.
    * @param reason the reason the user is being muted.
    */
-  public final void mute(final long time, final String reason) {
-    this.history.add(new InfractionEntry(PunishmentType.MUTE, time, reason));
+  public final void mute(final long issueTime, final int muteDuration, final String reason) {
+    this.history.add(new InfractionEntry(PunishmentType.MUTE, issueTime, reason));
+    this.muteDuration = muteDuration;
     this.muteCount++;
     setMuted(true);
   }
@@ -167,6 +173,11 @@ public class InfractionData implements Serializable {
     this.history.add(new InfractionEntry(PunishmentType.BAN, time, reason));
     this.banCount++;
     setBanned(true);
+  }
+  
+  // TODO: Javadoc this
+  public final int getMuteDuration() {
+    return this.muteDuration;
   }
   
 }

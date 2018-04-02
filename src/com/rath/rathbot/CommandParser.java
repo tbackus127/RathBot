@@ -5,6 +5,7 @@ import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
 
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
 /**
@@ -21,12 +22,16 @@ public class CommandParser {
    * @param author the author of the message as an IAuthor object.
    * @param message the message itself.
    */
-  public static final void parseCommand(final IChannel channel, final IUser author, final String message) {
+  public static final void parseCommand(final IMessage message) {
     
-    System.out.println("Parsing command: \"" + message + "\".");
+    final String msgString = message.getContent();
+    final IUser author = message.getAuthor();
+    final IChannel channel = message.getChannel();
+    
+    System.out.println("Parsing command: \"" + msgString + "\".");
     
     // Split into tokens separated by spaces, ignoring spaces between quotes
-    final String[] tokens = message.split("\"?( |$)(?=(([^\"]*\"){2})*[^\"]*$)\"?");
+    final String[] tokens = msgString.split("\"?( |$)(?=(([^\"]*\"){2})*[^\"]*$)\"?");
     
     // Ensure the message isn't just the prefix
     if (tokens.length <= 1) {
@@ -52,8 +57,18 @@ public class CommandParser {
     // Check permissions for this command.
     if (PermissionsTable.getLevel(userID) >= cmd.permissionLevelRequired()) {
       
+      // If a PM-only command was issued in a public channel
+      if (cmd.requiresDirectMessage() && RathBot.getChannelMap().values().contains(channel)) {
+        
+        // Delete the message and post a notification.
+        message.delete();
+        RathBot.sendMessage(channel, "This command can only be issued in a direct message to RathBot.");
+        return;
+      }
+      
       // Execute the command that matches
       cmd.executeCommand(author, channel, tokens, 1);
+      
     } else {
       System.out
           .println("User " + author.getName() + " tried to execute " + cmd.getCommandName() + " with permission level "

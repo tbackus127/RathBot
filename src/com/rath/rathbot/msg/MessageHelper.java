@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.rath.rathbot.cmd.RBCommand;
+import com.rath.rathbot.disc.PunishmentType;
 
 /**
  * This class contains frequently-used message formatting methods.
@@ -75,5 +76,19 @@ public class MessageHelper {
     }
     
     return result;
+  }
+  
+  public static String buildDiscNotificationMessage(final PunishmentType type, final int time) {
+    String msg = "You have been " + type.getVerb() + type.getPrep() + " the osu! University server";
+    if (type.equals(PunishmentType.MUTE)) {
+      msg += " for ";
+      if (time >= 3600) {
+        msg += (time / 3600) + " hours";
+      } else {
+        msg += (time / 60 + " minutes");
+      }
+    }
+    msg += ".\nIf you believe this was an error, contact Rath (Rathuldr#0587) or Kami (Danni293#0911).";
+    return msg;
   }
 }

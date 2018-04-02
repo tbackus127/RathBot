@@ -31,8 +31,7 @@ public class PermCmd extends RBCommand {
   
   @Override
   public boolean requiresDirectMessage() {
-    // TODO Auto-generated method stub
-    return false;
+    return true;
   }
   
 }

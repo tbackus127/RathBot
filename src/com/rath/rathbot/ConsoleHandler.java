@@ -122,6 +122,16 @@ public class ConsoleHandler {
           }
         break;
       
+        // Reset infractions
+        case "ireset":
+          if (tokens.length == 2) {
+            final long uid = Long.parseLong(tokens[1]);
+            if (Infractions.hasMember(uid)) {
+              Infractions.clearInfractions(uid);
+            }
+          }
+        break;
+      
         default:
           System.out.println("Command not recognized.");
           

@@ -41,9 +41,14 @@ public class Infractions {
    * Gets whether the table has an entry for the given member.
    * 
    * @param user the Discord unique long ID.
-   * @return true if an entry exists; false if not.
+   * @return true if an entry exists; false if the map is null or the member isn't a key.
    */
   public static final boolean hasMember(final long user) {
+    
+    if (infractionMap == null) {
+      return false;
+    }
+    
     return infractionMap.containsKey(user);
   }
   
@@ -51,18 +56,31 @@ public class Infractions {
    * Populates the table with a new entry for the given user.
    * 
    * @param user the Discord unique long ID.
+   * @return true if there were no errors; false if there were.
    */
-  public static final void initMember(final long user) {
+  public static final boolean initMember(final long user) {
+    
+    if (infractionMap == null) {
+      return false;
+    }
+    
     infractionMap.put(user, new InfractionData());
+    return true;
   }
   
   /**
    * Gets the user's infraction history.
    * 
    * @param user the Discord unique long ID.
-   * @return an ArrayList of InfractionEntry's.
+   * @return an ArrayList of InfractionEntry's. Returns null if either the map itself is null, or the InfractionData
+   *         object is null.
    */
   public static final ArrayList<InfractionEntry> getInfractionHistory(final long user) {
+    
+    if (infractionMap == null || infractionMap.get(user) == null) {
+      return null;
+    }
+    
     return infractionMap.get(user).getHistory();
   }
   
@@ -70,9 +88,14 @@ public class Infractions {
    * Gets the number of times the user has been warned.
    * 
    * @param user the Discord unique long ID.
-   * @return an int.
+   * @return the warn count as an int. Returns -1 if the map is null.
    */
   public static final int getWarnCount(final long user) {
+    
+    if (infractionMap == null) {
+      return -1;
+    }
+    
     return infractionMap.get(user).getWarnCount();
   }
   
@@ -82,19 +105,33 @@ public class Infractions {
    * @param user the Discord unique long ID.
    * @param time the epoch time the user was warned.
    * @param reason the reason the user is being warned.
+   * @return true if there were no errors; false if either the map itself is null, or if the user's InfractionData list
+   *         is null.
    */
-  public static final void warnUser(final long user, final long time, final String reason) {
+  public static final boolean warnUser(final long user, final long time, final String reason) {
+    
+    if (infractionMap == null || infractionMap.get(user) == null) {
+      return false;
+    }
+    
     infractionMap.get(user).warn(time, reason);
     saveToFile();
+    
+    return true;
   }
   
   /**
    * Gets the user's muted status.
    * 
    * @param user the Discord unique long ID.
-   * @return true if the user is muted; false if not.
+   * @return true if the user is muted; false if not, or if the table is null.
    */
   public static final boolean isMuted(final long user) {
+    
+    if (infractionMap == null) {
+      return false;
+    }
+    
     return infractionMap.get(user).isMuted();
   }
   
@@ -102,9 +139,14 @@ public class Infractions {
    * Gets how many times the user has been muted.
    * 
    * @param user the Discord unique long ID.
-   * @return an int.
+   * @return an int. Returns -1 if the map is null.
    */
   public static final int getMuteCount(final long user) {
+    
+    if (infractionMap == null) {
+      return -1;
+    }
+    
     return infractionMap.get(user).getMuteCount();
   }
   
@@ -113,10 +155,18 @@ public class Infractions {
    * 
    * @param user the Discord unique long ID.
    * @param b true if muted; false if not.
+   * @return true if there were no errors; false if either the map itself was null, or if the user's InfractionData list
+   *         is null.
    */
-  public static final void setMuted(final long user, final boolean b) {
+  public static final boolean setMuted(final long user, final boolean b) {
+    
+    if (infractionMap == null || infractionMap.get(user) == null) {
+      return false;
+    }
+    
     infractionMap.get(user).setMuted(b);
     saveToFile();
+    return true;
   }
   
   /**
@@ -126,20 +176,33 @@ public class Infractions {
    * @param issueTime the epoch time the user was muted.
    * @param muteDuration the amount of time in seconds the user should be muted for.
    * @param reason the reason the user is being muted.
+   * @return true if there were no errors; false if either the map itself was null, or if the user's InfractionData list
+   *         is null.
    */
-  public static final void muteUser(final long user, final long issueTime, final int muteDuration,
+  public static final boolean muteUser(final long user, final long issueTime, final int muteDuration,
       final String reason) {
+    
+    if (infractionMap == null || infractionMap.get(user) == null) {
+      return false;
+    }
+    
     infractionMap.get(user).mute(issueTime, muteDuration, reason);
     saveToFile();
+    return true;
   }
   
   /**
    * Gets how many times the user has been kicked.
    * 
    * @param user the Discord unique long ID.
-   * @return an int.
+   * @return an int; returns -1 if the map or the user's InfractionData list is null.
    */
   public static final int getKickCount(final long user) {
+    
+    if (infractionMap == null || infractionMap.get(user) == null) {
+      return -1;
+    }
+    
     return infractionMap.get(user).getKickCount();
   }
   
@@ -149,19 +212,32 @@ public class Infractions {
    * @param user the Discord unique long ID.
    * @param time the epoch time the user was kicked.
    * @param reason the reason the user is being kicked.
+   * @return true if there were no errors; false if either the map itself was null, or if the user's InfractionData list
+   *         is null.
    */
-  public static final void kickUser(final long user, final long time, final String reason) {
+  public static final boolean kickUser(final long user, final long time, final String reason) {
+    
+    if (infractionMap == null || infractionMap.get(user) == null) {
+      return false;
+    }
+    
     infractionMap.get(user).kick(time, reason);
     saveToFile();
+    return true;
   }
   
   /**
    * Gets whether or not the user is banned.
    * 
    * @param user the Discord unique long ID.
-   * @return true if the user is banned; false if not.
+   * @return true if the user is banned; false if not or if something is null.
    */
   public static final boolean isBanned(final long user) {
+    
+    if (infractionMap == null || infractionMap.get(user) == null) {
+      return false;
+    }
+    
     return infractionMap.get(user).isBanned();
   }
   
@@ -169,9 +245,14 @@ public class Infractions {
    * Gets how many times the user has been banned.
    * 
    * @param user the Discord unique long ID.
-   * @return an int.
+   * @return an int; returns -1 if something is null.
    */
   public static final int getBanCount(final long user) {
+    
+    if (infractionMap == null || infractionMap.get(user) == null) {
+      return -1;
+    }
+    
     return infractionMap.get(user).getBanCount();
   }
   
@@ -180,10 +261,18 @@ public class Infractions {
    * 
    * @param user the Discord unique long ID.
    * @param b true if the user is banned; false if not.
+   * @return true if there were no errors; false if either the map itself was null, or if the user's InfractionData list
+   *         is null.
    */
-  public static final void setBanned(final long user, final boolean b) {
+  public static final boolean setBanned(final long user, final boolean b) {
+    
+    if (infractionMap == null || infractionMap.get(user) == null) {
+      return false;
+    }
+    
     infractionMap.get(user).setBanned(b);
     saveToFile();
+    return true;
   }
   
   /**
@@ -192,20 +281,42 @@ public class Infractions {
    * @param user the Discord unique long ID.
    * @param time the epoch time the user was banned.
    * @param reason the reason the user is being banned.
+   * @return true if there were no errors; false if either the map itself was null, or if the user's InfractionData list
+   *         is null.
    */
-  public static final void banUser(final long user, final long time, final String reason) {
+  public static final boolean banUser(final long user, final long time, final String reason) {
+    
+    if (infractionMap == null || infractionMap.get(user) == null) {
+      return false;
+    }
+    
     infractionMap.get(user).ban(time, reason);
     saveToFile();
+    return true;
   }
   
   /**
    * Clears the infractions records for the specified user.
    * 
    * @param user the Discord unique long ID.
+   * @return true if there were no errors; false if something was null.
    */
-  public static final void clearInfractions(final long user) {
+  public static final boolean clearInfractions(final long user) {
+    
+    if (infractionMap == null) {
+      return false;
+    }
+    
     infractionMap.put(user, new InfractionData());
     saveToFile();
+    return true;
+  }
+  
+  /**
+   * Clears the infractions table, but does not save it to disk. USE WITH CAUTION.
+   */
+  public static final void clearTable() {
+    infractionMap = new TreeMap<Long, InfractionData>();
   }
   
   /**

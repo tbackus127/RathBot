@@ -3,6 +3,7 @@ package com.rath.rathbot.msg;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.disc.PunishmentType;
@@ -14,6 +15,8 @@ import com.rath.rathbot.disc.PunishmentType;
  */
 public class MessageHelper {
   
+  public static final String NO_COMMANDS_MSG = "No commands registered.";
+  
   /**
    * Builds a message with commands and their descriptions.
    * 
@@ -23,15 +26,38 @@ public class MessageHelper {
    */
   public static final String buildCmdDescrMsg(final String header, final Map<String, RBCommand> commands) {
     
-    String result = header + "\n";
-    for (final String s : commands.keySet()) {
-      result += s + " - " + commands.get(s).getCommandDescription() + "\n";
+    if (commands == null) {
+      return NO_COMMANDS_MSG;
+    }
+    
+    String result = "";
+    
+    // Check if we need to indent because of a header
+    boolean doIndent = false;
+    if (header != null && header.length() >= 1) {
+      doIndent = true;
+      result += header + "\n";
+    }
+    
+    final Set<String> keySet = commands.keySet();
+    final int ksSize = keySet.size();
+    int i = 1;
+    for (final String s : keySet) {
+      if (doIndent) {
+        result += "  ";
+      }
+      result += s + " - " + commands.get(s).getCommandDescription();
+      if (i < ksSize) {
+        result += "\n";
+        i++;
+      }
     }
     return result;
   }
   
   /**
-   * Squishes a String array's contents to a single String starting at and including the given starting point.
+   * Squishes a String array's contents to a single String starting at and including the given starting point, with the
+   * contents of each index being separated by a single space.
    * 
    * @param tokens the String array to squish.
    * @param startIndex the index to start squishing at.
@@ -41,6 +67,7 @@ public class MessageHelper {
     
     if (tokens.length <= startIndex) {
       System.err.println("concatenateTokens(): Token length out of bounds.");
+      return null;
     }
     
     String result = tokens[startIndex];
@@ -78,6 +105,13 @@ public class MessageHelper {
     return result;
   }
   
+  /**
+   * Builds a notification message for an infraction, delivered to the user in a direct message.
+   * 
+   * @param type the type of punishment (warn, ban, etc.).
+   * @param time the amount of time the user stays muted; if the user isn't to be muted, this can be any value.
+   * @return the message that will be sent as a String.
+   */
   public static String buildDiscNotificationMessage(final PunishmentType type, final int time) {
     String msg = "You have been " + type.getVerb() + type.getPrep() + " the osu! University server";
     if (type.equals(PunishmentType.MUTE)) {

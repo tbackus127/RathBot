@@ -213,9 +213,4 @@ public class TestInfractionsTable {
     assertEquals(i, 0);
   }
   
-  @Test
-  public void testUserHistory() {
-    
-  }
-  
 }

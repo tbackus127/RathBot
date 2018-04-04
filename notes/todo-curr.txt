@@ -1,2 +1,0 @@
-* Write test cases for Infractions Table.
-* Write test cases for Message Helper.

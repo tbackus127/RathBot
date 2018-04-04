@@ -109,7 +109,7 @@ public class RathBot {
   public static final void muteUser(final IMessage message, final int muteDuration, final String reason) {
     final IUser author = message.getAuthor();
     Infractions.muteUser(author.getLongID(), message.getTimestamp().getEpochSecond(), muteDuration, reason);
-    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.MUTE, muteDuration));
+    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.MUTE, muteDuration, reason));
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
         message.getAuthor().getName() + " has been muted for reason: \"" + reason + "\".");
   }
@@ -132,7 +132,7 @@ public class RathBot {
    */
   public static final void kickUser(final IMessage message, final String reason) {
     final IUser author = message.getAuthor();
-    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.KICK, -1));
+    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.KICK, -1, reason));
     Infractions.kickUser(author.getLongID(), message.getTimestamp().getEpochSecond(), reason);
     guild.kickUser(author, reason);
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
@@ -147,7 +147,7 @@ public class RathBot {
    */
   public static final void banUser(final IMessage message, final String reason) {
     final IUser author = message.getAuthor();
-    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.BAN, -1));
+    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.BAN, -1, reason));
     Infractions.banUser(author.getLongID(), message.getTimestamp().getEpochSecond(), reason);
     guild.banUser(author, reason);
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),

@@ -15,7 +15,17 @@ import com.rath.rathbot.disc.PunishmentType;
  */
 public class MessageHelper {
   
+  /** The message that is displayed if no commands are registered with the bot. */
   public static final String NO_COMMANDS_MSG = "No commands registered.";
+  
+  /** Rath's contact information String. */
+  public static final String RATH_CONTACT = "Discord:Rathuldr#0587, Email:rathuldr@gmail.com";
+  
+  /** Kami's contact information String. */
+  public static final String KAMI_CONTACT = "Discord:Loli no Kami#0911";
+  
+  public static final String ERROR_CONTACT_MSG = "If you believe this was an error, contact Rath (" + RATH_CONTACT
+      + ") or Kami (" + KAMI_CONTACT + ").";
   
   /**
    * Builds a message with commands and their descriptions.
@@ -65,6 +75,10 @@ public class MessageHelper {
    */
   public static final String concatenateTokens(String[] tokens, int startIndex) {
     
+    if (tokens == null) {
+      return null;
+    }
+    
     if (tokens.length <= startIndex) {
       System.err.println("concatenateTokens(): Token length out of bounds.");
       return null;
@@ -87,7 +101,16 @@ public class MessageHelper {
    * @return the built String.
    */
   public static final String buildListString(final String header, final List<?> list, final boolean breakLines) {
-    String result = header + "\n  ";
+    
+    if (list == null) {
+      return null;
+    }
+    
+    String result = "";
+    
+    if (header != null && header.length() > 0) {
+      result += header + "\n  ";
+    }
     
     // Fencepost start
     if (list.size() >= 1) {
@@ -109,20 +132,72 @@ public class MessageHelper {
    * Builds a notification message for an infraction, delivered to the user in a direct message.
    * 
    * @param type the type of punishment (warn, ban, etc.).
-   * @param time the amount of time the user stays muted; if the user isn't to be muted, this can be any value.
+   * @param time the amount of time the user stays muted, in seconds. if the user isn't to be muted, this parameter is
+   *        ignored.
+   * @param reason the reason the user was banned, as a String.
    * @return the message that will be sent as a String.
    */
-  public static String buildDiscNotificationMessage(final PunishmentType type, final int time) {
-    String msg = "You have been " + type.getVerb() + type.getPrep() + " the osu! University server";
-    if (type.equals(PunishmentType.MUTE)) {
-      msg += " for ";
-      if (time >= 3600) {
-        msg += (time / 3600) + " hours";
-      } else {
-        msg += (time / 60 + " minutes");
-      }
+  public static String buildDiscNotificationMessage(final PunishmentType type, int time, String reason) {
+    
+    // Ensure type isn't null, time isn't negative, and that the reason isn't null or empty
+    if (type == null) {
+      return null;
     }
-    msg += ".\nIf you believe this was an error, contact Rath (Rathuldr#0587) or Kami (Danni293#0911).";
+    if (time <= 0) {
+      time = 0;
+    }
+    if (reason == null || reason.length() <= 0) {
+      reason = "No reason provided.";
+    }
+    
+    // Build the message
+    String msg = "You have been " + type.getVerb() + " " + type.getPrep() + " the osu! University server";
+    if (type.equals(PunishmentType.MUTE) && time > 0) {
+      msg += " for ";
+      
+      // Build a time string in the format "WdXhYmZs", where W=days, X=hours, Y=minutes, and Z=seconds
+      String timeString = "";
+      
+      // Days
+      if (time >= 86400) {
+        final int days = time / 86400;
+        if (days > 0) {
+          timeString += days + "d";
+        }
+        time %= 86400;
+      }
+      
+      // Hours
+      if (time >= 3600) {
+        final int hours = time / 3600;
+        if (hours > 0) {
+          timeString += hours + "h";
+        }
+        time %= 3600;
+      }
+      
+      // Minutes
+      if (time >= 60) {
+        final int minutes = time / 60;
+        if (minutes > 0) {
+          timeString += minutes + "m";
+        }
+        time %= 60;
+      }
+      
+      // Seconds
+      if (time > 0) {
+        final int seconds = time;
+        if (seconds > 0) {
+          timeString += seconds + "s";
+        }
+      }
+      
+      msg += timeString;
+    }
+    
+    msg += ".\nReason: \"" + reason + "\".\n";
+    msg += ERROR_CONTACT_MSG;
     return msg;
   }
 }

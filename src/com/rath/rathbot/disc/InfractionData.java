@@ -117,6 +117,8 @@ public class InfractionData implements Serializable {
   
   /**
    * Sets the user's muted status.
+   * 
+   * @param b true if the user shall be muted; false if not.
    */
   public final void setMuted(final boolean b) {
     this.isMuted = b;
@@ -140,7 +142,7 @@ public class InfractionData implements Serializable {
    * Increments a user's kick count.
    * 
    * @param time the epoch time the user was kicked.
-   * @param the reason the user is being kicked.
+   * @param reason the reason the user is being kicked.
    */
   public final void kick(final long time, final String reason) {
     this.history.add(new InfractionEntry(PunishmentType.KICK, time, reason));
@@ -158,6 +160,8 @@ public class InfractionData implements Serializable {
   
   /**
    * Sets the user's banned status.
+   * 
+   * @param b true if the user shall be banned; false if not.
    */
   public final void setBanned(final boolean b) {
     this.isBanned = b;

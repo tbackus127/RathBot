@@ -18,9 +18,7 @@ public class CommandParser {
   /**
    * Parses and dispatches a command to the proper methods.
    * 
-   * @param channel the IChannel the bot received the message on.
-   * @param author the author of the message as an IAuthor object.
-   * @param message the message itself.
+   * @param message the IMessage object containing the message contents, its author, etc.
    */
   public static final void parseCommand(final IMessage message) {
     

@@ -1,0 +1,15 @@
+com.rath.rathbot
+com.rath.rathbot.cmd
+com.rath.rathbot.cmd.admin
+com.rath.rathbot.cmd.disc
+com.rath.rathbot.cmd.disc.actions
+com.rath.rathbot.cmd.msg
+com.rath.rathbot.cmd.msg.faq
+com.rath.rathbot.cmd.msg.lib
+com.rath.rathbot.cmd.users.wallet
+com.rath.rathbot.disc
+com.rath.rathbot.exceptions
+com.rath.rathbot.log
+com.rath.rathbot.msg
+com.rath.rathbot.task
+com.rath.rathbot.util

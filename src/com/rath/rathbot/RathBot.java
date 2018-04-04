@@ -213,7 +213,7 @@ public class RathBot {
   /**
    * Gets the reference to the channel map.
    * 
-   * @return a TreeMap from String -> IChannel.
+   * @return a TreeMap from String to IChannel.
    */
   public static final TreeMap<String, IChannel> getChannelMap() {
     return channelMap;
@@ -261,10 +261,10 @@ public class RathBot {
   }
   
   /**
-   * Builds a map of Channel Name -> Channel ID.
+   * Builds a map of Channel Name to Channel ID.
    * 
    * @param client the logged-in client instance.
-   * @return a HashMap of type String -> Long.
+   * @return a HashMap of type String to Long.
    */
   private static final TreeMap<String, IChannel> buildChannelMap(final IDiscordClient client) {
     

@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.exceptions.FAQNotFoundException;
+import com.rath.rathbot.msg.MessageHelper;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -57,7 +58,7 @@ public class FAQCmd extends RBCommand {
   /**
    * Gets a list of FAQs that are currently set.
    * 
-   * @param channel the channel to send the list to. Returns null if the map is empty.
+   * @return a String containing a list of FAQs that are currently registered.
    */
   public static final String getFaqList() {
     
@@ -70,7 +71,6 @@ public class FAQCmd extends RBCommand {
     if (faqMap.size() <= 0) {
       return "There are no saved FAQs.";
     }
-    
     // Construct the FAQ list message
     String message = "FAQ List:\n";
     for (final String s : faqMap.keySet()) {
@@ -100,6 +100,7 @@ public class FAQCmd extends RBCommand {
    * Sends a FAQ's contents to the specific channel.
    * 
    * @param faq the FAQ ID to fetch the message of.
+   * @return the contents of the FAQ specified as a String.
    */
   public static final String getFaq(final String faq) {
     
@@ -260,8 +261,6 @@ public class FAQCmd extends RBCommand {
   
   /**
    * Initializes the FAQ map.
-   * 
-   * @return a TreeMap mapping FAQ ID to its contents.
    */
   private static final void initFAQ() {
     
@@ -291,8 +290,6 @@ public class FAQCmd extends RBCommand {
   
   /**
    * Loads the FAQ map from file.
-   * 
-   * @return the previously-serialized HashMap.
    */
   @SuppressWarnings("unchecked")
   private static final void loadFAQMap() {

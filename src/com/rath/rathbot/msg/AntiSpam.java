@@ -87,6 +87,7 @@ public class AntiSpam {
    * Performs message filtering for spam and muted users.
    * 
    * @param message the IMessage the event handler received.
+   * @return true if the spam filtering was flagged; false if not.
    */
   public static final boolean filterMessage(final IMessage message) {
     
@@ -108,7 +109,7 @@ public class AntiSpam {
     // If the author is muted, immediately delete muted users' messages
     if (Infractions.isMuted(uid)) {
       message.delete();
-      return true;
+      return false;
     }
     
     // Check for spam and return a type if a flag is raised

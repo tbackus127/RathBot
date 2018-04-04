@@ -17,6 +17,7 @@ public class TaskRegistry {
   /**
    * Register a task for the bot.
    * 
+   * @param name the name of the task as a String that will be referenced.
    * @param task the task as a RBTask object.
    */
   public static final void registerTask(final String name, final RBTask task) {
@@ -26,7 +27,7 @@ public class TaskRegistry {
   /**
    * Gets all tasks currently registered.
    * 
-   * @return a HashMap from String -> RBTask.
+   * @return a HashMap from String to RBTask.
    */
   public static final HashMap<String, RBTask> getTaskMap() {
     return taskSet;
@@ -36,7 +37,7 @@ public class TaskRegistry {
    * Gets a task by its name.
    * 
    * @param name the task's registered name.
-   * @return
+   * @return the RBTask task that is registered with the given name.
    */
   public static final RBTask getTaskByName(final String name) {
     return taskSet.get(name);

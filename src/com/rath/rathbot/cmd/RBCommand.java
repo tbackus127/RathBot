@@ -105,8 +105,11 @@ public abstract class RBCommand {
    * Executes the command. Any external data needed must first be added to the child command's class via other
    * non-inherited methods. See /ref/templates.txt for instructions to correctly override this method.
    * 
+   * @param author the IUser that executed the command.
    * @param channel the channel the command was received from.
-   * @param message the message that executed the command.
+   * @param tokens an array of Strings that were split at commas.
+   * @param tokenDepth the index of the token we are working with.
+   * @return true if the recursive command search can be stopped; false if not.
    */
   public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
       final int tokenDepth) {

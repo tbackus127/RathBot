@@ -30,6 +30,7 @@ public class HelpCmd extends RBCommand {
   /**
    * Adds a command to the help command set.
    * 
+   * @param name the name the command will be referenced with.
    * @param cmd the command to add.
    */
   public void addCommandEntry(final String name, final RBCommand cmd) {

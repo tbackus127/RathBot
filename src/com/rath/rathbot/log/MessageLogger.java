@@ -9,6 +9,8 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import com.rath.rathbot.RathBot;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 
@@ -114,6 +116,26 @@ public class MessageLogger {
     final String author = msg.getAuthor().getName();
     final String messageString = msg.getContent();
     final String timestamp = msg.getTimestamp().toString();
+    
+    // If the channel map isn't built, add this channel and add its PrintStream to the PrintStream map
+    final TreeMap<String, IChannel> chMap = RathBot.getChannelMap();
+    final String chName = channel.getName();
+    if (!chMap.containsKey(chName)) {
+      
+      // Add to Channel map
+      chMap.put(chName, channel);
+      System.out.println("Added channel mapping: " + chName + " -> " + channel.getLongID() + ".");
+      
+      // Add to PrintStream map
+      final String filePath = PATH_LOGS + LOG_PREFIX + chName + LOG_SUFFIX;
+      final File file = new File(filePath);
+      try {
+        printStreamMap.put(channel, new PrintStream(new FileOutputStream(file, true)));
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      }
+      
+    }
     
     // Build and append the string to the log file
     PrintStream ps = printStreamMap.get(channel);

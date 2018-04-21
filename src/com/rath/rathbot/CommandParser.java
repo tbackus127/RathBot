@@ -33,6 +33,7 @@ public class CommandParser {
     
     // Ensure the message isn't just the prefix
     if (tokens.length <= 1) {
+      RathBot.sendMessage(channel, "Invalid command. Type \"rb! help\" for a list of commands.");
       return;
     }
     
@@ -42,7 +43,7 @@ public class CommandParser {
     
     // If no command exists
     if (cmd == null) {
-      // TODO: Post invalid command message
+      RathBot.sendMessage(channel, "Invalid command. Type \"rb! help\" for a list of commands.");
       return;
     }
     
@@ -68,8 +69,8 @@ public class CommandParser {
       cmd.executeCommand(author, channel, tokens, 1);
       
     } else {
-      System.out
-          .println("User " + author.getName() + " tried to execute " + cmd.getCommandName() + " with permission level "
+      System.out.println(
+          "User " + author.getName() + " tried to execute " + cmd.getCommandName() + " with permission level "
               + PermissionsTable.getLevel(userID) + " (" + cmd.permissionLevelRequired() + " required).");
       RathBot.sendMessage(channel, "You do not have the required permissions for that command.");
     }

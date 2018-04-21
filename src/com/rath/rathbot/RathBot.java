@@ -45,6 +45,9 @@ public class RathBot {
   /** The channel where reports and actions will be posted. */
   private static final String REPORT_CHANNEL_NAME = "#report";
   
+  /** The report channel's long ID. */
+  private static final long REPORT_CHANNEL_ID = 387498131950141440L;
+  
   /** The osu! University guild ID. */
   private static final long GUILD_ID = 291067429596168193L;
   
@@ -281,6 +284,9 @@ public class RathBot {
     System.out.println("Building channel map...");
     final List<IChannel> channels = client.getChannels();
     final TreeMap<String, IChannel> result = new TreeMap<String, IChannel>();
+    
+    // Add important channels manually just in case Discord4J doesn't want to list channels
+    result.put("report", client.getChannelByID(REPORT_CHANNEL_ID));
     
     // For each channel, add a mapping from its name to its ID
     for (final IChannel c : channels) {

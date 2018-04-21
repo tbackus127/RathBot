@@ -15,7 +15,6 @@ import java.util.TreeMap;
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.exceptions.FAQNotFoundException;
-import com.rath.rathbot.msg.MessageHelper;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;

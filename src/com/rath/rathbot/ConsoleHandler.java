@@ -49,12 +49,13 @@ public class ConsoleHandler {
         // Send a message to a specific channel
         case "say":
           if (tokens.length >= 3) {
-            final String channel = tokens[1];
+            final long cid = Long.parseLong(tokens[1]);
             String npMessage = tokens[2];
             for (int i = 3; i < tokens.length; i++) {
               npMessage += " " + tokens[i];
             }
-            RathBot.sendMessage(RathBot.getChannelMap().get(channel), npMessage);
+            
+            RathBot.sendMessage(RathBot.getClient().getChannelByID(cid), npMessage);
           }
         break;
       

@@ -7,6 +7,7 @@ import com.rath.rathbot.cmd.RBCommand;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.util.DiscordException;
 
 /**
  * This class handles parsing and dispatching of commands.
@@ -47,20 +48,31 @@ public class CommandParser {
       return;
     }
     
+    System.out.println("Command found: " + cmd.getCommandName() + ".");
+    
     // If the user doesn't have an entry on the permissions table, initialize them and save
     final long userID = author.getLongID();
     if (!PermissionsTable.hasUser(userID)) {
       PermissionsTable.initUser(userID);
+      System.out.println("Initialized " + author.getName() + " in perm table.");
     }
     
     // Check permissions for this command.
     if (PermissionsTable.getLevel(userID) >= cmd.permissionLevelRequired()) {
       
+      System.out.println("Channel: " + channel.getName() + ", ReqDM?: " + cmd.requiresDirectMessage() + ", ChPriv?: "
+          + channel.isPrivate());
+      
       // If a PM-only command was issued in a public channel
-      if (cmd.requiresDirectMessage() && RathBot.getChannelMap().values().contains(channel)) {
+      if (cmd.requiresDirectMessage() && !channel.isPrivate()) {
         
         // Delete the message and post a notification.
-        message.delete();
+        try {
+          message.delete();
+        } catch (DiscordException dce) {
+          dce.printStackTrace();
+        }
+        
         RathBot.sendMessage(channel, "This command can only be issued in a direct message to RathBot.");
         return;
       }
@@ -69,6 +81,8 @@ public class CommandParser {
       cmd.executeCommand(author, channel, tokens, 1);
       
     } else {
+      
+      // Log and notify the author that they don't have the required permissions level
       System.out.println(
           "User " + author.getName() + " tried to execute " + cmd.getCommandName() + " with permission level "
               + PermissionsTable.getLevel(userID) + " (" + cmd.permissionLevelRequired() + " required).");

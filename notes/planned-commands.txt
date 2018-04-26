@@ -23,7 +23,7 @@ Required permission levels are in parentheses preceded by 'P': "(P4)" means the 
   [X] (P2) list: lists all stored FAQs
   [X] (P3) edit* <name> <content..>: Edits the contents of FAQ $name to $content, or creates it if it does not exist
   [X] (P4) remove* <name>: Removes a FAQ from memory.
-[ ] (P1) uid**: Gets the internal ID for a user. This is needed for anonymous reports.
+[X] (P1) uid**: Gets the internal ID for a user. This is needed for anonymous reports.
 [ ] memstats
   [ ] (P2) memtime <user>: Post how long $user has been a member of this server.
 
@@ -38,7 +38,7 @@ Required permission levels are in parentheses preceded by 'P': "(P4)" means the 
     set forth by this server."
 
 > Bot-related
-[ ] (P6) perm* <uid> <level>: Sets the user with UID=$uid to $level.
+[X] (P6) perm* <uid> <level>: Sets the user with UID=$uid to $level.
 [ ] (P7) shutdown: Shuts the bot down as a last resort in case something goes haywire.
 [ ] (P7) restart: Shuts the bot down and starts it back up.
 [ ] (P7) rebuild: Deletes all saved data structures and rebuilds them.

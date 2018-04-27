@@ -1,6 +1,7 @@
 
 package com.rath.rathbot;
 
+import java.io.File;
 import java.util.List;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -36,6 +37,9 @@ public class RathBot {
   
   /** The name of the data directory. */
   public static final String DIR_DATA = "dat/";
+  
+  /** The directory name that will contain the logs. */
+  public static final String DIR_LOGS = "logs/";
   
   /** Relative path to the bot's config file containing the authentication key. */
   private static final String CONFIG_FILE_PATH = "rathbot.conf";
@@ -252,6 +256,12 @@ public class RathBot {
    * @param client the Discord client used for pretty much everything.
    */
   private static final void buildAndLoadDataStructures(final IDiscordClient client) {
+    
+    // Create the data folders
+    final File datDir = new File(DIR_DATA);
+    if (!datDir.mkdir()) System.err.println("Error creating dat directory!");
+    final File logsDir = new File(DIR_LOGS);
+    if (!logsDir.mkdir()) System.err.println("Error creating logs directory!");
     
     // Log in and build the channel map
     discClient = client;

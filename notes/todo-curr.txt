@@ -1,0 +1,1 @@
+* Edit executeCommands() to take an IMessage object instead of an IUser/IAuthor combo.

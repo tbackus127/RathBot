@@ -17,13 +17,21 @@ Required permission levels are in parentheses preceded by 'P': "(P4)" means the 
 [ ] (P2) react <name>: Posts the reaction image named $name. Due to the possibility of registering potentially large
     images, Rath will add these manually. They can be hot-swapped while the bot is running.
 
-> Info
-[X] (P1) help [command]: Posts the commands list if $command is not given; otherwise, posts the help text for $command.
+> Utilities
+[ ] (P2) remind <time+> <message>: PMs a user <message> once <time> has elapsed.
 [X] (P2) faq <name>: posts the contents of the $name FAQ
   [X] (P2) list: lists all stored FAQs
   [X] (P3) edit* <name> <content..>: Edits the contents of FAQ $name to $content, or creates it if it does not exist
   [X] (P4) remove* <name>: Removes a FAQ from memory.
-[ ] (P1) uid**: Gets the internal ID for a user. This is needed for anonymous reports.
+[ ] task
+  [ ] (P5) act* <name>: Activates the task with the name <name>.
+  [ ] (P?) deact <name>: Deactivates the task with the name <name>.
+  [ ] (P6) del <name>: Removes the task with the name <name>.
+  [ ] (P6) cron <name> <time+> <repeat?>: Edits the task to be performed in <time> from now, and if it will <repeat> or not.
+
+> Info
+[X] (P1) help [command]: Posts the commands list if $command is not given; otherwise, posts the help text for $command.
+[X] (P1) uid**: Gets the internal ID for a user. This is needed for anonymous reports.
 [ ] memstats
   [ ] (P2) memtime <user>: Post how long $user has been a member of this server.
 
@@ -36,13 +44,17 @@ Required permission levels are in parentheses preceded by 'P': "(P4)" means the 
     too many messages during this time will result in a kick. A $reason may be given.
 [ ] (P1) rule <X.Y.Z>: Posts rule X.Y.Z. Example: "rb! rule 14.1" will post "14.1: The Discord EULA overrides all rules
     set forth by this server."
+[ ] (P5) prune* <time+>: Purges all inactive members since $time.
+[ ] (P5) prunewarn* <time+>: Private messages all members that would be purged by the purge command that they are at risk for being 
+    purged.
 
 > Bot-related
-[ ] (P6) perm* <uid> <level>: Sets the user with UID=$uid to $level.
+[X] (P6) perm* <uid> <level>: Sets the user with UID=$uid to $level.
 [ ] (P7) shutdown: Shuts the bot down as a last resort in case something goes haywire.
 [ ] (P7) restart: Shuts the bot down and starts it back up.
 [ ] (P7) rebuild: Deletes all saved data structures and rebuilds them.
 [ ] (P3) running: Posts how long the bot has been running.
+[ ] (P7) setvar <varName> <value>: Sets <varName> to <value> in the bot's variable table.
 
 
 * Mod/Admin-only commands

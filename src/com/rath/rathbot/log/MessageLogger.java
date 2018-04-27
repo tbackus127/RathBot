@@ -22,9 +22,6 @@ import sx.blah.discord.handle.obj.IMessage;
  */
 public class MessageLogger {
   
-  /** The directory name that will contain the logs. */
-  private static final String PATH_LOGS = "logs/";
-  
   /** The prefix for all log files. Channel names will be between these. */
   private static final String LOG_PREFIX = "log_";
   
@@ -35,7 +32,7 @@ public class MessageLogger {
    * The channel label for private message logging. Discord channels cannot contain spaces, so it should be impossible
    * to accidentally log here.
    */
-  private static final String PM_LOG_FILEPATH = PATH_LOGS + "_PM History" + LOG_SUFFIX;
+  private static final String PM_LOG_FILEPATH = RathBot.DIR_LOGS + "_PM History" + LOG_SUFFIX;
   
   /** Maps a channel to its PrintStream. */
   private static HashMap<IChannel, PrintStream> printStreamMap = null;
@@ -59,7 +56,7 @@ public class MessageLogger {
     for (final String s : channelMap.keySet()) {
       
       // Build log file path
-      final String filePath = PATH_LOGS + LOG_PREFIX + s + LOG_SUFFIX;
+      final String filePath = RathBot.DIR_LOGS + LOG_PREFIX + s + LOG_SUFFIX;
       try {
         
         // Create a new PrintStream with its correct channel name and map it from its IChannel
@@ -127,7 +124,7 @@ public class MessageLogger {
       System.out.println("Added channel mapping: " + chName + " -> " + channel.getLongID() + ".");
       
       // Add to PrintStream map
-      final String filePath = PATH_LOGS + LOG_PREFIX + chName + LOG_SUFFIX;
+      final String filePath = RathBot.DIR_LOGS + LOG_PREFIX + chName + LOG_SUFFIX;
       final File file = new File(filePath);
       try {
         printStreamMap.put(channel, new PrintStream(new FileOutputStream(file, true)));

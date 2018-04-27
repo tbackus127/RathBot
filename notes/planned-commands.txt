@@ -32,15 +32,19 @@ Required permission levels are in parentheses preceded by 'P': "(P4)" means the 
 > Info
 [X] (P1) help [command]: Posts the commands list if $command is not given; otherwise, posts the help text for $command.
 [X] (P1) uid**: Gets the internal ID for a user. This is needed for anonymous reports.
+[ ] (P1) guildid: Displays the server's internal ID.
+[ ] srvstats
+  [ ] (P2) emojiuse: Posts a frequency chart of emojis.
 [ ] memstats
   [ ] (P2) memtime <user>: Post how long $user has been a member of this server.
 
 > Administrative
-[ ] (P1) report** <UID> <reason..>: Only accepted through a PM. Reports the member with UID = $uid for $reason. The
+[ ] (P1) report** <uid> <reason..>: Only accepted through a PM. Reports the member with UID = $uid for $reason. The
     report will get posted in #report and will be logged.
-[ ] (P4) kick* <username> <reason..>: Kicks $username
-[ ] (P5) ban* <username> <time+> <reason..>: Bans $username.
-[ ] (P4) mute* <username> <time+> <reason..>: $username's new messages will be immediately deleted for $time. Posting
+[ ] (P4) strike* <uid> <reason..>: Adds a strike against the user with the given $uid. A $reason may be given.
+[ ] (P4) kick* <uid> <reason..>: Kicks the user with the given $uid.
+[ ] (P5) ban* <uid> <time+> <reason..>: Bans user with the given $uid.
+[ ] (P4) mute* <uid> <time+> <reason..>: User with the given $uid's new messages will be immediately deleted for $time. Posting
     too many messages during this time will result in a kick. A $reason may be given.
 [ ] (P1) rule <X.Y.Z>: Posts rule X.Y.Z. Example: "rb! rule 14.1" will post "14.1: The Discord EULA overrides all rules
     set forth by this server."
@@ -55,6 +59,15 @@ Required permission levels are in parentheses preceded by 'P': "(P4)" means the 
 [ ] (P7) rebuild: Deletes all saved data structures and rebuilds them.
 [ ] (P3) running: Posts how long the bot has been running.
 [ ] (P7) setvar <varName> <value>: Sets <varName> to <value> in the bot's variable table.
+
+> osu!
+[ ] osu
+  [ ] (P3) whatif <mapID> [{score}]: Calculates the issuer's stat change if they were theoretically to make a given play on $mapID with 
+      a given $score.
+  [ ] (P3) analyze**: Prompts the issuer to upload the map's .osu file and .osr replay and performs in-depth analysis on how they can 
+      improve, the play's metrics and statistics, and replies.
+  [ ] (P3) diffcalc: When posted with a .osu map file, performs component-based difficulty calculation on the map and posts the results.
+
 
 
 * Mod/Admin-only commands

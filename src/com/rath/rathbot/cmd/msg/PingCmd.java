@@ -7,21 +7,21 @@ import com.rath.rathbot.cmd.RBCommand;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
-public class SayHelloCmd extends RBCommand {
+public class PingCmd extends RBCommand {
   
   @Override
   public String getCommandName() {
-    return "sayhello";
+    return "ping";
   }
   
   @Override
   public String getCommandDescription() {
-    return "Make RathBot say \"hello\".";
+    return "Ping RathBot and receive a response.";
   }
   
   @Override
   public String getCommandUsage() {
-    return "rb! sayHello";
+    return "rb! ping";
   }
   
   @Override
@@ -37,7 +37,7 @@ public class SayHelloCmd extends RBCommand {
   @Override
   public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens, final int tokDepth) {
     
-    RathBot.sendMessage(channel, "Hello!");
+    RathBot.sendMessage(channel, "Pong!");
     
     return RBCommand.STOP_CMD_SEARCH;
   }

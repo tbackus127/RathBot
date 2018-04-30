@@ -1,2 +1,9 @@
 
-* Track emoji use (for pruning unused ones)
+* Track emoji use (for pruning unused ones).
+* Tasks:
+  - Scheduling
+  - Enabling
+  - Deletion
+  - Disabling
+* Gibberish filtering
+  - Use Markov chains trained against good and bad messages from server logs

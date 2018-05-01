@@ -125,22 +125,22 @@ public class AntiSpam {
       if (kickCount >= KICKS_TO_BAN) {
         
         // Issue the ban
-        RathBot.banUser(message, trig.getReason());
+        RathBot.banUser(author, message.getTimestamp().getEpochSecond(), trig.getReason());
         
       } else if (muteCount >= MUTES_TO_KICK) {
         
         // Issue the kick
-        RathBot.kickUser(message, trig.getReason());
+        RathBot.kickUser(author, message.getTimestamp().getEpochSecond(), trig.getReason());
         
       } else if (warnCount >= WARNS_TO_MUTE) {
         
         // Issue the mute
-        RathBot.muteUser(message, MUTE_DURATIONS[muteCount], trig.getReason());
+        RathBot.muteUser(author, message.getTimestamp().getEpochSecond(), MUTE_DURATIONS[muteCount], trig.getReason());
         
       } else {
         
         // Issue the warn
-        RathBot.warnUser(message, trig.getReason());
+        RathBot.warnUser(author, message.getTimestamp().getEpochSecond(), trig.getReason());
         
       }
       

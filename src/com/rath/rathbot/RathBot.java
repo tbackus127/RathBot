@@ -24,7 +24,6 @@ import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.StatusType;
 
@@ -101,30 +100,30 @@ public class RathBot {
   /**
    * Warns the user of the given message for a reason.
    * 
-   * @param message the IMessage object that warranted a warn.
+   * @param warnUser the IUser reference of the user to be warned.
+   * @param warnTime the time the warn was issued, in milliseconds.
    * @param reason the reason a warn was issued as a String.
    */
-  // TODO: Make this not kick the author
-  public static final void warnUser(final IMessage message, final String reason) {
-    Infractions.warnUser(message.getAuthor().getLongID(), message.getTimestamp().getEpochSecond(), reason);
+  public static final void warnUser(final IUser warnUser, final long warnTime, final String reason) {
+    Infractions.warnUser(warnUser.getLongID(), warnTime, reason);
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
-        message.getAuthor().getName() + " has been warned for reason: \"" + reason + "\".");
+        warnUser.getName() + " has been warned for reason: \"" + reason + "\".");
   }
   
   /**
    * Mutes the user of the given message for a reason.
    * 
-   * @param message the IMessage object that warranted a mute.
+   * @param muteUser the IUser reference of the user to be muted.
+   * @param muteTime the time the mute was issued, in milliseconds.
    * @param muteDuration the amount of time the user will be unable to chat, in seconds.
    * @param reason the reason a mute was issued as a String.
    */
-  // TODO: Make this not kick the author
-  public static final void muteUser(final IMessage message, final int muteDuration, final String reason) {
-    final IUser author = message.getAuthor();
-    Infractions.muteUser(author.getLongID(), message.getTimestamp().getEpochSecond(), muteDuration, reason);
-    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.MUTE, muteDuration, reason));
+  public static final void muteUser(final IUser muteUser, final long muteTime, final int muteDuration,
+      final String reason) {
+    Infractions.muteUser(muteUser.getLongID(), muteTime, muteDuration, reason);
+    sendDirectMessage(muteUser, MessageHelper.buildDiscNotificationMessage(PunishmentType.MUTE, muteDuration, reason));
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
-        message.getAuthor().getName() + " has been muted for reason: \"" + reason + "\".");
+        muteUser.getName() + " has been muted for reason: \"" + reason + "\".");
   }
   
   /**
@@ -140,33 +139,31 @@ public class RathBot {
   /**
    * Kicks the user of the given message for a reason.
    * 
-   * @param message the IMessage object that warranted a kick.
+   * @param kickUser the IUser reference of the user to be kicked.
+   * @param kickTime the time the kick was issued, in milliseconds.
    * @param reason the reason a kick was issued as a String.
    */
-  // TODO: Make this not kick the author
-  public static final void kickUser(final IMessage message, final String reason) {
-    final IUser author = message.getAuthor();
-    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.KICK, -1, reason));
-    Infractions.kickUser(author.getLongID(), message.getTimestamp().getEpochSecond(), reason);
-    guild.kickUser(author, reason);
+  public static final void kickUser(final IUser kickUser, final long kickTime, final String reason) {
+    sendDirectMessage(kickUser, MessageHelper.buildDiscNotificationMessage(PunishmentType.KICK, -1, reason));
+    Infractions.kickUser(kickUser.getLongID(), kickTime, reason);
+    guild.kickUser(kickUser, reason);
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
-        message.getAuthor().getName() + " has been kicked for reason: \"" + reason + "\".");
+        kickUser.getName() + " has been kicked for reason: \"" + reason + "\".");
   }
   
   /**
    * Bans the user of the given message for a reason.
    * 
-   * @param message the IMessage object that warranted a ban.
+   * @param banUser the IUser reference of the user to be banned.
+   * @param banTime the time the ban was issued, in milliseconds.
    * @param reason the reason a ban was issued as a String.
    */
-  // TODO: Make this not kick the author
-  public static final void banUser(final IMessage message, final String reason) {
-    final IUser author = message.getAuthor();
-    sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.BAN, -1, reason));
-    Infractions.banUser(author.getLongID(), message.getTimestamp().getEpochSecond(), reason);
-    guild.banUser(author, reason);
+  public static final void banUser(final IUser banUser, final long banTime, final String reason) {
+    sendDirectMessage(banUser, MessageHelper.buildDiscNotificationMessage(PunishmentType.BAN, -1, reason));
+    Infractions.banUser(banUser.getLongID(), banTime, reason);
+    guild.banUser(banUser, reason);
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
-        message.getAuthor().getName() + " has been banned for reason: \"" + reason + "\".");
+        banUser.getName() + " has been banned for reason: \"" + reason + "\".");
   }
   
   /**

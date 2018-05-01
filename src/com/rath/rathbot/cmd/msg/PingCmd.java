@@ -7,6 +7,14 @@ import com.rath.rathbot.cmd.RBCommand;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
+/**
+ * 
+ * This command pings the bot, prompting the bot to respond and verify the bot is processing commands.
+ * 
+ * @author Kami lehenbnw@gmail.com
+ *
+ */
+
 public class PingCmd extends RBCommand {
   
   @Override

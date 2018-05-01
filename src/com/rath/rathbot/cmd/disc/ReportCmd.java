@@ -23,7 +23,7 @@ public class ReportCmd extends RBCommand {
    * 
    * TODO: Remove this constant before merge with PROD.
    */
-  private static final long REPORT_CHANNEL_ID = 291441076257161217L;
+  private static final long REPORT_CHANNEL_ID = 431308950097494028L;
   
   /** IDiscordClient copy from RathBot, used to obtain IChannel object from channel map. */
   private static IDiscordClient client = RathBot.getClient();

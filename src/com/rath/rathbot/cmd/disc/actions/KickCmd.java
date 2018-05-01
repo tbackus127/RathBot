@@ -9,6 +9,13 @@ import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
+/**
+ * Kicks user by UID or mention for a given reason.
+ * 
+ * @author Kami lehenbnw@gmail.com
+ *
+ */
+
 public class KickCmd extends RBCommand {
   
   @Override
@@ -18,7 +25,7 @@ public class KickCmd extends RBCommand {
   
   @Override
   public String getCommandDescription() {
-    return "(Mod only) Kicks a user defined by their UID.";
+    return "(Mod only) Kicks a user defined by their UID or @mention for a given reason.";
   }
   
   @Override
@@ -45,6 +52,8 @@ public class KickCmd extends RBCommand {
       return RBCommand.STOP_CMD_SEARCH;
     }
     
+    // TODO: create a check for user mention or UID, use either to create user object.
+    
     long kickUserID = 0;
     
     // Retrieve UID from arguments.
@@ -56,7 +65,7 @@ public class KickCmd extends RBCommand {
     
     final IDiscordClient client = RathBot.getClient();
     
-    // Create IUser object from REPORTED_USER_ID to reference user in messages.
+    // Create IUser object from kickUserID to kick them.
     IUser kickedUser = client.getUserByID(kickUserID);
     if (kickedUser == null) {
       RathBot.sendDirectMessage(msg.getAuthor(), "Error! User not found, please enter a valid UID.");

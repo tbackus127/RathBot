@@ -59,7 +59,7 @@ public class RathBot {
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
-  private static final RBCommand[] commandList = { new FAQCmd(), new UIDCmd(), new MuteCmd(), new UnmuteCmd(),
+  private static final RBCommand[] commandList = { new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(),
       new PingCmd() };
   
   /** The set of commands this bot responds to. */

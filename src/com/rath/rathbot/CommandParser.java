@@ -78,7 +78,7 @@ public class CommandParser {
       }
       
       // Execute the command that matches
-      cmd.executeCommand(author, channel, tokens, 1);
+      cmd.executeCommand(message, tokens, 1);
       
     } else {
       

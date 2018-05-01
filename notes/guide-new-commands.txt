@@ -42,8 +42,9 @@
    helpful comments and document your command by filling out the Javadoc for your class itself, each of its fields,
    methods, and constructors. I will not accept a pull request if your code is not commented.
 
-10. Now that you have your command(s) created go into RathBot.java and find the "RBCommand[] commandList" initialization
+10. Now that you have your command(s) created, go into RathBot.java and find the "RBCommand[] commandList" initialization
     and add a new instance of your command(s) in the appropriate spot according to command priority. Higher priority commands
-    should go first as they will be checked sooner. Make sure you imported your command(s) before you commit changes.
+    should go first as they will be found sooner in the command search. Make sure you imported your command(s) before you
+    commit changes.
 
 

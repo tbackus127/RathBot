@@ -8,7 +8,7 @@ import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.msg.MessageHelper;
 
-import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
 /**
@@ -54,8 +54,7 @@ public class UIDCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
-      final int tokenDepth) {
+  public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
     // If there aren't enough commands, notify and stop
     if (tokens.length <= 2) {
@@ -75,7 +74,7 @@ public class UIDCmd extends RBCommand {
     
     // Build the list and send the message
     final String matchesStr = MessageHelper.buildListString("Matches for " + userSearch + ":", matchList, true);
-    RathBot.sendMessage(channel, matchesStr);
+    RathBot.sendMessage(msg.getChannel(), matchesStr);
     
     return RBCommand.STOP_CMD_SEARCH;
   }

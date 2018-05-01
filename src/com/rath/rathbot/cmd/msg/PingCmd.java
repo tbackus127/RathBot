@@ -4,8 +4,7 @@ package com.rath.rathbot.cmd.msg;
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IMessage;
 
 /**
  * 
@@ -43,9 +42,9 @@ public class PingCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens, final int tokDepth) {
+  public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokDepth) {
     
-    RathBot.sendMessage(channel, "Pong!");
+    RathBot.sendMessage(msg.getChannel(), "Pong!");
     
     return RBCommand.STOP_CMD_SEARCH;
   }

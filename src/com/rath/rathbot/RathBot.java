@@ -51,14 +51,17 @@ public class RathBot {
   private static final String REPORT_CHANNEL_NAME = "#report";
   
   /** The report channel's long ID. */
+  // Note: This is the report channel ID for the osu! University server.
   private static final long REPORT_CHANNEL_ID = 387498131950141440L;
   
   /** The osu! University guild ID. */
+  // Note: This is the guild ID for the osu! University server.
   private static final long GUILD_ID = 291067429596168193L;
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
-  private static final RBCommand[] commandList = { new FAQCmd(), new UIDCmd(), new MuteCmd(), new UnmuteCmd(), new PingCmd()};
+  private static final RBCommand[] commandList = { new FAQCmd(), new UIDCmd(), new MuteCmd(), new UnmuteCmd(),
+      new PingCmd() };
   
   /** The set of commands this bot responds to. */
   private static final TreeMap<String, RBCommand> commandMap = new TreeMap<String, RBCommand>();
@@ -101,6 +104,7 @@ public class RathBot {
    * @param message the IMessage object that warranted a warn.
    * @param reason the reason a warn was issued as a String.
    */
+  // TODO: Make this not kick the author
   public static final void warnUser(final IMessage message, final String reason) {
     Infractions.warnUser(message.getAuthor().getLongID(), message.getTimestamp().getEpochSecond(), reason);
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
@@ -114,6 +118,7 @@ public class RathBot {
    * @param muteDuration the amount of time the user will be unable to chat, in seconds.
    * @param reason the reason a mute was issued as a String.
    */
+  // TODO: Make this not kick the author
   public static final void muteUser(final IMessage message, final int muteDuration, final String reason) {
     final IUser author = message.getAuthor();
     Infractions.muteUser(author.getLongID(), message.getTimestamp().getEpochSecond(), muteDuration, reason);
@@ -138,6 +143,7 @@ public class RathBot {
    * @param message the IMessage object that warranted a kick.
    * @param reason the reason a kick was issued as a String.
    */
+  // TODO: Make this not kick the author
   public static final void kickUser(final IMessage message, final String reason) {
     final IUser author = message.getAuthor();
     sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.KICK, -1, reason));
@@ -153,6 +159,7 @@ public class RathBot {
    * @param message the IMessage object that warranted a ban.
    * @param reason the reason a ban was issued as a String.
    */
+  // TODO: Make this not kick the author
   public static final void banUser(final IMessage message, final String reason) {
     final IUser author = message.getAuthor();
     sendDirectMessage(author, MessageHelper.buildDiscNotificationMessage(PunishmentType.BAN, -1, reason));
@@ -246,7 +253,6 @@ public class RathBot {
     System.out.print("Creating client... ");
     final IDiscordClient client = new ClientBuilder().withPingTimeout(5).withToken(token).build();
     guild = client.getGuildByID(GUILD_ID);
-    
     return client;
   }
   

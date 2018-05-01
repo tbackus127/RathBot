@@ -5,8 +5,7 @@ import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.msg.MessageHelper;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IMessage;
 
 /**
  * Subcommand of 'faq' that allows editing of FAQs.
@@ -53,15 +52,14 @@ public class FAQEditCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
-      final int tokenDepth) {
+  public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
     System.out.println("Executing faq.edit");
     
     final String message = MessageHelper.concatenateTokens(tokens, 4);
     
     FAQCmd.addFaq(tokens[3], message);
-    RathBot.sendMessage(channel, "FAQ " + tokens[3] + " updated.");
+    RathBot.sendMessage(msg.getChannel(), "FAQ " + tokens[3] + " updated.");
     
     return RBCommand.STOP_CMD_SEARCH;
     

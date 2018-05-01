@@ -8,6 +8,7 @@ import java.util.Set;
 import com.rath.rathbot.RathBot;
 
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
 /**
@@ -105,14 +106,12 @@ public abstract class RBCommand {
    * Executes the command. Any external data needed must first be added to the child command's class via other
    * non-inherited methods. See /ref/templates.txt for instructions to correctly override this method.
    * 
-   * @param author the IUser that executed the command.
-   * @param channel the channel the command was received from.
+   * @param msg the IMessage the command came from.
    * @param tokens an array of Strings that were split at commas.
    * @param tokenDepth the index of the token we are working with.
    * @return true if the recursive command search can be stopped; false if not.
    */
-  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
-      final int tokenDepth) {
+  public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
     System.out.println("In executeCommand() for " + this.getCommandName() + " with td=" + tokenDepth);
     
@@ -120,17 +119,19 @@ public abstract class RBCommand {
     final RBCommand cmd = checkSubcommands(getSubcommands(), tokens, tokenDepth);
     
     // If a subcommand is not found
+    final IChannel channel = msg.getChannel();
     if (cmd == null) {
       System.out.println("No subcommands found for " + tokens[tokenDepth]);
       return RBCommand.CONTINUE_CMD_SEARCH;
     } else {
       
       // Check permissions for this command.
+      final IUser author = msg.getAuthor();
       final long userID = author.getLongID();
       if (PermissionsTable.getLevel(userID) >= cmd.permissionLevelRequired()) {
         
         // Valid subcommand found, so return true
-        cmd.executeCommand(author, channel, tokens, tokenDepth + 1);
+        cmd.executeCommand(msg, tokens, tokenDepth + 1);
         return RBCommand.STOP_CMD_SEARCH;
         
       } else {

@@ -7,7 +7,7 @@ import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.disc.Infractions;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IMessage;
 
 /**
  * Mutes a user. Muting will not completely prevent a player from posting messages (since that feature doesn't exist in
@@ -54,10 +54,10 @@ public class MuteCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
-      final int tokenDepth) {
+  public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
     // Ensure proper token length
+    final IChannel channel = msg.getChannel();
     if (tokens.length != 4) {
       RathBot.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
       return true;
@@ -73,7 +73,7 @@ public class MuteCmd extends RBCommand {
     }
     
     // If the issuer's permissions level is lower than or equal to the target's disallow the mute
-    if (PermissionsTable.getLevel(author.getLongID()) <= PermissionsTable.getLevel(member)) {
+    if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(member)) {
       RathBot.sendMessage(channel, "Cannot mute a member with a higher permission level.");
       return RBCommand.STOP_CMD_SEARCH;
     }

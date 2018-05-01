@@ -4,8 +4,7 @@ package com.rath.rathbot.cmd.msg.faq;
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IMessage;
 
 /**
  * This subcommand outputs a list of all saved FAQs.
@@ -47,11 +46,10 @@ public class FAQListCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
-      final int tokenDepth) {
+  public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
     System.out.println("Executing faq.list");
-    RathBot.sendMessage(channel, FAQCmd.getFaqList());
+    RathBot.sendMessage(msg.getChannel(), FAQCmd.getFaqList());
     
     return RBCommand.STOP_CMD_SEARCH;
     

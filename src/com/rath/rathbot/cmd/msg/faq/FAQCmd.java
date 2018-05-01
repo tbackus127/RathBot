@@ -17,7 +17,7 @@ import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.exceptions.FAQNotFoundException;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IMessage;
 
 /**
  * This class handles the 'faq' command, which provides a way to store and recall any text.
@@ -198,11 +198,11 @@ public class FAQCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
-      final int tokenDepth) {
+  public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
     // If there are no subcommands for this command
-    if (!super.executeCommand(author, channel, tokens, tokenDepth)) {
+    final IChannel channel = msg.getChannel();
+    if (!super.executeCommand(msg, tokens, tokenDepth)) {
       
       System.out.println("Executing faq");
       

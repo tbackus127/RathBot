@@ -6,7 +6,7 @@ import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.disc.Infractions;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IMessage;
 
 /**
  * Unmutes a user. The user will no longer have their messages immediately deleted.
@@ -51,10 +51,10 @@ public class UnmuteCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
-      final int tokenDepth) {
+  public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
     // Ensure proper token length
+    final IChannel channel = msg.getChannel();
     if (tokens.length != 3) {
       RathBot.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
       return true;

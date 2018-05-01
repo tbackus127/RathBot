@@ -6,7 +6,7 @@ import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.exceptions.FAQNotFoundException;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IMessage;
 
 /**
  * This subcommand of the 'faq' command allows mods to remove mappings from the FAQ table.
@@ -50,8 +50,7 @@ public class FAQRemoveCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final IUser author, final IChannel channel, final String[] tokens,
-      final int tokenDepth) {
+  public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
     System.out.println("Executing faq.remove");
     
@@ -60,6 +59,7 @@ public class FAQRemoveCmd extends RBCommand {
     
     // Get the FAQ name and check if it exists
     final String faqName = tokens[3];
+    final IChannel channel = msg.getChannel();
     if (FAQCmd.hasFaq(faqName)) {
       try {
         

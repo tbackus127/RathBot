@@ -42,9 +42,8 @@
    helpful comments and document your command by filling out the Javadoc for your class itself, each of its fields,
    methods, and constructors. I will not accept a pull request if your code is not commented.
 
-10. Now that you have your command created go into RathBot.java and find the "RBCommand[] commandList" initialization
-    and add your command to the end of the array. It will give an error that it cannot be resolved to a type. From here
-    you must import your command at the top along with all of the other import statements. Once this is completed you can
-    save and run your bot and test if your command is functional within the RathBot development server.
+10. Now that you have your command(s) created go into RathBot.java and find the "RBCommand[] commandList" initialization
+    and add a new instance of your command(s) in the appropriate spot according to command priority. Higher priority commands
+    should go first as they will be checked sooner. Make sure you imported your command(s) before you commit changes.
 
 

@@ -57,13 +57,12 @@ public class ReportCmd extends RBCommand {
     
     long REPORTED_USER_ID = 0;
     
-    // Retrieve UID from arguments, increment tokenDepth.
+    // Retrieve UID from arguments.
     try {
       REPORTED_USER_ID = Long.parseLong(tokens[tokenDepth]);
     } catch (NumberFormatException e) {
       e.printStackTrace();
     }
-    tokenDepth++;
     
     // Create IUser object from REPORTED_USER_ID to reference user in messages.
     IUser reportedUser = client.getUserByID(REPORTED_USER_ID);
@@ -78,7 +77,7 @@ public class ReportCmd extends RBCommand {
     // TODO: Replace ReportCmd.REPORT_CHANNEL_ID with RathBot.REPORT_CHANNEL_ID before merge into PROD.
     IChannel report = ReportCmd.client.getChannelByID(ReportCmd.REPORT_CHANNEL_ID);
     RathBot.sendMessage(report, "User " + reportedUser.getName() + " was reported by " + msg.getAuthor().getName()
-        + " at " + msg.getTimestamp() + ".\n" + "Reason: " + tokens[tokenDepth]);
+        + " at " + msg.getTimestamp() + ".\n" + "Reason: " + tokens[tokenDepth + 1]);
     
     return RBCommand.STOP_CMD_SEARCH;
   }

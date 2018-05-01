@@ -3,6 +3,7 @@ package com.rath.rathbot.cmd.disc;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
+import com.rath.rathbot.msg.MessageHelper;
 
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
@@ -25,9 +26,6 @@ public class ReportCmd extends RBCommand {
    */
   private static final long REPORT_CHANNEL_ID = 431308950097494028L;
   
-  /** IDiscordClient copy from RathBot, used to obtain IChannel object from channel map. */
-  private static IDiscordClient client = RathBot.getClient();
-  
   @Override
   public String getCommandName() {
     return "report";
@@ -44,7 +42,7 @@ public class ReportCmd extends RBCommand {
   
   @Override
   public String getCommandUsage() {
-    return "rb! report <uid> <Reason..>";
+    return "rb! report <uid> <reason..>";
   }
   
   @Override
@@ -53,37 +51,55 @@ public class ReportCmd extends RBCommand {
   }
   
   @Override
+  public boolean requiresDirectMessage() {
+    return true;
+  }
+
+  @Override
   public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
-    long REPORTED_USER_ID = 0;
+    // Ensures at least minimum valid arguments used.
+    if (tokens.length < 4) {
+      RathBot.sendDirectMessage(msg.getAuthor(), "Syntax Error! Usage: rb! report <uid> <reason>");
+      return RBCommand.STOP_CMD_SEARCH;
+    }
+    
+    long reportedUserID = 0;
     
     // Retrieve UID from arguments.
     try {
-      REPORTED_USER_ID = Long.parseLong(tokens[tokenDepth]);
+      reportedUserID = Long.parseLong(tokens[tokenDepth + 1]);
     } catch (NumberFormatException e) {
       e.printStackTrace();
     }
     
+    final IDiscordClient client = RathBot.getClient();
+    
     // Create IUser object from REPORTED_USER_ID to reference user in messages.
-    IUser reportedUser = client.getUserByID(REPORTED_USER_ID);
+    IUser reportedUser = client.getUserByID(reportedUserID);
+    if (reportedUser == null) {
+      RathBot.sendDirectMessage(msg.getAuthor(), "Error! User not found, please enter a valid UID.");
+      return RBCommand.STOP_CMD_SEARCH;
+    }
     
     // Message user for confirmation that report is being filed successfully.
     System.out.println("Filing report...");
     RathBot.sendDirectMessage(msg.getAuthor(), "Thank you, your report against " + reportedUser.getName()
-        + " We will look into this and take action accordingly.");
+        + " has been filed. We will look into this and take action accordingly.");
     
     // TODO: Log report
     
     // TODO: Replace ReportCmd.REPORT_CHANNEL_ID with RathBot.REPORT_CHANNEL_ID before merge into PROD.
-    IChannel report = ReportCmd.client.getChannelByID(ReportCmd.REPORT_CHANNEL_ID);
+    IChannel report = client.getChannelByID(ReportCmd.REPORT_CHANNEL_ID);
+    if (report == null) {
+      System.err.println("client.getChannelByID(ReportCmd.REPORT_CHANNEL_ID) returned null in ReportCmd.java");
+      return RBCommand.STOP_CMD_SEARCH;
+    }
+    
+    // Posts report in #reports.
     RathBot.sendMessage(report, "User " + reportedUser.getName() + " was reported by " + msg.getAuthor().getName()
-        + " at " + msg.getTimestamp() + ".\n" + "Reason: " + tokens[tokenDepth + 1]);
+        + " at " + msg.getTimestamp() + ".\nReason: " + MessageHelper.concatenateTokens(tokens, tokenDepth + 2));
     
     return RBCommand.STOP_CMD_SEARCH;
-  }
-  
-  @Override
-  public boolean requiresDirectMessage() {
-    return true;
   }
 }

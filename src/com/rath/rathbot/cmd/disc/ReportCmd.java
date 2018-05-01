@@ -24,7 +24,7 @@ public class ReportCmd extends RBCommand {
         + "You will need the member's internal ID. Get it using the \"uid <Discord username>\" command. "
         + "The uid command also requires a direct message."
         + "Note that this is NOT their nickname for the server, but the username you see when you open their profile."
-        + "For example, Kami's Discord username is \"Danni293\".";
+        + "For example, Kami's Discord username is \"Loli no Kami\".";
   }
   
   @Override
@@ -49,7 +49,7 @@ public class ReportCmd extends RBCommand {
     
     // TODO: Post to #report
     IChannel report = ReportCmd.client.getChannelByID(ReportCmd.REPORT_CHANNEL_ID);
-    RathBot.sendMessage(report, "User " + author.getName());
+    RathBot.sendMessage(report, "User " + author.getName() );
     
     return RBCommand.STOP_CMD_SEARCH;
   }

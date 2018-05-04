@@ -59,8 +59,8 @@ public class RathBot {
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
-  private static final RBCommand[] commandList = { new MuteCmd(), new UnmuteCmd(), new FAQCmd(),
-      new UIDCmd(), new PingCmd() };
+  private static final RBCommand[] commandList = { new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(),
+      new PingCmd() };
   
   /** The set of commands this bot responds to. */
   private static final TreeMap<String, RBCommand> commandMap = new TreeMap<String, RBCommand>();

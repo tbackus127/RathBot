@@ -2,6 +2,7 @@
 package com.rath.rathbot.cmd.disc.actions;
 
 import com.rath.rathbot.RathBot;
+import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.msg.MessageHelper;
 
@@ -31,7 +32,7 @@ public class KickCmd extends RBCommand {
   
   @Override
   public String getCommandUsage() {
-    return "rb! kick <uid> <reason..>";
+    return "rb! kick <uid|@mention> <reason..>";
   }
   
   @Override
@@ -85,6 +86,12 @@ public class KickCmd extends RBCommand {
     IUser kickedUser = client.getUserByID(kickUserID);
     if (kickedUser == null) {
       RathBot.sendDirectMessage(msg.getAuthor(), "Error! User not found, please enter a valid UID.");
+      return RBCommand.STOP_CMD_SEARCH;
+    }
+    
+    // If the issuer's permissions level is lower than or equal to the target's disallow the mute
+    if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(kickUserID)) {
+      RathBot.sendMessage(msg.getChannel(), "Cannot kick a member with an equal or higher permission level.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     

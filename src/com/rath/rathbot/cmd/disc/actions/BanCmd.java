@@ -2,6 +2,7 @@
 package com.rath.rathbot.cmd.disc.actions;
 
 import com.rath.rathbot.RathBot;
+import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.msg.MessageHelper;
 
@@ -10,7 +11,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
 /**
- * Bans user by UID or mention for a given reason.
+ * Bans user by UID or @mention for a given reason.
  * 
  * @author Kami lehenbnw@gmail.com
  * @author Tim Backus tbackus127@gmail.com
@@ -30,7 +31,7 @@ public class BanCmd extends RBCommand {
   
   @Override
   public String getCommandUsage() {
-    return "rb! ban <uid> <reason..>";
+    return "rb! ban <uid|@mention> <reason..>";
   }
   
   @Override
@@ -84,6 +85,12 @@ public class BanCmd extends RBCommand {
     IUser bannedUser = client.getUserByID(banUserID);
     if (bannedUser == null) {
       RathBot.sendDirectMessage(msg.getAuthor(), "Error! User not found, please enter a valid UID.");
+      return RBCommand.STOP_CMD_SEARCH;
+    }
+    
+    // If the issuer's permissions level is lower than or equal to the target's disallow the mute
+    if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(banUserID)) {
+      RathBot.sendMessage(msg.getChannel(), "Cannot ban a member with an equal or higher permission level.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     

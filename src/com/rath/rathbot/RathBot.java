@@ -9,8 +9,13 @@ import java.util.TreeMap;
 import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.cmd.admin.UIDCmd;
+
+import com.rath.rathbot.cmd.disc.actions.BanCmd;
+import com.rath.rathbot.cmd.disc.actions.KickCmd;
 import com.rath.rathbot.cmd.disc.actions.MuteCmd;
+import com.rath.rathbot.cmd.disc.actions.UnbanCmd;
 import com.rath.rathbot.cmd.disc.actions.UnmuteCmd;
+import com.rath.rathbot.cmd.disc.actions.WarnCmd;
 import com.rath.rathbot.cmd.msg.HelpCmd;
 import com.rath.rathbot.cmd.msg.PingCmd;
 import com.rath.rathbot.cmd.msg.faq.FAQCmd;
@@ -59,8 +64,9 @@ public class RathBot {
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
-  private static final RBCommand[] commandList = { new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(),
-      new PingCmd() };
+  
+  private static final RBCommand[] commandList = { new BanCmd(), new UnbanCmd(), new KickCmd(), new WarnCmd(),
+      new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(), new PingCmd() };
   
   /** The set of commands this bot responds to. */
   private static final TreeMap<String, RBCommand> commandMap = new TreeMap<String, RBCommand>();

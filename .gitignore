@@ -5,6 +5,7 @@
 /lib/
 /dat/
 /logs/
+/res/
 
 # Compiled class file
 *.class

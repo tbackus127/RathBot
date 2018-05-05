@@ -93,12 +93,13 @@ public class KickCmd extends RBCommand {
     }
     
     // If the issuer's permissions level is lower than or equal to the target's disallow the mute
-    if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(kickUserID)) {
+    final IUser author = msg.getAuthor();
+    if (PermissionsTable.getLevel(author.getLongID()) <= PermissionsTable.getLevel(kickUserID)) {
       RathBot.sendMessage(channel, "Cannot kick a member with an equal or higher permission level.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
-    RathBot.kickUser(kickedUser, msg.getTimestamp().getEpochSecond(),
+    RathBot.kickUser(author, kickedUser, msg.getTimestamp().getEpochSecond(),
         MessageHelper.concatenateTokens(tokens, tokDepth + 2));
     
     return RBCommand.STOP_CMD_SEARCH;

@@ -92,12 +92,13 @@ public class BanCmd extends RBCommand {
     }
     
     // If the issuer's permissions level is lower than or equal to the target's disallow the mute
-    if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(banUserID)) {
+    final IUser author = msg.getAuthor();
+    if (PermissionsTable.getLevel(author.getLongID()) <= PermissionsTable.getLevel(banUserID)) {
       RathBot.sendMessage(channel, "Cannot ban a member with an equal or higher permission level.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
-    RathBot.banUser(bannedUser, msg.getTimestamp().getEpochSecond(),
+    RathBot.banUser(author, bannedUser, msg.getTimestamp().getEpochSecond(),
         MessageHelper.concatenateTokens(tokens, tokDepth + 2));
     
     return RBCommand.STOP_CMD_SEARCH;

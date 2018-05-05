@@ -1,4 +1,5 @@
 com.rath.rathbot
+com.rath.rathbot.action
 com.rath.rathbot.cmd
 com.rath.rathbot.cmd.admin
 com.rath.rathbot.cmd.disc

@@ -82,22 +82,22 @@ public class WarnCmd extends RBCommand {
       }
     }
     
-    final IDiscordClient client = RathBot.getClient();
-    
     // Create IUser object from warnUserID to reference user in messages.
+    final IDiscordClient client = RathBot.getClient();
     final IUser warnedUser = client.getUserByID(warnUserID);
     if (warnedUser == null) {
       RathBot.sendMessage(channel, "Error! User not found, please enter a valid UID.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
+    final IUser author = msg.getAuthor();
     // If the issuer's permissions level is lower than or equal to the target's disallow the mute
-    if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(warnUserID)) {
+    if (PermissionsTable.getLevel(author.getLongID()) <= PermissionsTable.getLevel(warnUserID)) {
       RathBot.sendMessage(channel, "Cannot warn a member with an equal or higher permission level.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
-    RathBot.warnUser(warnedUser, msg.getTimestamp().getEpochSecond(),
+    RathBot.warnUser(author, warnedUser, msg.getTimestamp().getEpochSecond(),
         MessageHelper.concatenateTokens(tokens, tokDepth + 2));
     
     return RBCommand.STOP_CMD_SEARCH;

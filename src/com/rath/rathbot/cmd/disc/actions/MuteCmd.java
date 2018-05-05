@@ -4,10 +4,11 @@ package com.rath.rathbot.cmd.disc.actions;
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
-import com.rath.rathbot.disc.Infractions;
+import com.rath.rathbot.msg.MessageHelper;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IUser;
 
 /**
  * Mutes a user. Muting will not completely prevent a player from posting messages (since that feature doesn't exist in
@@ -26,7 +27,8 @@ public class MuteCmd extends RBCommand {
       + " specified period of time.";
   
   /** The command's syntax. */
-  private static final String CMD_USAGE = "rb! mute <UserID#> <Duration>";
+  // TODO: Change token 2 to work with mentions
+  private static final String CMD_USAGE = "rb! mute <uid|@mention> <duration> <reason..>";
   
   @Override
   public String getCommandName() {
@@ -58,28 +60,36 @@ public class MuteCmd extends RBCommand {
     
     // Ensure proper token length
     final IChannel channel = msg.getChannel();
-    if (tokens.length != 4) {
+    if (tokens.length < 4) {
       RathBot.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
       return true;
     }
     
     // Parse the user's long ID
-    long member = -1;
+    long mutedUserUID = -1;
     try {
-      member = Long.parseLong(tokens[2]);
+      mutedUserUID = Long.parseLong(tokens[2]);
     } catch (NumberFormatException nfe) {
       RathBot.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
     // If the issuer's permissions level is lower than or equal to the target's disallow the mute
-    if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(member)) {
+    final IUser author = msg.getAuthor();
+    if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(mutedUserUID)) {
       RathBot.sendMessage(channel, "Cannot mute a member with a higher permission level.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
-    Infractions.setMuted(member, true);
-    RathBot.sendMessage(channel, RathBot.getClient().getUserByID(member).getName() + " has been muted.");
+    // Parse the mute duration
+    // TODO: Make method for Y/M/W/d/h/m/s conversion to seconds
+    final int muteDuration = 0;
+    
+    // TODO: Parse mute duration and reason in tokens
+    final String muteReason = MessageHelper.concatenateTokens(tokens, 4);
+    final IUser mutedUser = RathBot.getClient().getUserByID(mutedUserUID);
+    RathBot.muteUser(author, mutedUser, msg.getTimestamp().getEpochSecond(), muteDuration, muteReason);
+    RathBot.sendMessage(channel, mutedUser.getName() + " has been muted.");
     
     return RBCommand.STOP_CMD_SEARCH;
   }

@@ -119,28 +119,30 @@ public class AntiSpam {
     if (trig != null) {
       
       // Check if the bot needs to ban the user
+      final IUser botUser = RathBot.getClient().getOurUser();
       final int kickCount = Infractions.getKickCount(uid);
       final int muteCount = Infractions.getMuteCount(uid);
       final int warnCount = Infractions.getWarnCount(uid);
       if (kickCount >= KICKS_TO_BAN) {
         
         // Issue the ban
-        RathBot.banUser(author, message.getTimestamp().getEpochSecond(), trig.getReason());
+        RathBot.banUser(botUser, author, message.getTimestamp().getEpochSecond(), trig.getReason());
         
       } else if (muteCount >= MUTES_TO_KICK) {
         
         // Issue the kick
-        RathBot.kickUser(author, message.getTimestamp().getEpochSecond(), trig.getReason());
+        RathBot.kickUser(botUser, author, message.getTimestamp().getEpochSecond(), trig.getReason());
         
       } else if (warnCount >= WARNS_TO_MUTE) {
         
         // Issue the mute
-        RathBot.muteUser(author, message.getTimestamp().getEpochSecond(), MUTE_DURATIONS[muteCount], trig.getReason());
+        RathBot.muteUser(botUser, author, message.getTimestamp().getEpochSecond(), MUTE_DURATIONS[muteCount],
+            trig.getReason());
         
       } else {
         
         // Issue the warn
-        RathBot.warnUser(author, message.getTimestamp().getEpochSecond(), trig.getReason());
+        RathBot.warnUser(botUser, author, message.getTimestamp().getEpochSecond(), trig.getReason());
         
       }
       

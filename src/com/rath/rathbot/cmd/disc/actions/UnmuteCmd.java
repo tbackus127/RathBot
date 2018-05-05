@@ -3,10 +3,10 @@ package com.rath.rathbot.cmd.disc.actions;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
-import com.rath.rathbot.disc.Infractions;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IUser;
 
 /**
  * Unmutes a user. The user will no longer have their messages immediately deleted.
@@ -69,8 +69,10 @@ public class UnmuteCmd extends RBCommand {
       return RBCommand.STOP_CMD_SEARCH;
     }
     
-    Infractions.setMuted(member, false);
-    RathBot.sendMessage(channel, RathBot.getClient().getUserByID(member).getName() + " has been unmuted.");
+    final IUser author = msg.getAuthor();
+    final IUser unmutedUser = RathBot.getClient().getUserByID(member);
+    RathBot.unmuteUser(author, unmutedUser);
+    RathBot.sendMessage(channel, unmutedUser + " has been unmuted.");
     
     return RBCommand.STOP_CMD_SEARCH;
   }

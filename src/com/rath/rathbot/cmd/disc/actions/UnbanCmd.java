@@ -90,12 +90,13 @@ public class UnbanCmd extends RBCommand {
     }
     
     // If the issuer's permissions level is lower than or equal to the target's disallow the mute
+    final IUser author = msg.getAuthor();
     if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(unbanUserID)) {
       RathBot.sendMessage(channel, "Cannot unban a member with an equal or higher permission level.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
-    RathBot.unbanUser(unbannedUser);
+    RathBot.unbanUser(author, unbannedUser);
     
     return RBCommand.STOP_CMD_SEARCH;
   }

@@ -7,6 +7,7 @@ import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.msg.MessageHelper;
 
 import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -47,20 +48,22 @@ public class WarnCmd extends RBCommand {
   @Override
   public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokDepth) {
     
+    final IChannel channel = msg.getChannel();
+    
     // Ensures at least minimum valid arguments used.
     if (tokens.length < 3) {
-      RathBot.sendMessage(msg.getChannel(), "Syntax Error! Usage: rb! kick <uid>");
+      RathBot.sendMessage(channel, "Syntax Error! Usage: rb! warn <uid|@mention> <reason>");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
     // Tests if the first argument of the command is an @mention or uid, then processes the argument accordingly.
     long warnUserID = 0;
-    String userToken = tokens[tokDepth + 1];
+    final String userToken = tokens[tokDepth + 1];
     if (userToken.matches("<@!?\\d+>")) {
       
       int hasNickName = 0;
       
-      if (userToken.matches("<@!\\d+>")) hasNickName = 1;
+      if (userToken.charAt(2) == '!') hasNickName = 1;
       
       // If argument is @mention, substring to get UID
       try {
@@ -75,22 +78,22 @@ public class WarnCmd extends RBCommand {
       try {
         warnUserID = Long.parseLong(tokens[tokDepth + 1]);
       } catch (NumberFormatException nfe) {
-        nfe.printStackTrace();
+        RathBot.sendMessage(channel, "Invalid UID, UIDs must only contain numbers.");
       }
     }
     
     final IDiscordClient client = RathBot.getClient();
     
     // Create IUser object from warnUserID to reference user in messages.
-    IUser warnedUser = client.getUserByID(warnUserID);
+    final IUser warnedUser = client.getUserByID(warnUserID);
     if (warnedUser == null) {
-      RathBot.sendDirectMessage(msg.getAuthor(), "Error! User not found, please enter a valid UID.");
+      RathBot.sendMessage(channel, "Error! User not found, please enter a valid UID.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
     // If the issuer's permissions level is lower than or equal to the target's disallow the mute
     if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(warnUserID)) {
-      RathBot.sendMessage(msg.getChannel(), "Cannot warn a member with an equal or higher permission level.");
+      RathBot.sendMessage(channel, "Cannot warn a member with an equal or higher permission level.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     

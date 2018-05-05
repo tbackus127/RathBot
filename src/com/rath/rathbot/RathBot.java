@@ -36,6 +36,7 @@ import sx.blah.discord.handle.obj.StatusType;
  * Main class for RathBot.
  * 
  * @author Tim Backus tbackus127@gmail.com
+ * @author Nathan Lehenbauer lehenbnw@gmail.com
  */
 public class RathBot {
   

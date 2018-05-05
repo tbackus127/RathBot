@@ -2,6 +2,7 @@
 package com.rath.rathbot;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Scanner;
@@ -25,6 +26,7 @@ import com.rath.rathbot.cmd.disc.actions.WarnCmd;
 import com.rath.rathbot.cmd.msg.HelpCmd;
 import com.rath.rathbot.cmd.msg.PingCmd;
 import com.rath.rathbot.cmd.msg.faq.FAQCmd;
+import com.rath.rathbot.cmd.msg.react.ReactCmd;
 import com.rath.rathbot.disc.Infractions;
 import com.rath.rathbot.disc.PunishmentType;
 import com.rath.rathbot.log.ActionLogger;
@@ -53,6 +55,12 @@ public class RathBot {
   /** The directory name that will contain the logs. */
   public static final String DIR_LOGS = "logs/";
   
+  /** The directory that resources will be contained in. */
+  public static final String DIR_RES = "res/";
+  
+  /** The directory that images will be contained in. */
+  public static final String DIR_IMG = DIR_RES + "img/";
+  
   /** Relative path to the bot's config file containing the authentication key. */
   private static final String CONFIG_FILE_PATH = "rathbot.conf";
   
@@ -74,7 +82,7 @@ public class RathBot {
   /** A list of commands to initialize. */
   
   private static final RBCommand[] commandList = { new BanCmd(), new UnbanCmd(), new KickCmd(), new WarnCmd(),
-      new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(), new PingCmd() };
+      new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(), new PingCmd(), new ReactCmd() };
   
   /** The set of commands this bot responds to. */
   private static final TreeMap<String, RBCommand> commandMap = new TreeMap<String, RBCommand>();
@@ -95,8 +103,18 @@ public class RathBot {
    * @param msg the message as a String.
    */
   public static final void sendMessage(final IChannel channel, final String msg) {
-    
     channel.sendMessage(msg);
+  }
+  
+  /**
+   * Sends a file to the specified channel.
+   * 
+   * @param channel the channel to send the message on.
+   * @param path the relative path to the local file on the bot's filesystem.
+   * @throws FileNotFoundException if the local file is not found.
+   */
+  public static final void sendFile(final IChannel channel, final File path) throws FileNotFoundException {
+    channel.sendFile(path);
   }
   
   /**
@@ -106,7 +124,6 @@ public class RathBot {
    * @param msg the message contents.
    */
   public static final void sendDirectMessage(final IUser user, final String msg) {
-    
     user.getOrCreatePMChannel().sendMessage(msg);
     
   }

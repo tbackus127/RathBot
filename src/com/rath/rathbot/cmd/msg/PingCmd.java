@@ -10,7 +10,7 @@ import sx.blah.discord.handle.obj.IMessage;
  * 
  * This command pings the bot, prompting the bot to respond and verify the bot is processing commands.
  * 
- * @author Kami lehenbnw@gmail.com
+ * @author Nathan Lehenbauer lehenbnw@gmail.com
  *
  */
 

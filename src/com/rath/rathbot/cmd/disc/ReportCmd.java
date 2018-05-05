@@ -1,4 +1,3 @@
-
 package com.rath.rathbot.cmd.disc;
 
 import com.rath.rathbot.cmd.RBCommand;

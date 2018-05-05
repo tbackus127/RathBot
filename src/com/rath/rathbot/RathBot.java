@@ -9,8 +9,13 @@ import java.util.TreeMap;
 import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.cmd.admin.UIDCmd;
+
+import com.rath.rathbot.cmd.disc.actions.BanCmd;
+import com.rath.rathbot.cmd.disc.actions.KickCmd;
 import com.rath.rathbot.cmd.disc.actions.MuteCmd;
+import com.rath.rathbot.cmd.disc.actions.UnbanCmd;
 import com.rath.rathbot.cmd.disc.actions.UnmuteCmd;
+import com.rath.rathbot.cmd.disc.actions.WarnCmd;
 import com.rath.rathbot.cmd.msg.HelpCmd;
 import com.rath.rathbot.cmd.msg.PingCmd;
 import com.rath.rathbot.cmd.msg.faq.FAQCmd;
@@ -31,6 +36,7 @@ import sx.blah.discord.handle.obj.StatusType;
  * Main class for RathBot.
  * 
  * @author Tim Backus tbackus127@gmail.com
+ * @author Nathan Lehenbauer lehenbnw@gmail.com
  */
 public class RathBot {
   
@@ -59,8 +65,9 @@ public class RathBot {
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
-  private static final RBCommand[] commandList = { new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(),
-      new PingCmd() };
+  
+  private static final RBCommand[] commandList = { new BanCmd(), new UnbanCmd(), new KickCmd(), new WarnCmd(),
+      new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(), new PingCmd() };
   
   /** The set of commands this bot responds to. */
   private static final TreeMap<String, RBCommand> commandMap = new TreeMap<String, RBCommand>();
@@ -248,17 +255,13 @@ public class RathBot {
     
     // Create the client and the bot
     System.out.print("Creating client... ");
-    final IDiscordClient client = new ClientBuilder().withPingTimeout(5).withToken(token).build();
-    guild = client.getGuildByID(GUILD_ID);
-    return client;
+    return new ClientBuilder().withPingTimeout(5).withToken(token).build();
   }
   
   /**
    * Builds and loads the various data structures the bot needs.
-   * 
-   * @param client the Discord client used for pretty much everything.
    */
-  private static final void buildAndLoadDataStructures(final IDiscordClient client) {
+  private static final void buildAndLoadDataStructures() {
     
     // Create the data folders
     final File datDir = new File(DIR_DATA);
@@ -267,8 +270,7 @@ public class RathBot {
     if (!logsDir.mkdir()) System.err.println("Error creating logs directory!");
     
     // Log in and build the channel map
-    discClient = client;
-    channelMap = buildChannelMap(client);
+    channelMap = buildChannelMap();
     
     // Load and initialize everything
     MessageLogger.initPrintStreamMap(channelMap);
@@ -280,27 +282,26 @@ public class RathBot {
   /**
    * Builds a map of Channel Name to Channel ID.
    * 
-   * @param client the logged-in client instance.
    * @return a HashMap of type String to Long.
    */
-  private static final TreeMap<String, IChannel> buildChannelMap(final IDiscordClient client) {
+  private static final TreeMap<String, IChannel> buildChannelMap() {
     
     // Log in and wait until ready to receive commands
     System.out.println("Logging in... ");
     login();
-    while (!client.isReady()) {}
+    while (!discClient.isReady()) {}
     System.out.println("Successfully logged in.");
     
     // Change the playing text to the default
-    client.changePresence(StatusType.ONLINE, ActivityType.PLAYING, DEFAULT_PLAYING_TEXT);
+    discClient.changePresence(StatusType.ONLINE, ActivityType.PLAYING, DEFAULT_PLAYING_TEXT);
     
     // Initialize channel structures
     System.out.println("Building channel map...");
-    final List<IChannel> channels = client.getChannels();
+    final List<IChannel> channels = discClient.getChannels();
     final TreeMap<String, IChannel> result = new TreeMap<String, IChannel>();
     
     // Add important channels manually just in case Discord4J doesn't want to list channels
-    result.put("report", client.getChannelByID(REPORT_CHANNEL_ID));
+    result.put("report", discClient.getChannelByID(REPORT_CHANNEL_ID));
     
     // For each channel, add a mapping from its name to its ID
     for (final IChannel c : channels) {
@@ -361,10 +362,11 @@ public class RathBot {
   public static final void main(String[] args) {
     
     // Start the bot up
-    final IDiscordClient client = createClient();
-    buildAndLoadDataStructures(client);
+    discClient = createClient();
+    buildAndLoadDataStructures();
+    guild = discClient.getGuildByID(GUILD_ID);
     buildCommands();
-    client.getDispatcher().registerListener(new EventHandler());
+    discClient.getDispatcher().registerListener(new EventHandler());
     System.out.println("Startup complete!");
     
     // Start accepting commands from the console window

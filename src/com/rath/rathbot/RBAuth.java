@@ -42,7 +42,9 @@ public class RBAuth {
     } catch (IOException ioe) {
       ioe.printStackTrace(System.err);
     } finally {
-      fscan.close();
+      if (fscan != null) {
+        fscan.close();
+      }
     }
     return null;
   }

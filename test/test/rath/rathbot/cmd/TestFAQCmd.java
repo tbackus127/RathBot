@@ -14,6 +14,7 @@ public class TestFAQCmd {
   
   @BeforeClass
   public static void setupFAQTest() {
+    System.out.println("Disabling saving FAQ map to disk...");
     FAQCmd.disableSaveToDisk();
     final FAQCmd fq = new FAQCmd();
     fq.setupCommand();
@@ -81,7 +82,7 @@ public class TestFAQCmd {
     
     try {
       FAQCmd.removeFaq("this should not exist");
-    } catch (FAQNotFoundException e) {
+    } catch (@SuppressWarnings("unused") FAQNotFoundException e) {
       gotException = true;
     }
     

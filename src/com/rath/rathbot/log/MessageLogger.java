@@ -72,6 +72,7 @@ public class MessageLogger {
           return;
         }
         
+        @SuppressWarnings("resource")
         final PrintStream ps = new PrintStream(new FileOutputStream(file, true));
         result.put(channelMap.get(s), ps);
         
@@ -88,7 +89,7 @@ public class MessageLogger {
     try {
       pmLog.createNewFile();
       pmStream = new PrintStream(pmLog);
-    } catch (IOException e) {
+    } catch (@SuppressWarnings("unused") IOException e) {
       System.err.println("Error initializing PM log file! Disabling logging.");
       return;
     }
@@ -101,6 +102,7 @@ public class MessageLogger {
    * 
    * @param msg the IMessage event caught by the EventHandler.
    */
+  @SuppressWarnings("resource")
   public static final void logMessage(final IMessage msg) {
     
     // Do not log if it's not ready

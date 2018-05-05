@@ -14,7 +14,7 @@ import com.rath.rathbot.cmd.admin.UIDCmd;
 import com.rath.rathbot.cmd.disc.actions.MuteCmd;
 import com.rath.rathbot.cmd.msg.faq.FAQCmd;
 import com.rath.rathbot.disc.PunishmentType;
-import com.rath.rathbot.msg.MessageHelper;
+import com.rath.rathbot.util.MessageHelper;
 
 public class TestMessageHelper {
   

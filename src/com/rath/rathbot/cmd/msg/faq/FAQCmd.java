@@ -294,16 +294,11 @@ public class FAQCmd extends RBCommand {
   private static final void loadFAQMap() {
     
     // Initialize data streams
-    FileInputStream fis = null;
-    ObjectInputStream oin = null;
     Object obj = null;
-    
-    try {
+    try (FileInputStream fis = new FileInputStream(FAQ_DATA_PATH); ObjectInputStream oin = new ObjectInputStream(fis)) {
       
       // Build an input stream for deserialization
-      fis = new FileInputStream(FAQ_DATA_PATH);
       if (fis.available() > 0) {
-        oin = new ObjectInputStream(fis);
         
         // Read the object in and close the streams
         obj = oin.readObject();
@@ -322,11 +317,6 @@ public class FAQCmd extends RBCommand {
       e.printStackTrace();
     }
     
-    // If something went wrong, return null
-    if (fis == null || oin == null) {
-      System.err.println("FAQ map load error.");
-    }
-    
     // Cast the read object to a TreeMap
     if (obj instanceof TreeMap) {
       faqMap = (TreeMap<String, String>) obj;
@@ -341,18 +331,14 @@ public class FAQCmd extends RBCommand {
    */
   private static final void saveFAQMap() {
     
+    // Ignore if we're not currently saving to disk
     if (!saveToDisk) {
       return;
     }
     
-    FileOutputStream fos = null;
-    ObjectOutputStream oos = null;
-    
-    try {
-      
-      // Build an output stream for serialization
-      fos = new FileOutputStream(FAQ_DATA_PATH);
-      oos = new ObjectOutputStream(fos);
+    // Initialize data streams
+    try (FileOutputStream fos = new FileOutputStream(FAQ_DATA_PATH);
+        ObjectOutputStream oos = new ObjectOutputStream(fos)) {
       
       // Write the map and close streams
       oos.writeObject(faqMap);
@@ -364,6 +350,7 @@ public class FAQCmd extends RBCommand {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    
   }
   
 }

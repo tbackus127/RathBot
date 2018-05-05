@@ -331,14 +331,8 @@ public class Infractions {
     
     System.out.println("Saving infractions map to file.");
     
-    FileOutputStream fos = null;
-    ObjectOutputStream oos = null;
-    
-    try {
-      
-      // Build an output stream for serialization
-      fos = new FileOutputStream(INFRACTIONS_DATA_PATH);
-      oos = new ObjectOutputStream(fos);
+    try (FileOutputStream fos = new FileOutputStream(INFRACTIONS_DATA_PATH);
+        ObjectOutputStream oos = new ObjectOutputStream(fos)) {
       
       // Write the map and close streams
       oos.writeObject(infractionMap);
@@ -350,6 +344,7 @@ public class Infractions {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    
   }
   
   /**
@@ -359,11 +354,6 @@ public class Infractions {
   public static final void loadFromFile() {
     
     System.out.println("Loading Infractions map from file.");
-    
-    // Initialize data streams
-    FileInputStream fis = null;
-    ObjectInputStream oin = null;
-    Object obj = null;
     
     // Create the file if it doesn't exist.
     if (!INFRACTIONS_FILE.exists()) {
@@ -375,17 +365,25 @@ public class Infractions {
       }
     }
     
-    try {
+    Object obj = null;
+    try (FileInputStream fis = new FileInputStream(INFRACTIONS_DATA_PATH);
+        ObjectInputStream oin = new ObjectInputStream(fis)) {
       
       // Build an input stream for deserialization
-      fis = new FileInputStream(INFRACTIONS_DATA_PATH);
       if (fis.available() > 0) {
-        oin = new ObjectInputStream(fis);
         
         // Read the object in and close the streams
         obj = oin.readObject();
         oin.close();
         fis.close();
+        
+        // If something went wrong, return null
+        if (obj == null) {
+          System.err.println("Infractions map load error.");
+          infractionMap = new TreeMap<Long, InfractionData>();
+          saveToFile();
+          return;
+        }
         
       } else {
         System.err.println("Infractions map is empty.");
@@ -397,14 +395,6 @@ public class Infractions {
       e.printStackTrace();
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
-    }
-    
-    // If something went wrong, return null
-    if (obj == null || fis == null || oin == null) {
-      System.err.println("Infractions map load error.");
-      infractionMap = new TreeMap<Long, InfractionData>();
-      saveToFile();
-      return;
     }
     
     // Cast the read object to a TreeMap

@@ -4,7 +4,7 @@ package com.rath.rathbot.cmd.disc.actions;
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
-import com.rath.rathbot.msg.MessageHelper;
+import com.rath.rathbot.util.MessageHelper;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
@@ -69,7 +69,7 @@ public class MuteCmd extends RBCommand {
     long mutedUserUID = -1;
     try {
       mutedUserUID = Long.parseLong(tokens[2]);
-    } catch (NumberFormatException nfe) {
+    } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
       RathBot.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
       return RBCommand.STOP_CMD_SEARCH;
     }

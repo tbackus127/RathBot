@@ -4,7 +4,7 @@ package com.rath.rathbot.cmd.disc.actions;
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
-import com.rath.rathbot.msg.MessageHelper;
+import com.rath.rathbot.util.MessageHelper;
 
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
@@ -77,7 +77,7 @@ public class WarnCmd extends RBCommand {
       // Else argument is UID, parse UID
       try {
         warnUserID = Long.parseLong(tokens[tokDepth + 1]);
-      } catch (NumberFormatException nfe) {
+      } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
         RathBot.sendMessage(channel, "Invalid UID, UIDs must only contain numbers.");
       }
     }

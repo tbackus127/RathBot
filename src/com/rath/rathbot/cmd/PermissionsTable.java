@@ -159,14 +159,8 @@ public class PermissionsTable {
     
     System.out.println("Saving permissions map to file.");
     
-    FileOutputStream fos = null;
-    ObjectOutputStream oos = null;
-    
-    try {
-      
-      // Build an output stream for serialization
-      fos = new FileOutputStream(PERM_DATA_PATH);
-      oos = new ObjectOutputStream(fos);
+    try (FileOutputStream fos = new FileOutputStream(PERM_DATA_PATH);
+        ObjectOutputStream oos = new ObjectOutputStream(fos)) {
       
       // Write the map and close streams
       oos.writeObject(permMap);
@@ -178,6 +172,7 @@ public class PermissionsTable {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    
   }
   
   /**
@@ -187,11 +182,6 @@ public class PermissionsTable {
   public static final void loadPerms() {
     
     System.out.println("Loading permissions map from file.");
-    
-    // Initialize data streams
-    FileInputStream fis = null;
-    ObjectInputStream oin = null;
-    Object obj = null;
     
     // Create the file if it doesn't exist.
     if (!PERM_FILE.exists()) {
@@ -203,12 +193,11 @@ public class PermissionsTable {
       }
     }
     
-    try {
+    Object obj = null;
+    try (FileInputStream fis = new FileInputStream(PERM_DATA_PATH);
+        ObjectInputStream oin = new ObjectInputStream(fis);) {
       
-      // Build an input stream for deserialization
-      fis = new FileInputStream(PERM_DATA_PATH);
       if (fis.available() > 0) {
-        oin = new ObjectInputStream(fis);
         
         // Read the object in and close the streams
         obj = oin.readObject();
@@ -225,11 +214,6 @@ public class PermissionsTable {
       e.printStackTrace();
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
-    }
-    
-    // If something went wrong, return null
-    if (fis == null || oin == null) {
-      System.err.println("Permissions map load error.");
     }
     
     // Cast the read object to a TreeMap

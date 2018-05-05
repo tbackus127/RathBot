@@ -1,5 +1,5 @@
 
-package com.rath.rathbot.msg;
+package com.rath.rathbot.util;
 
 import java.util.List;
 import java.util.Map;

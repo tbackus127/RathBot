@@ -66,7 +66,7 @@ public class FAQRemoveCmd extends RBCommand {
         // Remove and send confirmation
         FAQCmd.removeFaq(faqName);
         RathBot.sendMessage(channel, "FAQ \"" + faqName + "\" removed.");
-      } catch (FAQNotFoundException e) {
+      } catch (@SuppressWarnings("unused") FAQNotFoundException e) {
         
         // Inform that it doesn't exist
         RathBot.sendMessage(channel, "This FAQ doesn't exist.");

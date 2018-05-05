@@ -46,7 +46,7 @@ public class InfractionEntry {
    * @return a long.
    */
   public final long getTimestamp() {
-    return timestamp;
+    return this.timestamp;
   }
   
   /**
@@ -55,7 +55,7 @@ public class InfractionEntry {
    * @return a String.
    */
   public final String getReason() {
-    return reason;
+    return this.reason;
   }
   
 }

@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.TreeMap;
 
+import com.rath.rathbot.action.ActionBan;
+import com.rath.rathbot.action.ActionKick;
+import com.rath.rathbot.action.ActionMute;
+import com.rath.rathbot.action.ActionUnban;
+import com.rath.rathbot.action.ActionUnmute;
 import com.rath.rathbot.action.ActionWarn;
 import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
@@ -24,7 +29,7 @@ import com.rath.rathbot.disc.Infractions;
 import com.rath.rathbot.disc.PunishmentType;
 import com.rath.rathbot.log.ActionLogger;
 import com.rath.rathbot.log.MessageLogger;
-import com.rath.rathbot.msg.MessageHelper;
+import com.rath.rathbot.util.MessageHelper;
 
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
@@ -55,7 +60,7 @@ public class RathBot {
   private static final String DEFAULT_PLAYING_TEXT = "\u2606I\u2606MA\u2606SU\u2606GU\u2606";
   
   /** The channel where reports and actions will be posted. */
-  private static final String REPORT_CHANNEL_NAME = "#report";
+  private static final String REPORT_CHANNEL_NAME = "report";
   
   /** The report channel's long ID. */
   // Note: This is the report channel ID for the osu! University server.
@@ -119,6 +124,9 @@ public class RathBot {
     Infractions.warnUser(warnUser.getLongID(), warnTime, reason);
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
         warnUser.getName() + " has been warned for reason: \"" + reason + "\".");
+    
+    // TODO: Maybe send a PM to the user that they've been warned for whatever reason
+    
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
     ActionLogger.logAction(new ActionWarn(Instant.now(), isr, warnUser));
   }
@@ -139,7 +147,7 @@ public class RathBot {
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
         muteUser.getName() + " has been muted for reason: \"" + reason + "\".");
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
-    ActionLogger.logAction(new ActionWarn(Instant.now(), isr, muteUser));
+    ActionLogger.logAction(new ActionMute(Instant.now(), isr, muteUser));
   }
   
   /**
@@ -150,9 +158,9 @@ public class RathBot {
    */
   public static final void unmuteUser(final IUser issuer, final IUser user) {
     Infractions.setMuted(user.getLongID(), false);
-    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME), user.getName() + " has been ummuted.");
+    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME), user.getName() + " has been unmuted.");
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
-    ActionLogger.logAction(new ActionWarn(Instant.now(), isr, user));
+    ActionLogger.logAction(new ActionUnmute(Instant.now(), isr, user));
   }
   
   /**
@@ -171,7 +179,7 @@ public class RathBot {
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
         kickUser.getName() + " has been kicked for reason: \"" + reason + "\".");
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
-    ActionLogger.logAction(new ActionWarn(Instant.now(), isr, kickUser));
+    ActionLogger.logAction(new ActionKick(Instant.now(), isr, kickUser));
   }
   
   /**
@@ -189,7 +197,7 @@ public class RathBot {
     sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
         banUser.getName() + " has been banned for reason: \"" + reason + "\".");
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
-    ActionLogger.logAction(new ActionWarn(Instant.now(), isr, banUser));
+    ActionLogger.logAction(new ActionBan(Instant.now(), isr, banUser));
   }
   
   /**
@@ -201,7 +209,7 @@ public class RathBot {
   public static final void unbanUser(final IUser issuer, final IUser user) {
     Infractions.setBanned(user.getLongID(), false);
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
-    ActionLogger.logAction(new ActionWarn(Instant.now(), isr, user));
+    ActionLogger.logAction(new ActionUnban(Instant.now(), isr, user));
   }
   
   /**
@@ -287,12 +295,15 @@ public class RathBot {
     
     // Create the data folders
     final File datDir = new File(DIR_DATA);
-    if (!datDir.mkdir()) System.err.println("Error creating dat directory!");
+    if (!datDir.exists() && !datDir.mkdir()) System.err.println("Error creating dat directory!");
     final File logsDir = new File(DIR_LOGS);
-    if (!logsDir.mkdir()) System.err.println("Error creating logs directory!");
+    if (!logsDir.exists() && !logsDir.mkdir()) System.err.println("Error creating logs directory!");
     
     // Log in and build the channel map
     channelMap = buildChannelMap();
+    
+    // Change the playing text to the default
+    discClient.changePresence(StatusType.ONLINE, ActivityType.PLAYING, DEFAULT_PLAYING_TEXT);
     
     // Load and initialize everything
     MessageLogger.initPrintStreamMap(channelMap);
@@ -314,9 +325,6 @@ public class RathBot {
     login();
     while (!discClient.isReady()) {}
     System.out.println("Successfully logged in.");
-    
-    // Change the playing text to the default
-    discClient.changePresence(StatusType.ONLINE, ActivityType.PLAYING, DEFAULT_PLAYING_TEXT);
     
     // Initialize channel structures
     System.out.println("Building channel map...");

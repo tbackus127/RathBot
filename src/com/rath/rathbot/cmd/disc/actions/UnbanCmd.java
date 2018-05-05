@@ -75,7 +75,7 @@ public class UnbanCmd extends RBCommand {
       // Else argument is UID, parse UID
       try {
         unbanUserID = Long.parseLong(tokens[tokDepth + 1]);
-      } catch (NumberFormatException nfe) {
+      } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
         RathBot.sendMessage(channel, "Invalid UID, UIDs must only contain numbers.");
       }
     }
@@ -96,7 +96,9 @@ public class UnbanCmd extends RBCommand {
       return RBCommand.STOP_CMD_SEARCH;
     }
     
+    // Unban the user.
     RathBot.unbanUser(author, unbannedUser);
+    RathBot.sendMessage(channel, author.getName() + " has been unbanned.");
     
     return RBCommand.STOP_CMD_SEARCH;
   }

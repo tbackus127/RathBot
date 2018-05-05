@@ -64,7 +64,7 @@ public class UnmuteCmd extends RBCommand {
     long member = -1;
     try {
       member = Long.parseLong(tokens[2]);
-    } catch (NumberFormatException nfe) {
+    } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
       RathBot.sendMessage(channel, "Usage: \"" + getCommandUsage() + "\".");
       return RBCommand.STOP_CMD_SEARCH;
     }

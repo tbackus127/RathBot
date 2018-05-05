@@ -6,7 +6,7 @@ import java.util.TreeMap;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
-import com.rath.rathbot.msg.MessageHelper;
+import com.rath.rathbot.util.MessageHelper;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;

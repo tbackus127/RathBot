@@ -4,6 +4,7 @@ package com.rath.rathbot.log;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import com.rath.rathbot.RathBot;
@@ -35,8 +36,14 @@ public class ActionLogger {
   public static final void initActionLogger() {
     
     if (!ACTION_LOG_FILE.exists()) {
-      System.err.println("Action log file \"" + ACTION_LOG_FILE.getAbsolutePath() + "\" does not exist!");
-      return;
+      System.out.println("Action log file \"" + ACTION_LOG_FILE.getAbsolutePath() + "\" does not exist. Creating.");
+      try {
+        ACTION_LOG_FILE.createNewFile();
+      } catch (IOException e) {
+        System.err.println("Failed to create new action logger file.");
+        e.printStackTrace();
+        return;
+      }
     }
     
     if (!ACTION_LOG_FILE.canWrite()) {
@@ -46,7 +53,7 @@ public class ActionLogger {
     
     try {
       logWriter = new PrintStream(new FileOutputStream(ACTION_LOG_FILE, true));
-    } catch (FileNotFoundException e) {
+    } catch (@SuppressWarnings("unused") FileNotFoundException e) {
       System.err.println("Error initializing action logger!");
     }
   }

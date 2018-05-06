@@ -33,8 +33,8 @@ public class ConsoleHandler {
         // Logout
         case "logout":
           RathBot.logout();
-        break;
-      
+          return;
+        
         // Change Now Playing status
         case "np":
           if (tokens.length >= 2) {

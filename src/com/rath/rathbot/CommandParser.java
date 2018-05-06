@@ -27,7 +27,7 @@ public class CommandParser {
     final IUser author = message.getAuthor();
     final IChannel channel = message.getChannel();
     
-    System.out.println("Parsing command: \"" + msgString + "\".");
+    System.out.println("Received command: \"" + msgString + "\".");
     
     // Split into tokens separated by spaces, ignoring spaces between quotes
     final String[] tokens = msgString.split("\"?( |$)(?=(([^\"]*\"){2})*[^\"]*$)\"?");
@@ -59,9 +59,6 @@ public class CommandParser {
     
     // Check permissions for this command.
     if (PermissionsTable.getLevel(userID) >= cmd.permissionLevelRequired()) {
-      
-      System.out.println("Channel: " + channel.getName() + ", ReqDM?: " + cmd.requiresDirectMessage() + ", ChPriv?: "
-          + channel.isPrivate());
       
       // If a PM-only command was issued in a public channel
       if (cmd.requiresDirectMessage() && !channel.isPrivate()) {

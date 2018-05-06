@@ -33,7 +33,7 @@ public class HelpCmd extends RBCommand {
    * @param name the name the command will be referenced with.
    * @param cmd the command to add.
    */
-  public void addCommandEntry(final String name, final RBCommand cmd) {
+  public static void addCommandEntry(final String name, final RBCommand cmd) {
     
     helpCmdMap.put(name, cmd);
   }

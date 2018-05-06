@@ -39,6 +39,13 @@ public class PermissionsTable {
   private static boolean saveToDisk = true;
   
   /**
+   * Initializes the permissions table. Must be called in the bot's startup routine before commands are received.
+   */
+  public static final void initPermsTable() {
+    permMap = new TreeMap<Long, Integer>();
+  }
+  
+  /**
    * Disables saving the table to disk.
    */
   public static final void disableSaveToDisk() {
@@ -142,9 +149,9 @@ public class PermissionsTable {
   }
   
   /**
-   * Clears the permissions table, but does not save it to disk. USE WITH CAUTION.
+   * Initializes the permissions table, but does not save it to disk. USE WITH CAUTION.
    */
-  public static final void clearTable() {
+  public static final void initTable() {
     permMap = new TreeMap<Long, Integer>();
   }
   
@@ -194,10 +201,11 @@ public class PermissionsTable {
     }
     
     Object obj = null;
-    try (FileInputStream fis = new FileInputStream(PERM_DATA_PATH);
-        ObjectInputStream oin = new ObjectInputStream(fis);) {
+    try (FileInputStream fis = new FileInputStream(PERM_DATA_PATH)) {
       
       if (fis.available() > 0) {
+        
+        ObjectInputStream oin = new ObjectInputStream(fis);
         
         // Read the object in and close the streams
         obj = oin.readObject();
@@ -205,7 +213,9 @@ public class PermissionsTable {
         fis.close();
         
       } else {
-        System.err.println("Permissions map is empty.");
+        System.out.println("Permissions map is empty.");
+        initTable();
+        return;
       }
       
     } catch (FileNotFoundException e) {
@@ -221,7 +231,7 @@ public class PermissionsTable {
       permMap = (TreeMap<Long, Integer>) obj;
     } else {
       System.err.println("Error with loading. Creating new table.");
-      permMap = new TreeMap<Long, Integer>();
+      initTable();
     }
     
   }

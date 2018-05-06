@@ -25,7 +25,7 @@ public abstract class RBIssuedAction extends RBAction {
    * @return an IUser reference.
    */
   public IUser getIssuer() {
-    return issuer;
+    return this.issuer;
   }
   
 }

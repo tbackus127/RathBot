@@ -3,7 +3,9 @@ package com.rath.rathbot;
 
 import com.rath.rathbot.log.MessageLogger;
 
+import sx.blah.discord.api.events.Event;
 import sx.blah.discord.api.events.EventSubscriber;
+import sx.blah.discord.api.events.IListener;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
@@ -14,7 +16,7 @@ import sx.blah.discord.handle.obj.IUser;
  * @author Tim Backus tbackus127@gmail.com
  *
  */
-public class EventHandler {
+public class EventHandler implements IListener<MessageReceivedEvent> {
   
   /** The prefix for all commands. */
   private static final String COMMAND_PREFIX = "rb!";
@@ -24,8 +26,8 @@ public class EventHandler {
    * 
    * @param event contains event details.
    */
-  @EventSubscriber
-  public void onMessageReceived(MessageReceivedEvent event) {
+  @Override
+  public void handle(MessageReceivedEvent event) {
     
     // Let's not respond to bots
     final IUser author = event.getAuthor();
@@ -54,7 +56,7 @@ public class EventHandler {
    * @param evt contains event details.
    */
   @SuppressWarnings("unused")
-  private final void logMessageDetailsToConsole(final MessageReceivedEvent evt) {
+  private final static void logMessageDetailsToConsole(final MessageReceivedEvent evt) {
     final String author = evt.getAuthor().getName();
     final String channel = evt.getChannel().getName();
     final String message = evt.getMessage().getContent();

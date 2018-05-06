@@ -23,6 +23,7 @@ public class TestPermissionsTable {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testErrors() {
     
     boolean result = PermissionsTable.initUser(0);
@@ -46,9 +47,10 @@ public class TestPermissionsTable {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testInitUser() {
     
-    PermissionsTable.clearTable();
+    PermissionsTable.initTable();
     
     final long uid = 8675309L;
     boolean result = PermissionsTable.hasUser(uid);
@@ -60,10 +62,11 @@ public class TestPermissionsTable {
     result = PermissionsTable.hasUser(uid);
   }
   
+  @SuppressWarnings("static-method")
   @Test
   public void testUpdateUser() {
     
-    PermissionsTable.clearTable();
+    PermissionsTable.initTable();
     
     final long uid = 4856154453L;
     int lvl = PermissionsTable.getLevel(uid);
@@ -79,9 +82,10 @@ public class TestPermissionsTable {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testRemoveUser() {
     
-    PermissionsTable.clearTable();
+    PermissionsTable.initTable();
     final long uid = 783648392578L;
     
     boolean result = PermissionsTable.hasUser(uid);

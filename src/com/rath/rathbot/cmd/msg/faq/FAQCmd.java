@@ -112,9 +112,8 @@ public class FAQCmd extends RBCommand {
     
     if (faqMap.containsKey(faq)) {
       return faqMap.get(faq);
-    } else {
-      return null;
     }
+    return null;
   }
   
   /**

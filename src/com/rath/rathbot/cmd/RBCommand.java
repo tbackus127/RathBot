@@ -89,6 +89,7 @@ public abstract class RBCommand {
    * anything else necessary to execute before the command can be issued. If no setup is required, overriding this
    * method is unnecessary.
    */
+  @SuppressWarnings("static-method")
   public void setupCommand() {
     return;
   };
@@ -98,6 +99,7 @@ public abstract class RBCommand {
    * 
    * @return a Set of RBCommand classes. Use a HashSet for these, not a TreeSet.
    */
+  @SuppressWarnings("static-method")
   public Set<RBCommand> getSubcommands() {
     return null;
   };
@@ -113,39 +115,33 @@ public abstract class RBCommand {
    */
   public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
-    System.out.println("In executeCommand() for " + this.getCommandName() + " with td=" + tokenDepth);
-    
     // Check this command's subcommands for a match, and return the matched command
     final RBCommand cmd = checkSubcommands(getSubcommands(), tokens, tokenDepth);
     
     // If a subcommand is not found
     final IChannel channel = msg.getChannel();
     if (cmd == null) {
-      System.out.println("No subcommands found for " + tokens[tokenDepth]);
       return RBCommand.CONTINUE_CMD_SEARCH;
-    } else {
+    }
+    // Check permissions for this command.
+    final IUser author = msg.getAuthor();
+    final long userID = author.getLongID();
+    if (PermissionsTable.getLevel(userID) >= cmd.permissionLevelRequired()) {
       
-      // Check permissions for this command.
-      final IUser author = msg.getAuthor();
-      final long userID = author.getLongID();
-      if (PermissionsTable.getLevel(userID) >= cmd.permissionLevelRequired()) {
-        
-        // Valid subcommand found, so return true
-        cmd.executeCommand(msg, tokens, tokenDepth + 1);
-        return RBCommand.STOP_CMD_SEARCH;
-        
-      } else {
-        
-        // Insufficient permissions. Log and notify.
-        System.out.println(
-            "User " + author.getName() + " tried to execute " + cmd.getCommandName() + " with permission level "
-                + PermissionsTable.getLevel(userID) + " (" + cmd.permissionLevelRequired() + " required).");
-        RathBot.sendMessage(channel, "You do not have the required permissions for that command.");
-        
-        return RBCommand.STOP_CMD_SEARCH;
-      }
+      // Valid subcommand found, so return true
+      cmd.executeCommand(msg, tokens, tokenDepth + 1);
+      return RBCommand.STOP_CMD_SEARCH;
       
     }
+    
+    // Insufficient permissions. Log and notify.
+    System.out.println(
+        "User " + author.getName() + " tried to execute " + cmd.getCommandName() + " with permission level "
+            + PermissionsTable.getLevel(userID) + " (" + cmd.permissionLevelRequired() + " required).");
+    RathBot.sendMessage(channel, "You do not have the required permissions for that command.");
+    
+    return RBCommand.STOP_CMD_SEARCH;
+    
   }
   
   /**
@@ -159,33 +155,19 @@ public abstract class RBCommand {
   protected static final RBCommand checkSubcommands(final Set<RBCommand> subcommands, final String[] tokens,
       final int tokenDepth) {
     
-    System.out.println("Checking subcommands of " + tokens[tokenDepth] + ":");
-    
     // If there are no subcommands, return null
-    if (subcommands == null) {
-      System.out.println("  " + tokens[tokenDepth] + " has no subcommands.");
-      return null;
-    }
-    
-    if (tokenDepth + 1 >= tokens.length) {
-      System.out.println("Tokens exhausted.");
+    if (subcommands == null || tokenDepth + 1 >= tokens.length) {
       return null;
     }
     
     // Go through each subcommand and check the correct token for a match
     for (final RBCommand cmd : subcommands) {
-      
-      System.out.println(
-          "  Checking \"" + tokens[tokenDepth + 1] + "\" against subcommand \"" + cmd.getCommandName() + "\".");
       if (cmd.getCommandName().equalsIgnoreCase(tokens[tokenDepth + 1])) {
-        
-        System.out.println("  Matched with " + cmd.getCommandName());
         return cmd;
       }
     }
     
     // No valid subcommand was found, so return null
-    System.out.println("  No subcommands found for token.");
     return null;
     
   }

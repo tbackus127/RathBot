@@ -21,6 +21,7 @@ public class TestFAQCmd {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testFAQAdd() {
     
     System.out.println("Testing FAQ.add");
@@ -37,6 +38,7 @@ public class TestFAQCmd {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testFAQHas() {
     
     FAQCmd.addFaq("testa", "test-a-msg");
@@ -44,6 +46,7 @@ public class TestFAQCmd {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testFAQGet() {
     
     final String key1 = "key1";
@@ -57,6 +60,7 @@ public class TestFAQCmd {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testEditFAQ() {
     
     FAQCmd.addFaq("test1", "old-message");
@@ -67,6 +71,7 @@ public class TestFAQCmd {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testRemoveFAQ() {
     
     FAQCmd.addFaq("test1", "should be gone");

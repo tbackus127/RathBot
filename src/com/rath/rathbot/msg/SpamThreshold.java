@@ -39,7 +39,7 @@ public class SpamThreshold {
    * @return a positive int.
    */
   public int getCount() {
-    return count;
+    return this.count;
   }
   
   /**
@@ -48,6 +48,6 @@ public class SpamThreshold {
    * @return a positive int.
    */
   public int getTimeout() {
-    return timeout;
+    return this.timeout;
   }
 }

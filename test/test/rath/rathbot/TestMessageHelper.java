@@ -19,6 +19,7 @@ import com.rath.rathbot.util.MessageHelper;
 public class TestMessageHelper {
   
   @Test
+  @SuppressWarnings("static-method")
   public void testCommandDescription() {
     
     String result = MessageHelper.buildCmdDescrMsg(null, null);
@@ -58,6 +59,7 @@ public class TestMessageHelper {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testConcatTokens() {
     
     String[] nullArray = null;
@@ -84,6 +86,7 @@ public class TestMessageHelper {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testListString() {
     
     String result = null;
@@ -149,6 +152,7 @@ public class TestMessageHelper {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testDiscNotification() {
     String exp = "";
     String res = "";
@@ -249,6 +253,7 @@ public class TestMessageHelper {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testDiscNotificationTimes() {
     
     String res = "";

@@ -32,7 +32,7 @@ public class MessageTrackerEntry {
    * @return a positive long.
    */
   public long getTime() {
-    return time;
+    return this.time;
   }
   
   /**
@@ -41,6 +41,6 @@ public class MessageTrackerEntry {
    * @return a String.
    */
   public String getMessage() {
-    return message;
+    return this.message;
   }
 }

@@ -3,8 +3,6 @@ package com.rath.rathbot.cmd.msg.react;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;

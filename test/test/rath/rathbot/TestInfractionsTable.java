@@ -26,6 +26,7 @@ public class TestInfractionsTable {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testErrors() {
     
     boolean result = Infractions.initMember(0);
@@ -79,8 +80,9 @@ public class TestInfractionsTable {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testInit() {
-    Infractions.clearTable();
+    Infractions.initTable();
     
     final long u = 23895789L;
     
@@ -98,6 +100,7 @@ public class TestInfractionsTable {
   }
   
   @Test
+  @SuppressWarnings("static-method")
   public void testUpdates() {
     
     final long u = 23785623895L;

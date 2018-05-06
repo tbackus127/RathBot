@@ -67,17 +67,6 @@ public class RathBot {
   /** The default Playing text under the bot's username. */
   private static final String DEFAULT_PLAYING_TEXT = "\u2606I\u2606MA\u2606SU\u2606GU\u2606";
   
-  /** The channel where reports and actions will be posted. */
-  private static final String REPORT_CHANNEL_NAME = "report";
-  
-  /** The report channel's long ID. */
-  // Note: This is the report channel ID for the osu! University server.
-  private static final long REPORT_CHANNEL_ID = 387498131950141440L;
-  
-  /** The osu! University guild ID. */
-  // Note: This is the guild ID for the osu! University server.
-  private static final long GUILD_ID = 291067429596168193L;
-  
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
   
@@ -139,7 +128,7 @@ public class RathBot {
   public static final void warnUser(final IUser issuer, final IUser warnUser, final long warnTime,
       final String reason) {
     Infractions.warnUser(warnUser.getLongID(), warnTime, reason);
-    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
+    sendMessage(getChannelMap().get(RBConfig.getReportChannelName()),
         warnUser.getName() + " has been warned for reason: \"" + reason + "\".");
     
     // TODO: Maybe send a PM to the user that they've been warned for whatever reason
@@ -161,8 +150,8 @@ public class RathBot {
       final int muteDuration, final String reason) {
     Infractions.muteUser(muteUser.getLongID(), muteTime, muteDuration, reason);
     sendDirectMessage(muteUser, MessageHelper.buildDiscNotificationMessage(PunishmentType.MUTE, muteDuration, reason));
-    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
-        muteUser.getName() + " has been muted for reason: \"" + reason + "\".");
+    sendMessage(getChannelMap().get(RBConfig.getReportChannelName()),
+        muteUser.getName() + " has been " + PunishmentType.MUTE.getVerb() + " for reason: \"" + reason + "\".");
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
     ActionLogger.logAction(new ActionMute(Instant.now(), isr, muteUser));
   }
@@ -175,7 +164,7 @@ public class RathBot {
    */
   public static final void unmuteUser(final IUser issuer, final IUser user) {
     Infractions.setMuted(user.getLongID(), false);
-    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME), user.getName() + " has been unmuted.");
+    sendMessage(getChannelMap().get(RBConfig.getReportChannelName()), user.getName() + " has been unmuted.");
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
     ActionLogger.logAction(new ActionUnmute(Instant.now(), isr, user));
   }
@@ -193,7 +182,7 @@ public class RathBot {
     sendDirectMessage(kickUser, MessageHelper.buildDiscNotificationMessage(PunishmentType.KICK, -1, reason));
     Infractions.kickUser(kickUser.getLongID(), kickTime, reason);
     guild.kickUser(kickUser, reason);
-    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
+    sendMessage(getChannelMap().get(RBConfig.getReportChannelName()),
         kickUser.getName() + " has been kicked for reason: \"" + reason + "\".");
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
     ActionLogger.logAction(new ActionKick(Instant.now(), isr, kickUser));
@@ -211,7 +200,7 @@ public class RathBot {
     sendDirectMessage(banUser, MessageHelper.buildDiscNotificationMessage(PunishmentType.BAN, -1, reason));
     Infractions.banUser(banUser.getLongID(), banTime, reason);
     guild.banUser(banUser, reason);
-    sendMessage(getChannelMap().get(REPORT_CHANNEL_NAME),
+    sendMessage(getChannelMap().get(RBConfig.getReportChannelName()),
         banUser.getName() + " has been banned for reason: \"" + reason + "\".");
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
     ActionLogger.logAction(new ActionBan(Instant.now(), isr, banUser));
@@ -293,7 +282,7 @@ public class RathBot {
   private static final IDiscordClient createClient() {
     
     // Get the authentication token
-    final String token = RBAuth.readToken(CONFIG_FILE_PATH);
+    final String token = RBConfig.getAuthToken();
     System.out.println("Creating bot with token " + token + ".");
     if (token == null) {
       System.err.println("Fetching the authentication token went wrong. Exiting.");
@@ -349,7 +338,7 @@ public class RathBot {
     final TreeMap<String, IChannel> result = new TreeMap<String, IChannel>();
     
     // Add important channels manually just in case Discord4J doesn't want to list channels
-    result.put("report", discClient.getChannelByID(REPORT_CHANNEL_ID));
+    result.put("report", discClient.getChannelByID(RBConfig.getReportChannelID()));
     
     // For each channel, add a mapping from its name to its ID
     for (final IChannel c : channels) {
@@ -385,7 +374,7 @@ public class RathBot {
     // Iterate through every command in the command map
     final HelpCmd result = new HelpCmd();
     for (final String cmdName : commandMap.keySet()) {
-      result.addCommandEntry(cmdName, commandMap.get(cmdName));
+      HelpCmd.addCommandEntry(cmdName, commandMap.get(cmdName));
     }
     return result;
   }
@@ -409,10 +398,14 @@ public class RathBot {
    */
   public static final void main(String[] args) {
     
+    // Load the config file name-value pairs
+    System.out.println("Loading config values...");
+    RBConfig.loadConfigMap(CONFIG_FILE_PATH);
+    
     // Start the bot up
     discClient = createClient();
     buildAndLoadDataStructures();
-    guild = discClient.getGuildByID(GUILD_ID);
+    guild = discClient.getGuildByID(RBConfig.getGuildID());
     buildCommands();
     discClient.getDispatcher().registerListener(new EventHandler());
     System.out.println("Startup complete!");
@@ -423,6 +416,8 @@ public class RathBot {
     
     // Clean everything up
     cin.close();
+    MessageLogger.closeStreams();
+    ActionLogger.closePrintStream();
     if (discClient.isLoggedIn()) {
       logout();
     }

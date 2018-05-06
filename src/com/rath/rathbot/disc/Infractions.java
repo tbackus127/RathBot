@@ -315,7 +315,7 @@ public class Infractions {
   /**
    * Clears the infractions table, but does not save it to disk. USE WITH CAUTION.
    */
-  public static final void clearTable() {
+  public static final void initTable() {
     infractionMap = new TreeMap<Long, InfractionData>();
   }
   
@@ -366,11 +366,12 @@ public class Infractions {
     }
     
     Object obj = null;
-    try (FileInputStream fis = new FileInputStream(INFRACTIONS_DATA_PATH);
-        ObjectInputStream oin = new ObjectInputStream(fis)) {
+    try (FileInputStream fis = new FileInputStream(INFRACTIONS_DATA_PATH);) {
       
       // Build an input stream for deserialization
       if (fis.available() > 0) {
+        
+        ObjectInputStream oin = new ObjectInputStream(fis);
         
         // Read the object in and close the streams
         obj = oin.readObject();
@@ -380,13 +381,15 @@ public class Infractions {
         // If something went wrong, return null
         if (obj == null) {
           System.err.println("Infractions map load error.");
-          infractionMap = new TreeMap<Long, InfractionData>();
+          initTable();
           saveToFile();
           return;
         }
         
       } else {
-        System.err.println("Infractions map is empty.");
+        System.out.println("Infractions map is empty.");
+        initTable();
+        return;
       }
       
     } catch (FileNotFoundException e) {
@@ -402,7 +405,7 @@ public class Infractions {
       infractionMap = (TreeMap<Long, InfractionData>) obj;
     } else {
       System.err.println("Error with loading. Creating new table.");
-      infractionMap = new TreeMap<Long, InfractionData>();
+      initTable();
     }
   }
 }

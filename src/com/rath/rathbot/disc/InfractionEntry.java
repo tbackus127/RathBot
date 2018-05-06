@@ -37,7 +37,7 @@ public class InfractionEntry {
    * @return the enum value from PunishmentType.
    */
   public PunishmentType getType() {
-    return type;
+    return this.type;
   }
   
   /**

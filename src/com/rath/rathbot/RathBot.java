@@ -69,7 +69,6 @@ public class RathBot {
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
-  
   private static final RBCommand[] commandList = { new BanCmd(), new UnbanCmd(), new KickCmd(), new WarnCmd(),
       new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(), new PingCmd(), new ReactCmd() };
   

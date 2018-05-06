@@ -3,8 +3,6 @@ package com.rath.rathbot;
 
 import com.rath.rathbot.log.MessageLogger;
 
-import sx.blah.discord.api.events.Event;
-import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.api.events.IListener;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IMessage;

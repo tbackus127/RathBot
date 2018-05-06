@@ -22,7 +22,7 @@ public class MessageHelper {
   public static final String RATH_CONTACT = "Discord:Rathuldr#0587, Email:rathuldr@gmail.com";
   
   /** Kami's contact information String. */
-  public static final String KAMI_CONTACT = "Discord:Loli no Kami#0911";
+  public static final String KAMI_CONTACT = "Discord:Loli no Kami#0911, Email:lehenbnw@gmail.com";
   
   public static final String ERROR_CONTACT_MSG = "If you believe this was an error, contact Rath (" + RATH_CONTACT
       + ") or Kami (" + KAMI_CONTACT + ").";

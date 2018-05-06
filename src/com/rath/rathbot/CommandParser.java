@@ -48,8 +48,6 @@ public class CommandParser {
       return;
     }
     
-    System.out.println("Command found: " + cmd.getCommandName() + ".");
-    
     // If the user doesn't have an entry on the permissions table, initialize them and save
     final long userID = author.getLongID();
     if (!PermissionsTable.hasUser(userID)) {
@@ -67,9 +65,12 @@ public class CommandParser {
         try {
           message.delete();
         } catch (DiscordException dce) {
+          System.err.println("There was an error deleting the message. Ensure that permissions are set correctly."
+              + "If the message was deleted by the mod team before the bot had a chance to, ignore this error.");
           dce.printStackTrace();
         }
         
+        // Let the user know that the command requires a direct message.
         RathBot.sendMessage(channel, "This command can only be issued in a direct message to RathBot.");
         return;
       }

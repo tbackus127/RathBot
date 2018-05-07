@@ -4,8 +4,8 @@ package com.rath.rathbot.cmd.disc.actions;
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
+import com.rath.rathbot.util.MessageHelper;
 
-import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
@@ -54,51 +54,25 @@ public class UnbanCmd extends RBCommand {
       return RBCommand.STOP_CMD_SEARCH;
     }
     
-    // Tests if the first argument of the command is an @mention or uid, then processes the argument accordingly.
-    long unbanUserID = 0;
-    final String userToken = tokens[tokDepth + 1];
-    if (userToken.matches("<@!?\\d+>")) {
-      
-      int hasNickName = 0;
-      
-      if (userToken.charAt(2) == '!') hasNickName = 1;
-      
-      // If argument is @mention, substring to get UID
-      try {
-        unbanUserID = Long.parseLong(
-            userToken.substring((userToken.indexOf('@') + hasNickName + 1), userToken.indexOf('>')));
-      } catch (NumberFormatException nfe) {
-        nfe.printStackTrace();
-      }
-    } else {
-      
-      // Else argument is UID, parse UID
-      try {
-        unbanUserID = Long.parseLong(tokens[tokDepth + 1]);
-      } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
-        RathBot.sendMessage(channel, "Invalid UID, UIDs must only contain numbers.");
-      }
-    }
-    
-    final IDiscordClient client = RathBot.getClient();
-    
-    // Create IUser object from unbanUserID to reference user in messages.
-    final IUser unbannedUser = client.getUserByID(unbanUserID);
-    if (unbannedUser == null) {
-      RathBot.sendMessage(channel, "Error! User not found, please enter a valid UID.");
+    // Create IUser object from token to issue disciplinary action on them.
+    final IUser infringingUser = MessageHelper.getUserFromToken(tokens[tokDepth + 1], channel);
+    if (infringingUser == null) {
+      RathBot.sendMessage(channel,
+          "Error: Invalid UID or User not Found! Please verify User exists and UID is correct. Remember: UIDs should only contain numbers.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
-    // If the issuer's permissions level is lower than or equal to the target's disallow the mute
+    // If the issuer's permissions level is lower than or equal to the target's disallow the command.
     final IUser author = msg.getAuthor();
-    if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(unbanUserID)) {
+    if (PermissionsTable.getLevel(msg.getAuthor().getLongID()) <= PermissionsTable.getLevel(
+        infringingUser.getLongID())) {
       RathBot.sendMessage(channel, "Cannot unban a member with an equal or higher permission level.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
     // Unban the user.
-    RathBot.unbanUser(author, unbannedUser);
-    RathBot.sendMessage(channel, author.getName() + " has been unbanned.");
+    RathBot.unbanUser(author, infringingUser);
+    RathBot.sendMessage(channel, infringingUser.getName() + " has been unbanned.");
     
     return RBCommand.STOP_CMD_SEARCH;
   }

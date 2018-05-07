@@ -1,9 +1,13 @@
 
 package com.rath.rathbot.cmd.disc.actions;
 
+import java.time.Instant;
+
 import com.rath.rathbot.RathBot;
+import com.rath.rathbot.action.ActionUnban;
 import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
+import com.rath.rathbot.log.ActionLogger;
 import com.rath.rathbot.util.MessageHelper;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -73,6 +77,9 @@ public class UnbanCmd extends RBCommand {
     // Unban the user.
     RathBot.unbanUser(author, infringingUser);
     RathBot.sendMessage(channel, infringingUser.getName() + " has been unbanned.");
+    
+    // Log unban.
+    ActionLogger.logAction(new ActionUnban(Instant.now(), author, infringingUser));
     
     return RBCommand.STOP_CMD_SEARCH;
   }

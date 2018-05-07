@@ -1,9 +1,13 @@
 
 package com.rath.rathbot.cmd.disc.actions;
 
+import java.time.Instant;
+
 import com.rath.rathbot.RathBot;
+import com.rath.rathbot.action.ActionWarn;
 import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.cmd.RBCommand;
+import com.rath.rathbot.log.ActionLogger;
 import com.rath.rathbot.util.MessageHelper;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -72,6 +76,11 @@ public class WarnCmd extends RBCommand {
     
     RathBot.warnUser(author, infringingUser, msg.getTimestamp().getEpochSecond(),
         MessageHelper.concatenateTokens(tokens, tokDepth + 2));
+    
+    // Log warn.
+    ActionLogger.logAction(new ActionWarn(Instant.now(), author, infringingUser));
+    
+    RathBot.sendMessage(channel, infringingUser.getName() + " has been warned.");
     
     return RBCommand.STOP_CMD_SEARCH;
   }

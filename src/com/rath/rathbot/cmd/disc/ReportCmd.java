@@ -18,7 +18,7 @@ import sx.blah.discord.handle.obj.IUser;
 /**
  * Provides a report command for users to report rule breaking activity, posts the report in server #report channel.
  * 
- * @author Kami lehenbnw@gmail.com
+ * @author Nathan Lehenbauer lehenbnw@gmail.com
  *
  */
 

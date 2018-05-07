@@ -39,7 +39,7 @@ Required permission levels are in parentheses preceded by 'P': "(P4)" means the 
   [ ] (P2) memtime <user>: Post how long $user has been a member of this server.
 
 > Administrative
-[~] (P1) report** <uid> <reason..>: Only accepted through a PM. Reports the member with UID = $uid for $reason. The
+[x] (P1) report** <uid> <reason..>: Only accepted through a PM. Reports the member with UID = $uid for $reason. The
     report will get posted in #report and will be logged.
 [ ] (P4) strike* <uid> <reason..>: Adds a strike against the user with the given $uid. A $reason may be given.
 [x] (P4) kick* <uid|mention> <reason..>: Kicks the user with the given $uid.

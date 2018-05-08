@@ -5,8 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.disc.PunishmentType;
+
+import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IUser;
 
 /**
  * This class contains frequently-used message formatting methods.
@@ -200,4 +205,56 @@ public class MessageHelper {
     msg += ERROR_CONTACT_MSG;
     return msg;
   }
+  
+  /**
+   * Parses a token for a UID and returns it as a long.
+   * 
+   * @param token The token to parse for the UID. Can be a text UID or @mention.
+   * @param channel The channel the command was called from.
+   * @return The UID of the user as a long, or -1 if there is a NFE.
+   */
+  public static final long getUIDFromToken(String token, IChannel channel) {
+    
+    long uid = 0;
+    
+    // Check if token is a mention.
+    if (token.matches("<@!?\\d+>")) {
+      
+      int hasNickName = 0;
+      
+      if (token.charAt(2) == '!') hasNickName = 1;
+      
+      // Argument is @mention, so substring to get UID
+      try {
+        uid = Long.parseLong(token.substring((token.indexOf('@') + hasNickName + 1), token.indexOf('>')));
+      } catch (NumberFormatException nfe) {
+        nfe.printStackTrace();
+      }
+    } else {
+      
+      // Else argument is UID, parse UID
+      try {
+        uid = Long.parseLong(token);
+      } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+        return -1;
+      }
+    }
+    
+    return uid;
+  }
+  
+  /**
+   * Creates a User object from the given token.
+   * 
+   * @param token The token with user's UID.
+   * @param channel The channel the command was called from.
+   * @return The IUser object with the UID from token.
+   */
+  public static final IUser getUserFromToken(String token, IChannel channel) {
+    
+    IDiscordClient client = RathBot.getClient();
+    
+    return client.getUserByID(getUIDFromToken(token, channel));
+  }
+  
 }

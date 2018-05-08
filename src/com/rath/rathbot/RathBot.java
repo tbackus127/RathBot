@@ -66,7 +66,7 @@ public class RathBot {
   private static final String CONFIG_FILE_PATH = "rathbot.conf";
   
   /** The default Playing text under the bot's username. */
-  private static final String DEFAULT_PLAYING_TEXT = "v1.3.0";
+  private static final String DEFAULT_PLAYING_TEXT = "v0.1.5";
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */

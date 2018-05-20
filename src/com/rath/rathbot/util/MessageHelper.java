@@ -32,6 +32,27 @@ public class MessageHelper {
   public static final String ERROR_CONTACT_MSG = "If you believe this was an error, contact Rath (" + RATH_CONTACT
       + ") or Kami (" + KAMI_CONTACT + ").";
   
+  public static final long parseTimeString(final String timestring) {
+    
+    // Ensure that the String isn't empty
+    if (timestring.length() <= 0) {
+      return -1;
+    }
+    
+    // Ensure that the String matches the proper format
+    if (!timestring.matches("(\\d+M)?(\\d+w)?(\\d+d)?(\\d+h)?(\\d+m)?")) {
+      return -1;
+    }
+    
+    long result = 0;
+    
+    
+    // TODO: This
+    
+    
+    return result;
+  }
+  
   /**
    * Builds a message with commands and their descriptions.
    * 
@@ -142,7 +163,7 @@ public class MessageHelper {
    * @param reason the reason the user was banned, as a String.
    * @return the message that will be sent as a String.
    */
-  public static String buildDiscNotificationMessage(final PunishmentType type, int time, String reason) {
+  public static final String buildDiscNotificationMessage(final PunishmentType type, int time, String reason) {
     
     // Ensure type isn't null, time isn't negative, and that the reason isn't null or empty
     if (type == null) {

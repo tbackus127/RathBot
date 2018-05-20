@@ -33,6 +33,8 @@ public class EventHandler implements IListener<MessageReceivedEvent> {
       return;
     }
     
+    System.out.println("Message received.");
+    
     // Log the message
     final IMessage message = event.getMessage();
     MessageLogger.logMessage(message);

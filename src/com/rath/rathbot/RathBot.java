@@ -70,8 +70,8 @@ public class RathBot {
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
-  private static final RBCommand[] commandList = { new ReportCmd(), new BanCmd(), new UnbanCmd(), new KickCmd(), new WarnCmd(),
-      new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(), new PingCmd(), new ReactCmd() };
+  private static final RBCommand[] commandList = { new ReportCmd(), new BanCmd(), new UnbanCmd(), new KickCmd(),
+      new WarnCmd(), new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(), new PingCmd(), new ReactCmd() };
   
   /** The set of commands this bot responds to. */
   private static final TreeMap<String, RBCommand> commandMap = new TreeMap<String, RBCommand>();
@@ -316,7 +316,7 @@ public class RathBot {
     ActionLogger.initActionLogger();
     PermissionsTable.loadPerms();
     Infractions.loadFromFile();
-    // TODO: Add more tables here when/if needed
+    // TODO: Initialize more tables here when/if needed
   }
   
   /**
@@ -404,7 +404,7 @@ public class RathBot {
     
     // Start the bot up
     discClient = createClient();
-    if(discClient == null) {
+    if (discClient == null) {
       return;
     }
     buildAndLoadDataStructures();

@@ -33,13 +33,8 @@ public class EventHandler implements IListener<MessageReceivedEvent> {
       return;
     }
     
-    System.out.println("Message received.");
-    
-    // Log the message
-    final IMessage message = event.getMessage();
-    MessageLogger.logMessage(message);
-    
     // Parse commands if it starts with the command prefix
+    final IMessage message = event.getMessage();
     final String messageString = message.getContent();
     if (messageString.startsWith(COMMAND_PREFIX)) {
       
@@ -48,6 +43,8 @@ public class EventHandler implements IListener<MessageReceivedEvent> {
       CommandParser.parseCommand(message);
     }
     
+    // Log the message after performing the action
+    MessageLogger.logMessage(message);
   }
   
   /**

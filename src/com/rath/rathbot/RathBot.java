@@ -405,6 +405,9 @@ public class RathBot {
     
     // Start the bot up
     createClient();
+    if (discClient == null) {
+      return;
+    }
     buildAndLoadDataStructures();
     guild = discClient.getGuildByID(RBConfig.getGuildID());
     buildCommands();

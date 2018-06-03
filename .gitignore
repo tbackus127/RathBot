@@ -1,5 +1,6 @@
 .classpath
 .project
+pushToProduction.sh
 
 *.conf
 /lib/

@@ -82,10 +82,9 @@ public class MuteCmd extends RBCommand {
     }
     
     // Parse the mute duration
-    // TODO: Make method for Y/M/W/d/h/m/s conversion to seconds
+    // TODO: Use method for Y/M/W/d/h/m/s conversion to seconds and allow a duration token
     final int muteDuration = 0;
     
-    // TODO: Parse mute duration and reason in tokens
     final String muteReason = MessageHelper.concatenateTokens(tokens, 4);
     final IUser mutedUser = RathBot.getClient().getUserByID(mutedUserUID);
     RathBot.muteUser(author, mutedUser, msg.getTimestamp().getEpochSecond(), muteDuration, muteReason);

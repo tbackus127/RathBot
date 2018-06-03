@@ -6,6 +6,7 @@
 /dat/
 /logs/
 /res/
+pushToProduction.sh
 
 # Compiled class file
 *.class

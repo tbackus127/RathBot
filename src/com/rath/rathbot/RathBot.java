@@ -32,6 +32,7 @@ import com.rath.rathbot.disc.Infractions;
 import com.rath.rathbot.disc.PunishmentType;
 import com.rath.rathbot.log.ActionLogger;
 import com.rath.rathbot.log.MessageLogger;
+import com.rath.rathbot.task.TaskRegistry;
 import com.rath.rathbot.util.MessageHelper;
 
 import sx.blah.discord.api.ClientBuilder;
@@ -68,10 +69,10 @@ public class RathBot {
   /** The default Playing text under the bot's username. */
   private static final String DEFAULT_PLAYING_TEXT = "v0.1.5";
   
-  // TODO: Add more here as they become available.
+  // TODO: ** Add more commands here as they become available.
   /** A list of commands to initialize. */
-  private static final RBCommand[] commandList = { new ReportCmd(), new BanCmd(), new UnbanCmd(), new KickCmd(), new WarnCmd(),
-      new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(), new PingCmd(), new ReactCmd() };
+  private static final RBCommand[] commandList = { new ReportCmd(), new BanCmd(), new UnbanCmd(), new KickCmd(),
+      new WarnCmd(), new MuteCmd(), new UnmuteCmd(), new FAQCmd(), new UIDCmd(), new PingCmd(), new ReactCmd() };
   
   /** The set of commands this bot responds to. */
   private static final TreeMap<String, RBCommand> commandMap = new TreeMap<String, RBCommand>();
@@ -131,7 +132,7 @@ public class RathBot {
     sendMessage(getChannelMap().get(RBConfig.getReportChannelName()),
         warnUser.getName() + " has been warned for reason: \"" + reason + "\".");
     
-    // TODO: Maybe send a PM to the user that they've been warned for whatever reason
+    // TODO: Send a PM to the user that they've been warned for the given reason
     
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
     ActionLogger.logAction(new ActionWarn(Instant.now(), isr, warnUser));
@@ -279,19 +280,19 @@ public class RathBot {
    * 
    * @return the built IDiscordClient object.
    */
-  private static final IDiscordClient createClient() {
+  private static final void createClient() {
     
     // Get the authentication token
     final String token = RBConfig.getAuthToken();
     System.out.println("Creating bot with token " + token + ".");
     if (token == null) {
       System.err.println("Fetching the authentication token went wrong. Exiting.");
-      return null;
+      return;
     }
     
     // Create the client and the bot
     System.out.print("Creating client... ");
-    return new ClientBuilder().withPingTimeout(5).withToken(token).build();
+    discClient = new ClientBuilder().withPingTimeout(5).withToken(token).build();
   }
   
   /**
@@ -316,7 +317,7 @@ public class RathBot {
     ActionLogger.initActionLogger();
     PermissionsTable.loadPerms();
     Infractions.loadFromFile();
-    // TODO: Add more tables here when/if needed
+    // TODO: ** Add more data structures to load here before the bot receives commands
   }
   
   /**
@@ -365,6 +366,18 @@ public class RathBot {
   }
   
   /**
+   * Adds a command to the bot's list of available commands.
+   * 
+   * @param cmd the RBCommand to add.
+   */
+  private final static void addAndInitializeCommand(final RBCommand cmd) {
+    System.out.print("Initializing command " + cmd.getCommandName() + "... ");
+    cmd.setupCommand();
+    commandMap.put(cmd.getCommandName(), cmd);
+    System.out.println("DONE");
+  }
+  
+  /**
    * Builds the help command's entries after all other commands have been registered.
    * 
    * @return the built HelpCmd.
@@ -380,18 +393,6 @@ public class RathBot {
   }
   
   /**
-   * Adds a command to the bot's list of available commands.
-   * 
-   * @param cmd the RBCommand to add.
-   */
-  private final static void addAndInitializeCommand(final RBCommand cmd) {
-    System.out.print("Initializing command " + cmd.getCommandName() + "... ");
-    cmd.setupCommand();
-    commandMap.put(cmd.getCommandName(), cmd);
-    System.out.println("DONE");
-  }
-  
-  /**
    * Main method.
    * 
    * @param args runtime arguments (ignored).
@@ -403,11 +404,12 @@ public class RathBot {
     RBConfig.loadConfigMap(CONFIG_FILE_PATH);
     
     // Start the bot up
-    discClient = createClient();
+    createClient();
     buildAndLoadDataStructures();
     guild = discClient.getGuildByID(RBConfig.getGuildID());
     buildCommands();
     discClient.getDispatcher().registerListener(new EventHandler());
+    TaskRegistry.setupTasks();
     System.out.println("Startup complete!");
     
     // Start accepting commands from the console window

@@ -179,7 +179,11 @@ public class InfractionData implements Serializable {
     setBanned(true);
   }
   
-  // TODO: Javadoc this
+  /**
+   * Gets the mute duration.
+   * 
+   * @return the mute duration in seconds, as an int.
+   */
   public final int getMuteDuration() {
     return this.muteDuration;
   }

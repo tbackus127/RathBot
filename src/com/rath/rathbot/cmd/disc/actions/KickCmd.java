@@ -61,7 +61,7 @@ public class KickCmd extends RBCommand {
     }
     
     // Create IUser object from token to issue disciplinary action on them.
-    final IUser infringingUser = MessageHelper.getUserFromToken(tokens[tokDepth + 1], channel);
+    final IUser infringingUser = MessageHelper.getUserFromToken(tokens[tokDepth + 1]);
     if (infringingUser == null) {
       RathBot.sendMessage(channel,
           "Error: Invalid UID or User not Found! Please verify User exists and UID is correct. Remember: UIDs should only contain numbers.");

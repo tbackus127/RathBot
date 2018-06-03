@@ -10,7 +10,6 @@ import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.disc.PunishmentType;
 
 import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
 /**
@@ -210,18 +209,16 @@ public class MessageHelper {
    * Parses a token for a UID and returns it as a long.
    * 
    * @param token The token to parse for the UID. Can be a text UID or @mention.
-   * @param channel The channel the command was called from.
    * @return The UID of the user as a long, or -1 if there is a NFE.
    */
-  public static final long getUIDFromToken(String token, IChannel channel) {
-    
-    long uid = 0;
+  public static final long getUIDFromToken(final String token) {
     
     // Check if token is a mention.
+    long uid = 0;
     if (token.matches("<@!?\\d+>")) {
       
+      // If the user has a nickname, we need to add one to the parse start index
       int hasNickName = 0;
-      
       if (token.charAt(2) == '!') hasNickName = 1;
       
       // Argument is @mention, so substring to get UID
@@ -247,14 +244,12 @@ public class MessageHelper {
    * Creates a User object from the given token.
    * 
    * @param token The token with user's UID.
-   * @param channel The channel the command was called from.
    * @return The IUser object with the UID from token.
    */
-  public static final IUser getUserFromToken(String token, IChannel channel) {
+  public static final IUser getUserFromToken(final String token) {
     
     IDiscordClient client = RathBot.getClient();
-    
-    return client.getUserByID(getUIDFromToken(token, channel));
+    return client.getUserByID(getUIDFromToken(token));
   }
   
 }

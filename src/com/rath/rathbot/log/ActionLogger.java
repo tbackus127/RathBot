@@ -32,7 +32,6 @@ public class ActionLogger {
   /**
    * Initializes the action logger. Must be called before commands are received!
    */
-  // TODO: ^ This
   public static final void initActionLogger() {
     
     if (!ACTION_LOG_FILE.exists()) {
@@ -61,7 +60,7 @@ public class ActionLogger {
   /**
    * Closes the PrintStream open on the log file. This should be called during a graceful shutdown.
    */
-  // TODO: ^ This
+  // TODO: Implement graceful shutdown for RathBot
   public static final void closePrintStream() {
     logWriter.close();
   }

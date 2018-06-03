@@ -60,7 +60,13 @@ public class Infractions {
    */
   public static final boolean initMember(final long user) {
     
+    // Ensure the map isn't null
     if (infractionMap == null) {
+      return false;
+    }
+    
+    // Disallow negative UIDs
+    if (user < 0) {
       return false;
     }
     
@@ -92,7 +98,7 @@ public class Infractions {
    */
   public static final int getWarnCount(final long user) {
     
-    if (infractionMap == null) {
+    if (infractionMap == null || infractionMap.get(user) == null) {
       return -1;
     }
     
@@ -128,7 +134,7 @@ public class Infractions {
    */
   public static final boolean isMuted(final long user) {
     
-    if (infractionMap == null) {
+    if (infractionMap == null || infractionMap.get(user) == null) {
       return false;
     }
     
@@ -143,7 +149,7 @@ public class Infractions {
    */
   public static final int getMuteCount(final long user) {
     
-    if (infractionMap == null) {
+    if (infractionMap == null || infractionMap.get(user) == null) {
       return -1;
     }
     

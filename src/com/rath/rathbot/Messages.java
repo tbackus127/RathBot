@@ -17,6 +17,6 @@ public class Messages {
   /** The message that is displayed when the bot takes disciplinary action against a given member. */
   private static final String DISC_NOTIF_MSG = "%s has been %s for the following reason: \"%s\".";
   
-  // TODO: The rest of these.
+  // TODO: Complete messages class.
   
 }

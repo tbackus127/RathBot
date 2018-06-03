@@ -76,12 +76,12 @@ public class HelpCmd extends RBCommand {
     } else {
       
       // If the command sent for the 3rd token is a valid command, post its syntax
-      // TODO: Do subcommands, too
+      // TODO: Have help command work with subcommands, too.
       if (helpCmdMap.containsKey(tokens[2])) {
         final String cmdDescr = helpCmdMap.get(tokens[2]).getCommandDescription();
         RathBot.sendMessage(channel, tokens[2] + " - " + cmdDescr);
       } else {
-        // TODO: Help entry not found
+        // TODO: Message when help entry isn't found
       }
       
     }

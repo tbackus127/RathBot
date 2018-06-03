@@ -31,7 +31,6 @@ public class AntiSpam {
   
   /** Permissions level required to bypass spam filtering. */
   private static final int PERM_LVL_IGNORE = 9;
-  // TODO: Change this back to RBCommand.PERM_LVL_SUDO
   
   /** Whether or not to ignore messages containing only a single image (for dumps). */
   private static final boolean IGNORE_IMAGE_POSTS = true;
@@ -42,8 +41,6 @@ public class AntiSpam {
   /** How many messages a user needs to send while muted to be kicked. */
   @SuppressWarnings("unused")
   private static final int MUTE_KICK_THRESHOLD = 10;
-  // TODO: ^ If they keep posting after being muted, they get kicked.
-  // TODO: Have the bot PM them with minutes left every N minutes. N depends on muted time left.
   
   /** How many warns it takes for the bot to mute a user. */
   private static final int WARNS_TO_MUTE = 5;
@@ -103,8 +100,7 @@ public class AntiSpam {
       return false;
     }
     
-    // If the author's mute time is up, unmute them
-    // TODO: ^ This. Use MUTE_DURATIONS, MUTE_KICK_THRESHOLD
+    // If the author's mute time is up, unmute them. Use MUTE_DURATIONS, MUTE_KICK_THRESHOLD
     
     // If the author is muted, immediately delete muted users' messages
     if (Infractions.isMuted(uid)) {

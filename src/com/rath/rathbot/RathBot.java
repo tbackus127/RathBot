@@ -66,7 +66,8 @@ public class RathBot {
   private static final String CONFIG_FILE_PATH = "rathbot.conf";
   
   /** The default Playing text under the bot's username. */
-  private static final String DEFAULT_PLAYING_TEXT = "v0.1.5";
+  // TODO: Change this back to 0.1.5.1
+  private static final String DEFAULT_PLAYING_TEXT = "v0.1.5.1";
   
   // TODO: Add more here as they become available.
   /** A list of commands to initialize. */
@@ -291,7 +292,7 @@ public class RathBot {
     
     // Create the client and the bot
     System.out.print("Creating client... ");
-    return new ClientBuilder().withPingTimeout(5).withToken(token).build();
+    return new ClientBuilder().withPingTimeout(10).withToken(token).build();
   }
   
   /**
@@ -330,22 +331,25 @@ public class RathBot {
     System.out.println("Logging in... ");
     login();
     while (!discClient.isReady()) {}
-    System.out.println("Successfully logged in.");
+    System.out.println("Successfully logged in. Waiting for guilds...");
+    
+    while (discClient.getGuilds().isEmpty()) {}
+    
+    // Set our guild
+    guild = discClient.getGuilds().get(0);
     
     // Initialize channel structures
     System.out.println("Building channel map...");
-    final List<IChannel> channels = discClient.getChannels();
     final TreeMap<String, IChannel> result = new TreeMap<String, IChannel>();
     
-    // Add important channels manually just in case Discord4J doesn't want to list channels
-    result.put("report", discClient.getChannelByID(RBConfig.getReportChannelID()));
-    
     // For each channel, add a mapping from its name to its ID
+    final List<IChannel> channels = guild.getChannels();
     for (final IChannel c : channels) {
       final String name = c.getName();
       System.out.println("  Added channel #" + name + " -> " + c.getLongID() + ".");
       result.put(name, c);
     }
+    
     System.out.println("Channel map successfully built.");
     return result;
   }
@@ -408,9 +412,9 @@ public class RathBot {
       return;
     }
     buildAndLoadDataStructures();
-    guild = discClient.getGuildByID(RBConfig.getGuildID());
     buildCommands();
     discClient.getDispatcher().registerListener(new EventHandler());
+    
     System.out.println("Startup complete!");
     
     // Start accepting commands from the console window

@@ -28,7 +28,7 @@ import com.rath.rathbot.cmd.msg.HelpCmd;
 import com.rath.rathbot.cmd.msg.PingCmd;
 import com.rath.rathbot.cmd.msg.faq.FAQCmd;
 import com.rath.rathbot.cmd.msg.react.ReactCmd;
-import com.rath.rathbot.disc.Infractions;
+import com.rath.rathbot.disc.InfractionsTable;
 import com.rath.rathbot.disc.PunishmentType;
 import com.rath.rathbot.log.ActionLogger;
 import com.rath.rathbot.log.MessageLogger;
@@ -128,7 +128,7 @@ public class RathBot {
    */
   public static final void warnUser(final IUser issuer, final IUser warnUser, final long warnTime,
       final String reason) {
-    Infractions.warnUser(warnUser.getLongID(), warnTime, reason);
+    InfractionsTable.warnUser(warnUser.getLongID(), warnTime, reason);
     sendMessage(getChannelMap().get(RBConfig.getReportChannelName()),
         warnUser.getName() + " has been warned for reason: \"" + reason + "\".");
     
@@ -149,7 +149,7 @@ public class RathBot {
    */
   public static final void muteUser(final IUser issuer, final IUser muteUser, final long muteTime,
       final int muteDuration, final String reason) {
-    Infractions.muteUser(muteUser.getLongID(), muteTime, muteDuration, reason);
+    InfractionsTable.muteUser(muteUser.getLongID(), muteTime, muteDuration, reason);
     sendDirectMessage(muteUser, MessageHelper.buildDiscNotificationMessage(PunishmentType.MUTE, muteDuration, reason));
     sendMessage(getChannelMap().get(RBConfig.getReportChannelName()),
         muteUser.getName() + " has been " + PunishmentType.MUTE.getVerb() + " for reason: \"" + reason + "\".");
@@ -164,7 +164,7 @@ public class RathBot {
    * @param user the user to be muted as an IUser object.
    */
   public static final void unmuteUser(final IUser issuer, final IUser user) {
-    Infractions.setMuted(user.getLongID(), false);
+    InfractionsTable.setMuted(user.getLongID(), false);
     sendMessage(getChannelMap().get(RBConfig.getReportChannelName()), user.getName() + " has been unmuted.");
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
     ActionLogger.logAction(new ActionUnmute(Instant.now(), isr, user));
@@ -181,7 +181,7 @@ public class RathBot {
   public static final void kickUser(final IUser issuer, final IUser kickUser, final long kickTime,
       final String reason) {
     sendDirectMessage(kickUser, MessageHelper.buildDiscNotificationMessage(PunishmentType.KICK, -1, reason));
-    Infractions.kickUser(kickUser.getLongID(), kickTime, reason);
+    InfractionsTable.kickUser(kickUser.getLongID(), kickTime, reason);
     guild.kickUser(kickUser, reason);
     sendMessage(getChannelMap().get(RBConfig.getReportChannelName()),
         kickUser.getName() + " has been kicked for reason: \"" + reason + "\".");
@@ -199,7 +199,7 @@ public class RathBot {
    */
   public static final void banUser(final IUser issuer, final IUser banUser, final long banTime, final String reason) {
     sendDirectMessage(banUser, MessageHelper.buildDiscNotificationMessage(PunishmentType.BAN, -1, reason));
-    Infractions.banUser(banUser.getLongID(), banTime, reason);
+    InfractionsTable.banUser(banUser.getLongID(), banTime, reason);
     guild.banUser(banUser, reason);
     sendMessage(getChannelMap().get(RBConfig.getReportChannelName()),
         banUser.getName() + " has been banned for reason: \"" + reason + "\".");
@@ -214,7 +214,7 @@ public class RathBot {
    * @param user the IUser to unban.
    */
   public static final void unbanUser(final IUser issuer, final IUser user) {
-    Infractions.setBanned(user.getLongID(), false);
+    InfractionsTable.setBanned(user.getLongID(), false);
     final IUser isr = (issuer == null) ? discClient.getOurUser() : issuer;
     ActionLogger.logAction(new ActionUnban(Instant.now(), isr, user));
   }
@@ -316,7 +316,7 @@ public class RathBot {
     MessageLogger.initPrintStreamMap(channelMap);
     ActionLogger.initActionLogger();
     PermissionsTable.loadPerms();
-    Infractions.loadFromFile();
+    InfractionsTable.loadFromFile();
     // TODO: ** Add more data structures to load here before the bot receives commands
   }
   
@@ -412,7 +412,7 @@ public class RathBot {
     guild = discClient.getGuildByID(RBConfig.getGuildID());
     buildCommands();
     discClient.getDispatcher().registerListener(new EventHandler());
-    TaskRegistry.setupTasks();
+    TaskRegistry.startup();
     System.out.println("Startup complete!");
     
     // Start accepting commands from the console window

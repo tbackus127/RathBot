@@ -6,29 +6,27 @@ import com.rath.rathbot.task.RBTask;
 import com.rath.rathbot.task.time.AbsoluteTimeConfiguration;
 import com.rath.rathbot.task.time.TimeConfiguration;
 
-public class PurgeWarnTask extends RBTask {
+public class PurgeTask extends RBTask {
   
-  private static final String TASK_NAME = "purgewarn";
+  private static final String TASK_NAME = "purge";
   
-  private static final String CONFIG_STRING = "on [Jan,Apr,Jul,Nov] 1 at 06:00";
+  private static final String CONFIG_STRING = "on [Jan,Apr,Jul,Nov] 7 at 06:00";
   
-  // Month, day, year, hour, minute, timezone
   private static final TimeConfiguration TIME_CONFIG = new AbsoluteTimeConfiguration(CONFIG_STRING,
       RBConfig.getTimeZone());
   
-  public PurgeWarnTask() {
+  public PurgeTask() {
     super(TASK_NAME, TIME_CONFIG);
   }
   
   @Override
   public void performTask() {
-    // TODO: performTask() in PurgeWarnTask.java
-    
+    // TODO: performTask() in PurgeTask
   }
   
   @Override
   public boolean isResourceIntensive() {
-    return false;
+    return true;
   }
   
   @Override

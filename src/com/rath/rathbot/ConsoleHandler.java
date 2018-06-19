@@ -6,7 +6,7 @@ import java.util.Scanner;
 import java.util.TreeMap;
 
 import com.rath.rathbot.cmd.PermissionsTable;
-import com.rath.rathbot.disc.Infractions;
+import com.rath.rathbot.disc.InfractionsTable;
 
 import sx.blah.discord.handle.obj.IUser;
 
@@ -105,10 +105,10 @@ public class ConsoleHandler {
         case "mute":
           if (tokens.length == 2) {
             final long uid = Long.parseLong(tokens[1]);
-            if (!Infractions.hasMember(uid)) {
-              Infractions.initMember(uid);
+            if (!InfractionsTable.hasMember(uid)) {
+              InfractionsTable.initMember(uid);
             }
-            Infractions.setMuted(uid, true);
+            InfractionsTable.setMuted(uid, true);
           }
         break;
       
@@ -116,10 +116,10 @@ public class ConsoleHandler {
         case "unmute":
           if (tokens.length == 2) {
             final long uid = Long.parseLong(tokens[1]);
-            if (!Infractions.hasMember(uid)) {
-              Infractions.initMember(uid);
+            if (!InfractionsTable.hasMember(uid)) {
+              InfractionsTable.initMember(uid);
             }
-            Infractions.setMuted(uid, false);
+            InfractionsTable.setMuted(uid, false);
           }
         break;
       
@@ -127,8 +127,8 @@ public class ConsoleHandler {
         case "ireset":
           if (tokens.length == 2) {
             final long uid = Long.parseLong(tokens[1]);
-            if (Infractions.hasMember(uid)) {
-              Infractions.clearInfractions(uid);
+            if (InfractionsTable.hasMember(uid)) {
+              InfractionsTable.clearInfractions(uid);
             }
           }
         break;

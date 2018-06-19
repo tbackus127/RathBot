@@ -13,7 +13,7 @@ import java.util.TreeMap;
 
 import com.rath.rathbot.RathBot;
 
-public class Infractions {
+public class InfractionsTable {
   
   /** The filename for the permission data. */
   private static final String INFRACTIONS_DATA_FILENAME = "infractions.dat";

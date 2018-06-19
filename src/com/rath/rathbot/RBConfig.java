@@ -3,6 +3,7 @@ package com.rath.rathbot;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.ZoneId;
 import java.util.Scanner;
 import java.util.TreeMap;
 
@@ -20,7 +21,8 @@ public class RBConfig {
   private static TreeMap<String, String> configMap = null;
   
   /** The order of the expected config name-value pairs. */
-  private static final String[] CONFIG_NAMES = { "authKey", "guildID", "reportChannelID", "reportChannelName" };
+  private static final String[] CONFIG_NAMES = { "authKey", "timeZone", "guildID", "reportChannelID",
+      "reportChannelName" };
   
   /**
    * Loads the config values from file and populates the config map.
@@ -140,6 +142,10 @@ public class RBConfig {
     
     return null;
     
+  }
+  
+  public static final ZoneId getTimeZone() {
+    return ZoneId.of(configMap.get("timeZone"));
   }
   
   /**

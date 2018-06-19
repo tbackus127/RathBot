@@ -8,7 +8,7 @@ import java.util.TreeMap;
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.PermissionsTable;
 import com.rath.rathbot.disc.InfractionEntry;
-import com.rath.rathbot.disc.Infractions;
+import com.rath.rathbot.disc.InfractionsTable;
 
 import sx.blah.discord.handle.obj.IEmbed;
 import sx.blah.discord.handle.obj.IEmbed.IEmbedImage;
@@ -91,8 +91,8 @@ public class AntiSpam {
     // If the user isn't in the infractions table, initialize them
     final IUser author = message.getAuthor();
     final long uid = author.getLongID();
-    if (!Infractions.hasMember(uid)) {
-      Infractions.initMember(uid);
+    if (!InfractionsTable.hasMember(uid)) {
+      InfractionsTable.initMember(uid);
     }
     
     // If the author is an owner, bypass anti-spam measures
@@ -103,7 +103,7 @@ public class AntiSpam {
     // If the author's mute time is up, unmute them. Use MUTE_DURATIONS, MUTE_KICK_THRESHOLD
     
     // If the author is muted, immediately delete muted users' messages
-    if (Infractions.isMuted(uid)) {
+    if (InfractionsTable.isMuted(uid)) {
       message.delete();
       return false;
     }
@@ -116,9 +116,9 @@ public class AntiSpam {
       
       // Check if the bot needs to ban the user
       final IUser botUser = RathBot.getClient().getOurUser();
-      final int kickCount = Infractions.getKickCount(uid);
-      final int muteCount = Infractions.getMuteCount(uid);
-      final int warnCount = Infractions.getWarnCount(uid);
+      final int kickCount = InfractionsTable.getKickCount(uid);
+      final int muteCount = InfractionsTable.getMuteCount(uid);
+      final int warnCount = InfractionsTable.getWarnCount(uid);
       if (kickCount >= KICKS_TO_BAN) {
         
         // Issue the ban
@@ -218,7 +218,7 @@ public class AntiSpam {
     
     // Unpack message data
     final long authorID = msg.getAuthor().getLongID();
-    final ArrayList<InfractionEntry> infrHistory = Infractions.getInfractionHistory(authorID);
+    final ArrayList<InfractionEntry> infrHistory = InfractionsTable.getInfractionHistory(authorID);
     final long msgTime = msg.getTimestamp().getEpochSecond();
     
     // If the member has an infraction history
@@ -248,7 +248,7 @@ public class AntiSpam {
         if ((end - start) < TRIGGER_RATE_TIMEOUT_SECS[i]) {
           
           // Add an infraction as message rate abuse to the user's infraction data
-          Infractions.warnUser(authorID, msgTime, REASON_MSG_RATE_ABUSE);
+          InfractionsTable.warnUser(authorID, msgTime, REASON_MSG_RATE_ABUSE);
           return true;
         }
       }
@@ -276,7 +276,7 @@ public class AntiSpam {
     
     // Unpack infraction data
     final long uid = msg.getAuthor().getLongID();
-    ArrayList<InfractionEntry> infrHistory = Infractions.getInfractionHistory(uid);
+    ArrayList<InfractionEntry> infrHistory = InfractionsTable.getInfractionHistory(uid);
     final long msgTime = msg.getTimestamp().getEpochSecond();
     
     // If the member has an infraction history

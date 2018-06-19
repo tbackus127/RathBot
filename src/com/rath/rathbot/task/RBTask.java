@@ -3,6 +3,8 @@ package com.rath.rathbot.task;
 
 import java.util.concurrent.ScheduledFuture;
 
+import com.rath.rathbot.task.time.TimeConfiguration;
+
 /**
  * This class acts as a skeleton for periodic/delayed tasks performed by the bot.
  * 
@@ -11,66 +13,118 @@ import java.util.concurrent.ScheduledFuture;
  */
 public abstract class RBTask implements Runnable {
   
-  /** Constant for if the task repeats. */
-  public static final boolean REPEAT = true;
-  
-  /** Constant for if the task does not repeat. */
-  public static final boolean NO_REPEAT = false;
-  
   /** The name of the task. */
   protected final String taskName;
   
-  /** If the task repeats or not. */
-  protected final boolean doesTaskRepeat;
-  
-  /** The execution frequency, in seconds. */
-  protected long execFrequencySeconds;
-  
-  /** The delay before executing the task, in seconds. */
-  protected final long execDelaySeconds;
+  /** The timestring this task's execution follows. */
+  protected final TimeConfiguration timeConfig;
   
   /** The result of the task, for cancelling. */
   protected ScheduledFuture<?> result;
   
-  protected RBTask(final String name, final long execFrequencySeconds, final long execDelay,
-      final boolean doesTaskRepeat) {
+  /**
+   * Constructs a new RBTask object.
+   * 
+   * @param name the name of the task as a String.
+   * @param timeConfig a time configuration that contains the temporal data of this task.
+   */
+  protected RBTask(final String name, final TimeConfiguration timeConfig) {
     this.taskName = name;
-    this.execFrequencySeconds = execFrequencySeconds;
-    this.execDelaySeconds = execDelay;
-    this.doesTaskRepeat = doesTaskRepeat;
+    this.timeConfig = timeConfig;
   }
   
+  /**
+   * Gets the name of the task.
+   * 
+   * @return the task name that is used for task mapping as a String.
+   */
   public final String getTaskName() {
     return this.taskName;
   }
   
-  public final boolean doesRepeat() {
-    return this.doesTaskRepeat;
-  }
-  
-  public final void setFrequency(final int freq) {
-    this.execFrequencySeconds = freq;
-  }
-  
-  public final long getFrequency() {
-    return this.execFrequencySeconds;
-  }
-  
-  public final long getDelay() {
-    return this.execDelaySeconds;
-  }
-  
+  /**
+   * Sets the result of this task so it can be cancelled.
+   * 
+   * @param fut the ScheduledFuture that this task returns.
+   */
   public final void setResult(final ScheduledFuture<?> fut) {
     this.result = fut;
   }
   
+  /**
+   * Gets the task result so it can be cancelled.
+   * 
+   * @return the ScheduledFuture that this task returns.
+   */
   public final ScheduledFuture<?> getResult() {
     return this.result;
   }
   
+  /**
+   * Returns the next epoch second this task will execute at.
+   * 
+   * @return a long.
+   */
+  public final long getNextEpochSecond() {
+    return this.timeConfig.getNextEpochTime();
+  }
+  
+  /**
+   * Checks if the task is repeated or not.
+   * 
+   * @return true if the task will be immediately rescheduled after it finishes; false if not.
+   */
+  public final boolean doesRepeat() {
+    return this.timeConfig.doesRepeat();
+  }
+  
+  /**
+   * Runs the task.
+   */
+  @Override
+  public final void run() {
+    setupTask();
+    performTask();
+    TaskRegistry.unloadTask(this.getTaskName());
+    checkReschedule();
+  }
+  
+  /**
+   * Called before scheduling. Override if needed.
+   */
   @SuppressWarnings("static-method")
   public void setupTask() {
     return;
   }
   
+  /**
+   * Whether this task should be automatically scheduled at startup.
+   * 
+   * @return true if the task should be immediately scheduled; false if not.
+   */
+  @SuppressWarnings("static-method")
+  public boolean isSystemTask() {
+    return false;
+  }
+  
+  /**
+   * Has the task do its thing.
+   */
+  public abstract void performTask();
+  
+  /**
+   * Whether this task is resource intensive, and thus requires putting the bot in a low-workload state.
+   * 
+   * @return true if this task uses a lot of resources; false if not.
+   */
+  public abstract boolean isResourceIntensive();
+  
+  /**
+   * Reschedules this task if it should repeat.
+   */
+  private final void checkReschedule() {
+    if (this.doesRepeat()) {
+      TaskRegistry.loadTask(this);
+    }
+  }
 }

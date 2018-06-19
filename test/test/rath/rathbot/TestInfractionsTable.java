@@ -15,116 +15,116 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.rath.rathbot.disc.InfractionEntry;
-import com.rath.rathbot.disc.Infractions;
+import com.rath.rathbot.disc.InfractionsTable;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestInfractionsTable {
   
   @BeforeClass
   public static void setup() {
-    Infractions.disableSaveToDisk();
+    InfractionsTable.disableSaveToDisk();
   }
   
   @Test
   @SuppressWarnings("static-method")
   public void testErrors() {
     
-    boolean result = Infractions.initMember(-1L);
+    boolean result = InfractionsTable.initMember(-1L);
     assertFalse(result);
     
-    result = Infractions.hasMember(-1L);
+    result = InfractionsTable.hasMember(-1L);
     assertFalse(result);
     
-    ArrayList<InfractionEntry> hist = Infractions.getInfractionHistory(-1L);
+    ArrayList<InfractionEntry> hist = InfractionsTable.getInfractionHistory(-1L);
     assertNull(hist);
     
-    int intVal = Infractions.getWarnCount(-1L);
+    int intVal = InfractionsTable.getWarnCount(-1L);
     assertEquals(intVal, -1);
     
-    result = Infractions.warnUser(-1L, 0, "");
+    result = InfractionsTable.warnUser(-1L, 0, "");
     assertFalse(result);
     
-    result = Infractions.isMuted(-1L);
+    result = InfractionsTable.isMuted(-1L);
     assertFalse(result);
     
-    intVal = Infractions.getMuteCount(-1L);
+    intVal = InfractionsTable.getMuteCount(-1L);
     assertEquals(intVal, -1);
     
-    result = Infractions.setMuted(-1L, false);
+    result = InfractionsTable.setMuted(-1L, false);
     assertFalse(result);
     
-    result = Infractions.muteUser(-1L, 0, 0, "");
+    result = InfractionsTable.muteUser(-1L, 0, 0, "");
     assertFalse(result);
     
-    intVal = Infractions.getKickCount(-1L);
+    intVal = InfractionsTable.getKickCount(-1L);
     assertEquals(intVal, -1);
     
-    result = Infractions.kickUser(-1L, 0, "");
+    result = InfractionsTable.kickUser(-1L, 0, "");
     assertFalse(result);
     
-    result = Infractions.isBanned(-1L);
+    result = InfractionsTable.isBanned(-1L);
     assertFalse(result);
     
-    intVal = Infractions.getBanCount(-1L);
+    intVal = InfractionsTable.getBanCount(-1L);
     assertEquals(intVal, -1);
     
-    result = Infractions.setBanned(-1L, false);
+    result = InfractionsTable.setBanned(-1L, false);
     assertFalse(result);
     
-    result = Infractions.banUser(-1L, 0, "");
+    result = InfractionsTable.banUser(-1L, 0, "");
     assertFalse(result);
     
-    result = Infractions.clearInfractions(-1L);
+    result = InfractionsTable.clearInfractions(-1L);
     assertFalse(result);
     
-    Infractions.initTable();
+    InfractionsTable.initTable();
     
-    result = Infractions.initMember(-1L);
+    result = InfractionsTable.initMember(-1L);
     assertFalse(result);
     
-    result = Infractions.hasMember(-1L);
+    result = InfractionsTable.hasMember(-1L);
     assertFalse(result);
     
-    hist = Infractions.getInfractionHistory(-1L);
+    hist = InfractionsTable.getInfractionHistory(-1L);
     assertNull(hist);
     
-    intVal = Infractions.getWarnCount(-1L);
+    intVal = InfractionsTable.getWarnCount(-1L);
     assertEquals(intVal, -1);
     
-    result = Infractions.warnUser(-1L, 0, "");
+    result = InfractionsTable.warnUser(-1L, 0, "");
     assertFalse(result);
     
-    result = Infractions.isMuted(-1L);
+    result = InfractionsTable.isMuted(-1L);
     assertFalse(result);
     
-    intVal = Infractions.getMuteCount(-1L);
+    intVal = InfractionsTable.getMuteCount(-1L);
     assertEquals(intVal, -1);
     
-    result = Infractions.setMuted(-1L, false);
+    result = InfractionsTable.setMuted(-1L, false);
     assertFalse(result);
     
-    result = Infractions.muteUser(-1L, 0, 0, "");
+    result = InfractionsTable.muteUser(-1L, 0, 0, "");
     assertFalse(result);
     
-    intVal = Infractions.getKickCount(-1L);
+    intVal = InfractionsTable.getKickCount(-1L);
     assertEquals(intVal, -1);
     
-    result = Infractions.kickUser(-1L, 0, "");
+    result = InfractionsTable.kickUser(-1L, 0, "");
     assertFalse(result);
     
-    result = Infractions.isBanned(-1L);
+    result = InfractionsTable.isBanned(-1L);
     assertFalse(result);
     
-    intVal = Infractions.getBanCount(-1L);
+    intVal = InfractionsTable.getBanCount(-1L);
     assertEquals(intVal, -1);
     
-    result = Infractions.setBanned(-1L, false);
+    result = InfractionsTable.setBanned(-1L, false);
     assertFalse(result);
     
-    result = Infractions.banUser(-1L, 0, "");
+    result = InfractionsTable.banUser(-1L, 0, "");
     assertFalse(result);
     
-    result = Infractions.clearInfractions(-1L);
+    result = InfractionsTable.clearInfractions(-1L);
     assertTrue(result);
     
   }
@@ -132,20 +132,20 @@ public class TestInfractionsTable {
   @Test
   @SuppressWarnings("static-method")
   public void testInit() {
-    Infractions.initTable();
+    InfractionsTable.initTable();
     
     final long u = 23895789L;
     
-    boolean b = Infractions.hasMember(u);
+    boolean b = InfractionsTable.hasMember(u);
     assertFalse(b);
     
-    b = Infractions.initMember(u);
+    b = InfractionsTable.initMember(u);
     assertTrue(b);
     
-    b = Infractions.hasMember(u);
+    b = InfractionsTable.hasMember(u);
     assertTrue(b);
     
-    ArrayList<InfractionEntry> l = Infractions.getInfractionHistory(u);
+    ArrayList<InfractionEntry> l = InfractionsTable.getInfractionHistory(u);
     assertNotNull(l);
   }
   
@@ -155,114 +155,114 @@ public class TestInfractionsTable {
     
     final long u = 23785623895L;
     
-    boolean b = Infractions.hasMember(u);
+    boolean b = InfractionsTable.hasMember(u);
     assertFalse(b);
     
-    b = Infractions.initMember(u);
+    b = InfractionsTable.initMember(u);
     assertTrue(b);
     
     int i = 0;
     // Bans
-    b = Infractions.banUser(u, 1000, "test");
+    b = InfractionsTable.banUser(u, 1000, "test");
     assertTrue(b);
     
-    i = Infractions.getBanCount(u);
+    i = InfractionsTable.getBanCount(u);
     assertEquals(i, 1);
     
-    b = Infractions.banUser(u, 2000, "test2");
+    b = InfractionsTable.banUser(u, 2000, "test2");
     assertTrue(b);
     
-    i = Infractions.getBanCount(u);
+    i = InfractionsTable.getBanCount(u);
     assertEquals(i, 2);
     
-    b = Infractions.clearInfractions(u);
+    b = InfractionsTable.clearInfractions(u);
     assertTrue(b);
     
-    i = Infractions.getBanCount(u);
+    i = InfractionsTable.getBanCount(u);
     assertEquals(i, 0);
     
-    b = Infractions.setBanned(u, true);
+    b = InfractionsTable.setBanned(u, true);
     assertTrue(b);
     
-    i = Infractions.getBanCount(u);
+    i = InfractionsTable.getBanCount(u);
     assertEquals(i, 0);
     
-    b = Infractions.isBanned(u);
+    b = InfractionsTable.isBanned(u);
     assertTrue(b);
     
-    b = Infractions.setBanned(u, false);
+    b = InfractionsTable.setBanned(u, false);
     assertTrue(b);
     
-    b = Infractions.isBanned(u);
+    b = InfractionsTable.isBanned(u);
     assertFalse(b);
     
     // Kicks
-    b = Infractions.kickUser(u, 1000, "test");
+    b = InfractionsTable.kickUser(u, 1000, "test");
     assertTrue(b);
     
-    i = Infractions.getKickCount(u);
+    i = InfractionsTable.getKickCount(u);
     assertEquals(i, 1);
     
-    b = Infractions.kickUser(u, 2000, "test2");
+    b = InfractionsTable.kickUser(u, 2000, "test2");
     assertTrue(b);
     
-    i = Infractions.getKickCount(u);
+    i = InfractionsTable.getKickCount(u);
     assertEquals(i, 2);
     
-    b = Infractions.clearInfractions(u);
+    b = InfractionsTable.clearInfractions(u);
     assertTrue(b);
     
     // Mutes
-    b = Infractions.muteUser(u, 20, 1000, "test");
+    b = InfractionsTable.muteUser(u, 20, 1000, "test");
     assertTrue(b);
     
-    i = Infractions.getMuteCount(u);
+    i = InfractionsTable.getMuteCount(u);
     assertEquals(i, 1);
     
-    b = Infractions.muteUser(u, 10, 2000, "test2");
+    b = InfractionsTable.muteUser(u, 10, 2000, "test2");
     assertTrue(b);
     
-    i = Infractions.getMuteCount(u);
+    i = InfractionsTable.getMuteCount(u);
     assertEquals(i, 2);
     
-    b = Infractions.clearInfractions(u);
+    b = InfractionsTable.clearInfractions(u);
     assertTrue(b);
     
-    i = Infractions.getMuteCount(u);
+    i = InfractionsTable.getMuteCount(u);
     assertEquals(i, 0);
     
-    b = Infractions.setMuted(u, true);
+    b = InfractionsTable.setMuted(u, true);
     assertTrue(b);
     
-    i = Infractions.getMuteCount(u);
+    i = InfractionsTable.getMuteCount(u);
     assertEquals(i, 0);
     
-    b = Infractions.isMuted(u);
+    b = InfractionsTable.isMuted(u);
     assertTrue(b);
     
-    b = Infractions.setMuted(u, false);
+    b = InfractionsTable.setMuted(u, false);
     assertTrue(b);
     
-    b = Infractions.isMuted(u);
+    b = InfractionsTable.isMuted(u);
     assertFalse(b);
     
     // Warns
-    b = Infractions.warnUser(u, 1000, "test");
+    b = InfractionsTable.warnUser(u, 1000, "test");
     assertTrue(b);
     
-    i = Infractions.getWarnCount(u);
+    i = InfractionsTable.getWarnCount(u);
     assertEquals(i, 1);
     
-    b = Infractions.warnUser(u, 2000, "test2");
+    b = InfractionsTable.warnUser(u, 2000, "test2");
     assertTrue(b);
     
-    i = Infractions.getWarnCount(u);
+    i = InfractionsTable.getWarnCount(u);
     assertEquals(i, 2);
     
-    b = Infractions.clearInfractions(u);
+    b = InfractionsTable.clearInfractions(u);
     assertTrue(b);
     
-    i = Infractions.getWarnCount(u);
+    i = InfractionsTable.getWarnCount(u);
     assertEquals(i, 0);
   }
   

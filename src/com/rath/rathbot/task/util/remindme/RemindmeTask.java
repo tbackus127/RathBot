@@ -6,6 +6,8 @@ import java.util.TreeMap;
 
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.task.RBTask;
+import com.rath.rathbot.task.time.RelativeTimeConfiguration;
+import com.rath.rathbot.task.time.TimeConfiguration;
 
 /**
  * This task will direct message the command issuer a message of their choice on a specific date, or in a specific
@@ -18,18 +20,17 @@ public class RemindmeTask extends RBTask {
   /** The name of the task for registration. */
   private static final String TASK_NAME = "remindme";
   
-  /** The frequency that reminders will be checked (default: 60s (1min)). */
-  private static final long TASK_FREQ = 60;
+  private static final TimeConfiguration TIME_CONFIG = new RelativeTimeConfiguration("in 1m", true);
   
   /**
    * Default constructor.
    */
   public RemindmeTask() {
-    super(TASK_NAME, TASK_FREQ, 0, false);
+    super(TASK_NAME, TIME_CONFIG);
   }
   
   @Override
-  public void run() {
+  public void performTask() {
     
     // Iterate through the reminder table's users
     for (final Long uid : Reminders.getReminderTable().keySet()) {
@@ -54,9 +55,12 @@ public class RemindmeTask extends RBTask {
           }
         }
       }
-      
     }
-    
+  }
+  
+  @Override
+  public boolean isResourceIntensive() {
+    return false;
   }
   
 }

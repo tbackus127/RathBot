@@ -59,11 +59,12 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     
     // Set fields
     this.timeZone = zoneID;
+    
     final String[] clauses = getOnAtClause(this.config);
     
     this.dateCombinations = calcDateCombinations(clauses[0]);
-    final LocalTime atTime = calcTime(clauses[1]);
     
+    final LocalTime atTime = calcTime(clauses[1]);
     final int year = this.dateCombinations[2][0];
     final int month = this.dateCombinations[0][0];
     final int day = this.dateCombinations[1][0];
@@ -72,6 +73,16 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     
     this.localDateTime = ZonedDateTime.of(LocalDate.of(year, month, day), atTime, this.timeZone).withZoneSameInstant(
         RBConfig.getTimeZone());
+  }
+  
+  private LocalTime calcTime(String string) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
+  private String[] getOnAtClause(String config) {
+    // TODO Auto-generated method stub
+    return null;
   }
   
   @Override
@@ -162,17 +173,6 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       }
     }
     return true;
-  }
-  
-  private static final String[] getOnAtClause(String config) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
-  private static final LocalTime calcTime(String atClause) {
-    
-    // TODO: Don't forget to convert timezones
-    return null;
   }
   
   // {*, [1,7], 2018} -> {{1,2,3,4,5,6,7,8,9,10,11,12}, {1,7}, {2018}}

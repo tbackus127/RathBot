@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.rath.rathbot.DBG;
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 import com.rath.rathbot.exceptions.FAQNotFoundException;
@@ -61,6 +62,8 @@ public class FAQCmd extends RBCommand {
    */
   public static final String getFaqList() {
     
+    DBG.pl("Getting FAQ list.");
+    
     if (faqMap == null) {
       System.out.println("faqMap is null!");
       return null;
@@ -70,6 +73,9 @@ public class FAQCmd extends RBCommand {
     if (faqMap.size() <= 0) {
       return "There are no saved FAQs.";
     }
+    
+    DBG.pl("Constructing FAQ list.");
+    
     // Construct the FAQ list message
     String message = "FAQ List:\n";
     for (final String s : faqMap.keySet()) {
@@ -199,11 +205,13 @@ public class FAQCmd extends RBCommand {
   @Override
   public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
+    DBG.pl("Executing faq (searching).");
+    
     // If there are no subcommands for this command
     final IChannel channel = msg.getChannel();
     if (!super.executeCommand(msg, tokens, tokenDepth)) {
       
-      System.out.println("Executing faq");
+      System.out.println("Executing faq (found).");
       
       // Print the usage info if there aren't any arguments
       if (tokens.length <= 2) {

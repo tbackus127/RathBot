@@ -23,6 +23,8 @@ public class CommandParser {
    */
   public static final void parseCommand(final IMessage message) {
     
+    DBG.pl("Parsing command.");
+    
     final String msgString = message.getContent();
     final IUser author = message.getAuthor();
     final IChannel channel = message.getChannel();
@@ -39,6 +41,7 @@ public class CommandParser {
     }
     
     // Extract the command name and command reference
+    DBG.pl("Extracting command.");
     final String cmdName = tokens[1].trim().toLowerCase();
     final RBCommand cmd = RathBot.getCommandMap().get(cmdName);
     
@@ -49,6 +52,7 @@ public class CommandParser {
     }
     
     // If the user doesn't have an entry on the permissions table, initialize them and save
+    DBG.pl("Checking permissions.");
     final long userID = author.getLongID();
     if (!PermissionsTable.hasUser(userID)) {
       PermissionsTable.initUser(userID);

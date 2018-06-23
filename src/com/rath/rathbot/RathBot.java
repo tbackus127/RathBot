@@ -93,6 +93,7 @@ public class RathBot {
    * @param msg the message as a String.
    */
   public static final void sendMessage(final IChannel channel, final String msg) {
+    DBG.pl("Sending message...");
     channel.sendMessage(msg);
   }
   

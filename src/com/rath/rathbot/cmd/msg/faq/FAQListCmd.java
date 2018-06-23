@@ -1,6 +1,7 @@
 
 package com.rath.rathbot.cmd.msg.faq;
 
+import com.rath.rathbot.DBG;
 import com.rath.rathbot.RathBot;
 import com.rath.rathbot.cmd.RBCommand;
 
@@ -48,7 +49,7 @@ public class FAQListCmd extends RBCommand {
   @Override
   public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
-    System.out.println("Executing faq.list");
+    DBG.pl("Executing faq.list.");
     RathBot.sendMessage(msg.getChannel(), FAQCmd.getFaqList());
     
     return RBCommand.STOP_CMD_SEARCH;

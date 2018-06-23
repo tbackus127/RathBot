@@ -20,6 +20,7 @@ public abstract class TimeConfiguration {
    * 
    * @param type the type of configuration this is.
    * @param configString the String that describes this configuration.
+   * @param doesRepeat true if this time configuration is repeat-enabled; false if not.
    */
   protected TimeConfiguration(final TimeConfigurationType type, final String configString) {
     this.type = type;
@@ -27,20 +28,17 @@ public abstract class TimeConfiguration {
   }
   
   /**
+   * Gets if this time configuration is repeat-enabled.
+   * 
+   * @return true if it repeats; false if not.
+   */
+  public abstract boolean doesRepeat();
+  
+  /**
    * Gets the next time this task should be executed in milliseconds as of 1/1/1970.
    * 
    * @return a long.
    */
   public abstract long getNextEpochTime();
-  
-  /**
-   * Gets if this time configuration is repeat-enabled.
-   * 
-   * @return true if it repeats; false if not.
-   */
-  @SuppressWarnings("static-method")
-  public boolean doesRepeat() {
-    return false;
-  }
   
 }

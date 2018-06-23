@@ -20,7 +20,7 @@ public class RemindmeTask extends RBTask {
   /** The name of the task for registration. */
   private static final String TASK_NAME = "remindme";
   
-  private static final TimeConfiguration TIME_CONFIG = new RelativeTimeConfiguration("in 1m", true);
+  private static final TimeConfiguration TIME_CONFIG = new RelativeTimeConfiguration("every 1m");
   
   /**
    * Default constructor.

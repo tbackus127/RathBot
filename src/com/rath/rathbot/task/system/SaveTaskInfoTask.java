@@ -9,9 +9,9 @@ public class SaveTaskInfoTask extends RBTask {
   
   private static final String TASK_NAME = "saveTaskInfo";
   
-  private static final String CONFIG_STRING = "in 5m";
+  private static final String CONFIG_STRING = "every 5m";
   
-  private static final TimeConfiguration TIME_CONFIG = new RelativeTimeConfiguration(CONFIG_STRING, true);
+  private static final TimeConfiguration TIME_CONFIG = new RelativeTimeConfiguration(CONFIG_STRING);
   
   public SaveTaskInfoTask() {
     super(TASK_NAME, TIME_CONFIG);

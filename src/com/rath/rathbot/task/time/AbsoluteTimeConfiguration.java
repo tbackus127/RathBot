@@ -59,11 +59,12 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     
     // Set fields
     this.timeZone = zoneID;
+    
     final String[] clauses = getOnAtClause(this.config);
     
     this.dateCombinations = calcDateCombinations(clauses[0]);
-    final LocalTime atTime = calcTime(clauses[1]);
     
+    final LocalTime atTime = calcTime(clauses[1]);
     final int year = this.dateCombinations[2][0];
     final int month = this.dateCombinations[0][0];
     final int day = this.dateCombinations[1][0];
@@ -103,7 +104,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
   @Override
   public boolean doesRepeat() {
     
-    // TODO Auto-generated method stub
+    // TODO: doesRepeat in AbsoluteTimeConfig.java
     return false;
     
   }
@@ -135,6 +136,16 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     
   }
   
+  private static final LocalTime calcTime(String string) {
+    // TODO: calcTime in AbsoluteTimeConfig.java
+    return null;
+  }
+  
+  private static final String[] getOnAtClause(String config) {
+    // TODO: getOnAtClause in AbsoluteTimeConfig.java
+    return null;
+  }
+  
   /**
    * Checks if all date combinations are in order. This is required to ensure getNextEpochTime() returns the next epoch
    * second instead of a far-off one, or a previous one.
@@ -162,17 +173,6 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       }
     }
     return true;
-  }
-  
-  private static final String[] getOnAtClause(String config) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
-  private static final LocalTime calcTime(String atClause) {
-    
-    // TODO: Don't forget to convert timezones
-    return null;
   }
   
   // {*, [1,7], 2018} -> {{1,2,3,4,5,6,7,8,9,10,11,12}, {1,7}, {2018}}

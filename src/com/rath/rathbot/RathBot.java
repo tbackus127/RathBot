@@ -293,7 +293,7 @@ public class RathBot {
     
     // Create the client and the bot
     System.out.print("Creating client... ");
-    return new ClientBuilder().withPingTimeout(10).withToken(token).build();
+    return new ClientBuilder().withToken(token).build();
   }
   
   /**

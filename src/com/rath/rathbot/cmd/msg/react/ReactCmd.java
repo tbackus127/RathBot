@@ -92,6 +92,7 @@ public class ReactCmd extends RBCommand {
       }
       
       RathBot.sendMessage(channel, "That react image is not available.");
+      msg.delete();
     }
     
     return RBCommand.STOP_CMD_SEARCH;

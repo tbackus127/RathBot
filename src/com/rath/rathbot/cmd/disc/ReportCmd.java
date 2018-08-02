@@ -53,7 +53,7 @@ public class ReportCmd extends RBCommand {
   }
   
   @Override
-  public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokDepth) {
+  public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
     
     final IChannel channel = msg.getChannel();
     final IUser issuedUser = msg.getAuthor();
@@ -65,10 +65,10 @@ public class ReportCmd extends RBCommand {
     }
     
     // Create IUser object from token to issue disciplinary action on them.
-    final IUser infringingUser = MessageHelper.getUserFromToken(tokens[tokDepth + 1], channel);
+    final IUser infringingUser = MessageHelper.getUserFromToken(tokens[tokenDepth + 1], channel);
     if (infringingUser == null) {
-      RathBot.sendMessage(channel, "Error: Invalid UID or User not Found! "
-          + "Please verify User exists and UID is correct. " + "Remember: UIDs should only contain numbers.");
+      RathBot.sendMessage(channel,
+          "The given username or user ID was not found. Ensure that you've entered the member's username or user ID correctly.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
@@ -83,13 +83,13 @@ public class ReportCmd extends RBCommand {
     ActionLogger.logAction(new ActionReport(timestamp, issuedUser, infringingUser));
     System.out.println("Report filed and logged in */logs/actions.txt");
     
-    IChannel report = RathBot.getClient().getChannelByID(RBConfig.getReportChannelID());
+    final IChannel report = RathBot.getClient().getChannelByID(RBConfig.getReportChannelID());
     if (report == null) {
       System.err.println("client.getChannelByID(ReportCmd.REPORT_CHANNEL_ID) returned null in ReportCmd.java");
       return RBCommand.STOP_CMD_SEARCH;
     }
     
-    String reason = MessageHelper.concatenateTokens(tokens, tokDepth + 2);
+    final String reason = MessageHelper.concatenateTokens(tokens, tokenDepth + 2);
     
     // Posts report in #reports.
     RathBot.sendMessage(report, "User " + infringingUser.getName() + " was reported by " + issuedUser.getName() + " at "

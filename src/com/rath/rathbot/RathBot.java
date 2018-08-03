@@ -47,6 +47,8 @@ import sx.blah.discord.handle.obj.StatusType;
  * 
  * @author Tim Backus tbackus127@gmail.com
  * @author Nathan Lehenbauer lehenbnw@gmail.com
+ *
+ * @version 0.1.5.1
  */
 public class RathBot {
   

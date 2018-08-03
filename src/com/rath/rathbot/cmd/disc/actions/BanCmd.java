@@ -55,7 +55,7 @@ public class BanCmd extends RBCommand {
     
     // Ensures at least minimum valid arguments used.
     if (tokens.length < 4) {
-      RathBot.sendMessage(channel, "Syntax Error! Usage: rb! ban <uid|@mention> <reason>");
+      RathBot.sendMessage(channel, "Syntax Error! Usage: " + this.getCommandUsage());
       return RBCommand.STOP_CMD_SEARCH;
     }
     
@@ -63,7 +63,7 @@ public class BanCmd extends RBCommand {
     final IUser infringingUser = MessageHelper.getUserFromToken(tokens[tokDepth + 1], channel);
     if (infringingUser == null) {
       RathBot.sendMessage(channel,
-          "Error: Invalid UID or User not Found! Please verify User exists and UID is correct. Remember: UIDs should only contain numbers.");
+          "The given username or user ID was not found. Ensure that you've entered the member's username or user ID correctly.");
       return RBCommand.STOP_CMD_SEARCH;
     }
     

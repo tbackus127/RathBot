@@ -2,6 +2,7 @@
 package com.rath.rathbot.task.time;
 
 import java.time.Instant;
+import java.util.Iterator;
 
 public class RelativeTimeConfiguration extends TimeConfiguration {
   
@@ -13,22 +14,21 @@ public class RelativeTimeConfiguration extends TimeConfiguration {
   }
   
   @Override
-  public long getNextEpochTime() {
-    
-    long result = 0;
-    
-    // TODO: getNextEpochTime() in RelativeTimeConfiguration
-    
-    return result;
+  public Iterator<Long> iterator() {
+    return new Iterator<Long>() {
+      
+      @Override
+      public boolean hasNext() {
+        // TODO Auto-generated method stub
+        return false;
+      }
+      
+      @Override
+      public Long next() {
+        // TODO Auto-generated method stub
+        return null;
+      }
+      
+    };
   }
-  
-  public long getScheduleTime() {
-    return this.scheduleTime;
-  }
-  
-  @Override
-  public boolean doesRepeat() {
-    return this.config.startsWith("every");
-  }
-  
 }

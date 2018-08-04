@@ -62,5 +62,17 @@ public class RemindmeTask extends RBTask {
   public boolean isResourceIntensive() {
     return false;
   }
+
+  @Override
+  public long getNextEpochSecond() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public boolean doesRepeat() {
+    // TODO Auto-generated method stub
+    return false;
+  }
   
 }

@@ -65,18 +65,14 @@ public abstract class RBTask implements Runnable {
    * 
    * @return a long.
    */
-  public final long getNextEpochSecond() {
-    return this.timeConfig.getNextEpochTime();
-  }
+  public abstract long getNextEpochSecond();
   
   /**
    * Checks if the task is repeated or not.
    * 
    * @return true if the task will be immediately rescheduled after it finishes; false if not.
    */
-  public final boolean doesRepeat() {
-    return this.timeConfig.doesRepeat();
-  }
+  public abstract boolean doesRepeat();
   
   /**
    * Runs the task.

@@ -7,7 +7,7 @@ package com.rath.rathbot.task.time;
  * 
  * @author Tim Backus tbackus127@gmail.com
  */
-public abstract class TimeConfiguration {
+public abstract class TimeConfiguration implements Iterable<Long> {
   
   /** The type of time configuration this TimeConfiguration represents (relative or absolute). */
   protected final TimeConfigurationType type;
@@ -26,19 +26,5 @@ public abstract class TimeConfiguration {
     this.type = type;
     this.config = configString;
   }
-  
-  /**
-   * Gets if this time configuration is repeat-enabled.
-   * 
-   * @return true if it repeats; false if not.
-   */
-  public abstract boolean doesRepeat();
-  
-  /**
-   * Gets the next time this task should be executed in milliseconds as of 1/1/1970.
-   * 
-   * @return a long.
-   */
-  public abstract long getNextEpochTime();
   
 }

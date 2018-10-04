@@ -16,6 +16,7 @@ import sx.blah.discord.handle.obj.IUser;
  * This class contains frequently-used message formatting methods.
  * 
  * @author Tim Backus tbackus127@gmail.com
+ * @author Nathan Lehenbauer lehenbnw@gmail.com
  */
 public class MessageHelper {
   

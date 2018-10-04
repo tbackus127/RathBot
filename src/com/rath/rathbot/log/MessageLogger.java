@@ -9,6 +9,7 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import com.rath.rathbot.DBG;
 import com.rath.rathbot.RathBot;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -105,6 +106,8 @@ public class MessageLogger {
   @SuppressWarnings("resource")
   public static final void logMessage(final IMessage msg) {
     
+    DBG.pl("Logging message.");
+    
     // Do not log if it's not ready
     if (!isLoggerReady) {
       return;
@@ -120,6 +123,8 @@ public class MessageLogger {
     final TreeMap<String, IChannel> chMap = RathBot.getChannelMap();
     final String chName = channel.getName();
     if (!chMap.containsKey(chName)) {
+      
+      DBG.pl("Adding channel to channel map.");
       
       // Add to Channel map
       chMap.put(chName, channel);
@@ -145,7 +150,11 @@ public class MessageLogger {
       ps = pmStream;
     }
     
+    DBG.pl("Writing message.");
+    
     ps.println(logString);
+    
+    DBG.pl("Message written.");
     
   }
   

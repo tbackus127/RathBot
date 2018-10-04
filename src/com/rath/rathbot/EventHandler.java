@@ -27,6 +27,8 @@ public class EventHandler implements IListener<MessageReceivedEvent> {
   @Override
   public void handle(MessageReceivedEvent event) {
     
+    DBG.pl("Message receieved.");
+    
     // Let's not respond to bots
     final IUser author = event.getAuthor();
     if (author.isBot()) {

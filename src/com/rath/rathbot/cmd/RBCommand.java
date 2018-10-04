@@ -5,6 +5,7 @@ package com.rath.rathbot.cmd;
 
 import java.util.Set;
 
+import com.rath.rathbot.DBG;
 import com.rath.rathbot.RathBot;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -114,6 +115,8 @@ public abstract class RBCommand {
    * @return true if the recursive command search can be stopped; false if not.
    */
   public boolean executeCommand(final IMessage msg, final String[] tokens, final int tokenDepth) {
+    
+    DBG.pl("Searching @ tokDepth=" + tokenDepth);
     
     // Check this command's subcommands for a match, and return the matched command
     final RBCommand cmd = checkSubcommands(getSubcommands(), tokens, tokenDepth);

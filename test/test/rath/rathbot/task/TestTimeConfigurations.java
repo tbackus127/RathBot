@@ -8,9 +8,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.junit.Test;
 
@@ -233,9 +233,13 @@ public class TestTimeConfigurations {
     
     for (int year = THIS_YEAR; year <= 2026; year++) {
       for (int month = LocalDateTime.ofInstant(Instant.now(), TEST_ZONE).getMonthValue(); month <= 12; month++) {
+        // for (int day = (TODAY_INST.plus(14, ChronoUnit.HOURS).compareTo(Instant.now()) > 0)
+        // ? (TODAY_INST.plus(14, ChronoUnit.HOURS)).get(ChronoField.DAY_OF_MONTH)
+        // : (TOMORROW_INST.plus(14, ChronoUnit.HOURS)).get(ChronoField.DAY_OF_MONTH); day <= 31; day++) {
+        
         for (int day = (TODAY_INST.plus(14, ChronoUnit.HOURS).compareTo(Instant.now()) > 0)
-            ? (TOMORROW_INST.plus(14, ChronoUnit.HOURS)).get(ChronoField.DAY_OF_MONTH)
-            : (TOMORROW_INST.plus(14, ChronoUnit.HOURS)).get(ChronoField.DAY_OF_MONTH); day <= 31; day++) {
+            ? LocalDateTime.ofInstant(TODAY_INST, TEST_ZONE).getDayOfMonth()
+            : LocalDateTime.ofInstant(TOMORROW_INST, TEST_ZONE).getDayOfMonth(); day <= 31; day++) {
           
           if (iterations >= MAX_WILDCARD_ITERATIONS) {
             break;
@@ -314,7 +318,7 @@ public class TestTimeConfigurations {
   @SuppressWarnings("static-method")
   public void testBadFormatAbsConfigs() {
     
-    System.out.println("Testing bad absolute time configs...");
+    System.out.println("=== Testing bad absolute time configs ===");
     
     int numErrors = 0;
     for (int i = 0; i < BAD_FORMAT_ABS_CONFIGS.length; i++) {
@@ -338,7 +342,125 @@ public class TestTimeConfigurations {
       }
     }
     
+    System.out.println();
+    
     assertEquals(numErrors, BAD_FORMAT_ABS_CONFIGS.length);
     
   }
+  
+  @Test
+  @SuppressWarnings("static-method")
+  public void testBadSingleAbsConfigs() {
+    
+    System.out.println("=== Testing bad single absolute time configs ===");
+    
+    int numErrors = 0;
+    for (int i = 0; i < BAD_SINGLE_ABS_CONFIGS.length; i++) {
+      
+      final String config = BAD_SINGLE_ABS_CONFIGS[i];
+      System.out.print("Testing config: \"" + config + "\":");
+      
+      boolean caughtExc = false;
+      
+      try {
+        new AbsoluteTimeConfiguration(config, TEST_ZONE);
+      } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
+        caughtExc = true;
+      }
+      
+      if (caughtExc) {
+        numErrors++;
+        System.out.println(" OK");
+      } else {
+        System.out.println(" NOEXCEPT");
+      }
+    }
+    
+    System.out.println();
+    
+    assertEquals(numErrors, BAD_SINGLE_ABS_CONFIGS.length);
+    
+  }
+  
+  @Test
+  @SuppressWarnings("static-method")
+  public void testBadMultiAbsConfigs() {
+    
+    System.out.println("=== Testing bad multi absolute time configs ===");
+    
+    int numErrors = 0;
+    for (int i = 0; i < BAD_MULTI_ABS_CONFIGS.length; i++) {
+      
+      final String config = BAD_MULTI_ABS_CONFIGS[i];
+      System.out.print("Testing config: \"" + config + "\":");
+      
+      boolean caughtExc = false;
+      
+      try {
+        new AbsoluteTimeConfiguration(config, TEST_ZONE);
+      } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
+        caughtExc = true;
+      }
+      
+      if (caughtExc) {
+        numErrors++;
+        System.out.println(" OK");
+      } else {
+        System.out.println(" NOEXCEPT");
+      }
+    }
+    
+    System.out.println();
+    
+    assertEquals(numErrors, BAD_MULTI_ABS_CONFIGS.length);
+    
+  }
+  
+  @Test
+  @SuppressWarnings("static-method")
+  public void testGoodSingleAbsConfigs() {
+    
+    System.out.println("=== Testing good single absolute time configs ===");
+    
+    int failCount = 0;
+    for (int i = 0; i < GOOD_SINGLE_ABS_CONFIGS.length; i++) {
+      
+      final AbsTimeTestEntry entry = GOOD_SINGLE_ABS_CONFIGS[i];
+      System.out.print("Testing config: \"" + entry.getConfigString() + "\":");
+      
+      AbsoluteTimeConfiguration atc = null;
+      try {
+        atc = new AbsoluteTimeConfiguration(entry.getConfigString(), TEST_ZONE);
+      } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
+        System.out.println(" EXCEPTION");
+        failCount++;
+        continue;
+      }
+      
+      final Long expectedVal = entry.getExpected().get(0);
+      final Iterator<Long> itr = atc.iterator();
+      
+      if (!itr.hasNext()) {
+        System.out.println(" EMPTY");
+        failCount++;
+        continue;
+      }
+      
+      final Long actualVal = itr.next();
+      if (actualVal == null) {
+        System.out.println(" NULL");
+        failCount++;
+        continue;
+      }
+      
+      String resultStr = (actualVal.equals(expectedVal)) ? " OK" : " MISMATCH";
+      
+    }
+    
+    System.out.println();
+    
+    assertEquals(failCount, 0);
+    
+  }
+  
 }

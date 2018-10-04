@@ -126,6 +126,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
    */
   public AbsoluteTimeConfiguration(final String configString, final ZoneId timeZone) throws BadTimeConfigException {
     super(TimeConfigurationType.ABSOLUTE, configString);
+    
     this.fromTimeZone = timeZone;
     
     // At least 4 tokens are required ("on"/"at", on/at-clause, "to", to-clause)
@@ -143,7 +144,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       }
     }
     
-    // Check if every field was initialized; if not, throw exception
+    // Check if every field was initialized; if not, throw an exception
     if (this.monthPos == -1 || this.dayPos == -1 || this.yearPos == -1 || this.monthList == null || this.dayList == null
         || this.yearList == null) {
       throw new BadTimeConfigException();
@@ -333,11 +334,6 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
           throw new BadTimeConfigException();
         }
         
-        // Check out of bounds
-        if (m < MONTH_MIN || m > MONTH_MAX) {
-          throw new BadTimeConfigException();
-        }
-        
         monthsString = "[" + m + "]";
         
       }
@@ -367,9 +363,14 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         
       }
       
+      // Check out of bounds
+      if (m < MONTH_MIN || m > MONTH_MAX) {
+        throw new BadTimeConfigException();
+      }
+      
       this.monthList.add(m);
     }
-    
+    this.monthPos = 0;
   }
   
   /**
@@ -401,11 +402,6 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
           throw new BadTimeConfigException();
         }
         
-        // Check out of bounds
-        if (d < DAY_MIN || d > DAY_MAX) {
-          throw new BadTimeConfigException();
-        }
-        
         daysString = "[" + d + "]";
         
       }
@@ -427,9 +423,14 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         throw new BadTimeConfigException();
       }
       
+      // Check out of bounds
+      if (d < DAY_MIN || d > DAY_MAX) {
+        throw new BadTimeConfigException();
+      }
+      
       this.dayList.add(d);
     }
-    
+    this.dayPos = 0;
   }
   
   /**
@@ -489,7 +490,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       
       this.yearList.add(d);
     }
-    
+    this.yearPos = 0;
   }
   
   /**
@@ -512,8 +513,15 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       
       @Override
       public Long next() {
+        
         // TODO: Implement next() in AbsoluteTimeConfiguration.iterator()
         // TODO: DON'T FORGET TO ACCOUNT FOR NONEXISTENT DATES! (February 30, November 31, etc.)
+        // TODO: Make the year wildcard store the current year in its pos field
+        
+        // Construct new local datetime with current list pointers
+        // Convert from issuer's time zone -> my time zone
+        // Increment day, ripple carry through months/years
+        
         return null;
       }
       

@@ -7,6 +7,7 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -21,7 +22,10 @@ public class TestTimeConfigurations {
   
   // TODO: Make test suite classes and stuff
   
-  static final ZoneOffset TEST_ZONE = ZoneOffset.UTC;
+  static final ZoneId TEST_ZONE_ID = ZoneId.of("America/New_York");
+  
+  // static final ZoneOffset TEST_ZONE = ZoneOffset.UTC;
+  static final ZoneOffset TEST_ZONE = TEST_ZONE_ID.getRules().getOffset(Instant.now());
   
   private static final int MAX_WILDCARD_ITERATIONS = 1000;
   
@@ -41,7 +45,7 @@ public class TestTimeConfigurations {
   private static final String[] BAD_FORMAT_ABS_CONFIGS = { 
       "", " ", "\n", ",", "an", "at", "on", "to", "at ", "\nat", "at m", "at mon", "on 6", "at []", "*", "at *", "on *",
       "on dec 6pm", "at dec on 3:40", "at 4:00 on 3PM", "on dec 25 2019 at", "on 7 * at", "at 7pm on 4 5 [2018,]",
-      "on 4:40PM on dec 13 2023",  "on mar 16 * at *", "on 7/4/", "on 1//3", "on /12/9/18", "at 9am on [] * *",
+      "on 4:40PM on dec 13 2023",  "on mar 16 * at *", "on 1//3", "on /12/9/18", "at 9am on [] * *",
       "on [1,4] [6,12,18] []", "on [1,7,14,21,28] * [*]", "on [", "on jan]", "at 6:00ap"
   };
   
@@ -228,7 +232,6 @@ public class TestTimeConfigurations {
   private static final ArrayList<Long> generateAll14() {
     
     final ArrayList<Long> result = new ArrayList<Long>();
-    
     int iterations = 0;
     
     for (int year = THIS_YEAR; year <= 2026; year++) {
@@ -453,7 +456,9 @@ public class TestTimeConfigurations {
         continue;
       }
       
+      // TODO: Print expected and actual epoch seconds
       String resultStr = (actualVal.equals(expectedVal)) ? " OK" : " MISMATCH";
+      System.out.println(resultStr);
       
     }
     

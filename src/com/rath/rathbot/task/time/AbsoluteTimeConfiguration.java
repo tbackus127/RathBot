@@ -1,7 +1,10 @@
 
 package com.rath.rathbot.task.time;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -115,6 +118,9 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
   private int hour = -1;
   private int minute = -1;
   
+  private transient boolean parsedAt = false;
+  private transient boolean parsedOn = false;
+  
   /**
    * Constructs a new AbsoluteTimeConfiguration object.
    * 
@@ -135,6 +141,11 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       throw new BadTimeConfigException();
     }
     
+    // If the clause tokens length is not even, throw an exception
+    if(clauseTokens.length % 2 == 1) {
+      throw new BadTimeConfigException();
+    }
+    
     // Parse both at/on-clauses
     for (int i = 0; i < clauseTokens.length; i += 2) {
       if (clauseTokens[i].equals("at")) {
@@ -142,6 +153,33 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       } else if (clauseTokens[i].equals("on")) {
         parseOnClause(clauseTokens[i + 1]);
       }
+    }
+    
+    if (this.parsedAt && !this.parsedOn) {
+      
+      LocalDateTime desiredLdt = LocalDateTime.now(this.fromTimeZone).truncatedTo(ChronoUnit.DAYS).with(
+          ChronoField.HOUR_OF_DAY, this.hour).with(ChronoField.MINUTE_OF_DAY, this.minute);
+      
+      // If the desired time has already passed for today, use tomorrow's date
+      if (LocalDateTime.now(this.fromTimeZone).compareTo(desiredLdt) >= 0) {
+        desiredLdt = desiredLdt.plusDays(1);
+      }
+      
+      this.monthList = new ArrayList<Integer>();
+      this.monthList.add(desiredLdt.getMonthValue());
+      this.monthPos = 0;
+      this.dayList = new ArrayList<Integer>();
+      this.dayList.add(desiredLdt.getDayOfMonth());
+      this.dayPos = 0;
+      this.yearList = new ArrayList<Integer>();
+      this.yearList.add(desiredLdt.getYear());
+      this.yearPos = 0;
+      
+    } else if (this.parsedOn && !this.parsedAt) {
+      
+      this.hour = HOUR_24_MIN;
+      this.minute = MINUTE_MIN;
+      
     }
     
     // Check if every field was initialized; if not, throw an exception
@@ -188,6 +226,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       handleStandard(atTokens[0], atTokens[1], atTokens[2]);
     }
     
+    this.parsedAt = true;
   }
   
   /**
@@ -295,14 +334,37 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     
     // Split the at-clause into tokens and handle each
     final String[] onTokens = onClause.split(REGEX_SPLIT_ON_CLAUSE);
-    if (onTokens == null || onTokens.length != 3) {
+    if (onTokens == null || onTokens.length < 2 || onTokens.length > 3) {
       throw new BadTimeConfigException();
     }
     
     handleMonths(onTokens[0].trim());
     handleDays(onTokens[1].trim());
-    handleYears(onTokens[2].trim());
     
+    // If the year was specified, handle the token
+    if (onTokens.length == 3) {
+      handleYears(onTokens[2].trim());
+    } else {
+      
+      // If not, check if there is only one month/day
+      if (this.monthList.size() != 1 || this.dayList.size() != 1) {
+        throw new BadTimeConfigException();
+      }
+      
+      LocalDateTime desiredLdt = LocalDateTime.now(this.fromTimeZone).withMonth(this.monthList.get(0)).withDayOfMonth(
+          this.dayList.get(0));
+      
+      // If the desired time has already passed for today, use tomorrow's date
+      if (LocalDateTime.now(this.fromTimeZone).compareTo(desiredLdt) >= 0) {
+        desiredLdt = desiredLdt.plusYears(1);
+      }
+      
+      this.yearList = new ArrayList<Integer>();
+      this.yearList.add(desiredLdt.getYear());
+      this.yearPos = 0;
+    }
+    
+    this.parsedOn = true;
   }
   
   /**
@@ -326,12 +388,19 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         
       } else {
         
-        // Otherwise, parse as a single value and surround in square brackets
+        // Check if the current token is a three-letter month abbreviation
         int m = -1;
-        try {
-          m = Integer.parseInt(monthsString);
-        } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
-          throw new BadTimeConfigException();
+        if (MONTH_ALIASES.containsKey(monthsString.toLowerCase())) {
+          m = MONTH_ALIASES.get(monthsString);
+        } else {
+          
+          // Otherwise, parse as a single value and surround in square brackets
+          try {
+            m = Integer.parseInt(monthsString);
+          } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+            throw new BadTimeConfigException();
+          }
+          
         }
         
         monthsString = "[" + m + "]";
@@ -462,6 +531,11 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
           throw new BadTimeConfigException();
         }
         
+        // If the year was specified with two digits, add 2000 to the year
+        if (y < 100) {
+          y += 2000;
+        }
+        
         // Check out of bounds
         if (y < YEAR_MIN || y > YEAR_MAX) {
           throw new BadTimeConfigException();
@@ -521,6 +595,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         // Construct new local datetime with current list pointers
         // Convert from issuer's time zone -> my time zone
         // Increment day, ripple carry through months/years
+        // RBConfig.getTimeZone()
         
         return null;
       }

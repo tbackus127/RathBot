@@ -14,10 +14,10 @@ import java.util.TreeMap;
  * PM CST.
  * 
  * @author Tim Backus tbackus127@gmail.com
- *
  */
 public class AbsoluteTimeConfiguration extends TimeConfiguration {
   
+  /** Whether to spam the console with variables and such. */
   private static final boolean DEBUG_MODE = false;
   
   /** Choose spaces before and after the words "at" and "on". */
@@ -71,6 +71,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
   /** The maximum minute that can be specified. */
   private static final int MINUTE_MAX = 59;
   
+  /** A map of three-character months to their numeric counterparts. */
   private static final TreeMap<String, Integer> MONTH_ALIASES = new TreeMap<String, Integer>() {
     
     private static final long serialVersionUID = 1L;
@@ -113,14 +114,25 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
   /** The list of year numbers this time configuration is active for. */
   private ArrayList<Integer> yearList = null;
   
+  /** The position in the month list that will be used next. */
   private int monthPos = -1;
+  
+  /** The position in the day list that will be used next. */
   private int dayPos = -1;
+  
+  /** The position in the year list that will be used next. */
   private int yearPos = -1;
   
+  /** The hour this time configuration is set to. */
   private int hour = -1;
+  
+  /** The minute this time configuration is set to. */
   private int minute = -1;
   
+  /** If the constructor has parsed an at-clause. */
   private transient boolean parsedAt = false;
+  
+  /** If the constructor has parsed an on-clause. */
   private transient boolean parsedOn = false;
   
   /**
@@ -162,6 +174,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       }
     }
     
+    // If an at-clause has been parsed, but an on-clause hasn't
     if (this.parsedAt && !this.parsedOn) {
       
       if (DEBUG_MODE) System.out.println("Only at-clause specified.");
@@ -182,16 +195,22 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       
       if (DEBUG_MODE) System.out.println("Desired ZDT=" + desiredZdt + ".");
       
+      // Set the month list to the current month of the desired date/time
       this.monthList = new ArrayList<Integer>();
       this.monthList.add(desiredZdt.getMonthValue());
       this.monthPos = 0;
+      
+      // Set the day list to the current day of the desired date/time
       this.dayList = new ArrayList<Integer>();
       this.dayList.add(desiredZdt.getDayOfMonth());
       this.dayPos = 0;
+      
+      // Set the year list to the current year of the desired date/time
       this.yearList = new ArrayList<Integer>();
       this.yearList.add(desiredZdt.getYear());
       this.yearPos = 0;
       
+      // If we've parsed an on-clause but not an at-clause
     } else if (this.parsedOn && !this.parsedAt) {
       
       if (DEBUG_MODE) System.out.println("Only on-clause specified.");
@@ -224,22 +243,47 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     return this.fromTimeZone;
   }
   
+  /**
+   * Gets the current year in the year list.
+   * 
+   * @return an Integer.
+   */
   public final Integer getCurrentYear() {
     return this.yearList.get(this.yearPos);
   }
   
+  /**
+   * Gets the current month in the month list.
+   * 
+   * @return an Integer.
+   */
   public final Integer getCurrentMonth() {
     return this.monthList.get(this.monthPos);
   }
   
+  /**
+   * Gets the current year in the year list.
+   * 
+   * @return an Integer.
+   */
   public final Integer getCurrentDay() {
     return this.dayList.get(this.dayPos);
   }
   
+  /**
+   * Gets the hour of this configuration.
+   * 
+   * @return an Integer.
+   */
   public final Integer getHour() {
     return this.hour;
   }
   
+  /**
+   * Gets the hour of this configuration.
+   * 
+   * @return an Integer.
+   */
   public final Integer getMinute() {
     return this.minute;
   }
@@ -294,16 +338,9 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     };
   }
   
-  // Dy 0
-  // Mn 0
-  // Yr 2
-  //
-  // Dy {1, 5, 9} (size-1 = 2)
-  // ^
-  // Mn {4, 9} (size-1 = 1)
-  // ^
-  // Yr {2018, 2019} (size-1 = 1)
-  // ^
+  /**
+   * Ripple-carries the day, month, and year pointers.
+   */
   final void propogateCounters() {
     
     if (this.dayPos >= this.dayList.size() - 1) {
@@ -325,6 +362,13 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     
   }
   
+  /**
+   * Generates a comma-separated list of numbers enclosed in square brackets.
+   * 
+   * @param min The first and lowest value, inclusive.
+   * @param max The last and highest value, inclusive.
+   * @return a {@link String}.
+   */
   private static final String generateAsteriskString(final int min, final int max) {
     String result = "[" + min;
     for (int i = min + 1; i <= max; i++) {
@@ -751,6 +795,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
   
 }
 
+// TODO: ** Don't delete the help message; you need that.
 //@formatter:off
 /*
 

@@ -70,7 +70,7 @@ public class RathBot {
   
   // TODO: Change this back to 0.1.5.1
   /** The default Playing text under the bot's username. */
-  private static final String DEFAULT_PLAYING_TEXT = "v0.1.5.1";
+  private static final String DEFAULT_PLAYING_TEXT = "v0.2 (test)";
   
   // TODO: ** Add more commands here as they become available.
   /** A list of commands to initialize. */

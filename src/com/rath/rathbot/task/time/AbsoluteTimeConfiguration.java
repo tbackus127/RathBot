@@ -1,16 +1,13 @@
 
 package com.rath.rathbot.task.time;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
-
-// Use ZonedDateTime.now(ZoneId.of(INSERT_ISSUERS_TZ_HERE).withZoneSameInstant(ZoneId.of("America/New_York"));
-// LocalDateTime.atZone(ZoneId)
 
 /**
  * This class handles all time configurations that happen at specific points in time. e.g.: at February 10, 2019 at 6:00
@@ -20,6 +17,8 @@ import java.util.TreeMap;
  *
  */
 public class AbsoluteTimeConfiguration extends TimeConfiguration {
+  
+  private static final boolean DEBUG_MODE = false;
   
   /** Choose spaces before and after the words "at" and "on". */
   private static final String REGEX_SPLIT_CLAUSES = "((?<=at)\\s+)|(\\s+(?=at))|((?<=on)\\s+)|(\\s+(?=on))";
@@ -133,20 +132,25 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
   public AbsoluteTimeConfiguration(final String configString, final ZoneId timeZone) throws BadTimeConfigException {
     super(TimeConfigurationType.ABSOLUTE, configString);
     
+    if (DEBUG_MODE) System.out.println("Entered constructor.");
+    
     this.fromTimeZone = timeZone;
     
     // At least 4 tokens are required ("on"/"at", on/at-clause, "to", to-clause)
     final String[] clauseTokens = configString.split(REGEX_SPLIT_CLAUSES);
     if (clauseTokens == null || clauseTokens.length < 2) {
+      if (DEBUG_MODE) System.out.println("ERR001.");
       throw new BadTimeConfigException();
     }
     
     // If the clause tokens length is not even, throw an exception
-    if(clauseTokens.length % 2 == 1) {
+    if (clauseTokens.length % 2 == 1) {
+      if (DEBUG_MODE) System.out.println("ERR002.");
       throw new BadTimeConfigException();
     }
     
     // Parse both at/on-clauses
+    if (DEBUG_MODE) System.out.println("Parsing clauses.");
     for (int i = 0; i < clauseTokens.length; i += 2) {
       if (clauseTokens[i].equals("at")) {
         parseAtClause(clauseTokens[i + 1]);
@@ -157,25 +161,32 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     
     if (this.parsedAt && !this.parsedOn) {
       
-      LocalDateTime desiredLdt = LocalDateTime.now(this.fromTimeZone).truncatedTo(ChronoUnit.DAYS).with(
+      if (DEBUG_MODE) System.out.println("Only at-clause specified.");
+      
+      ZonedDateTime desiredZdt = ZonedDateTime.now(this.fromTimeZone).truncatedTo(ChronoUnit.DAYS).with(
           ChronoField.HOUR_OF_DAY, this.hour).with(ChronoField.MINUTE_OF_DAY, this.minute);
+      // LocalDateTime desiredLdt =
+      // LocalDateTime.now(this.fromTimeZone).truncatedTo(ChronoUnit.DAYS).with(ChronoField.HOUR_OF_DAY,
+      // this.hour).with(ChronoField.MINUTE_OF_DAY, this.minute);
       
       // If the desired time has already passed for today, use tomorrow's date
-      if (LocalDateTime.now(this.fromTimeZone).compareTo(desiredLdt) >= 0) {
-        desiredLdt = desiredLdt.plusDays(1);
+      if (ZonedDateTime.now(this.fromTimeZone).compareTo(desiredZdt) >= 0) {
+        desiredZdt = desiredZdt.plusDays(1);
       }
       
       this.monthList = new ArrayList<Integer>();
-      this.monthList.add(desiredLdt.getMonthValue());
+      this.monthList.add(desiredZdt.getMonthValue());
       this.monthPos = 0;
       this.dayList = new ArrayList<Integer>();
-      this.dayList.add(desiredLdt.getDayOfMonth());
+      this.dayList.add(desiredZdt.getDayOfMonth());
       this.dayPos = 0;
       this.yearList = new ArrayList<Integer>();
-      this.yearList.add(desiredLdt.getYear());
+      this.yearList.add(desiredZdt.getYear());
       this.yearPos = 0;
       
     } else if (this.parsedOn && !this.parsedAt) {
+      
+      if (DEBUG_MODE) System.out.println("Only on-clause specified.");
       
       this.hour = HOUR_24_MIN;
       this.minute = MINUTE_MIN;
@@ -185,8 +196,14 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     // Check if every field was initialized; if not, throw an exception
     if (this.monthPos == -1 || this.dayPos == -1 || this.yearPos == -1 || this.monthList == null || this.dayList == null
         || this.yearList == null) {
+      if (DEBUG_MODE) System.out.println("ERR003");
       throw new BadTimeConfigException();
     }
+    
+    if (DEBUG_MODE) System.out.println("Finished construction.");
+    if (DEBUG_MODE) System.out.println("M=" + this.monthList.toString() + " D=" + this.dayList.toString() + " Y="
+        + this.yearList.toString() + " H=" + this.hour + " M=" + this.minute);
+    if (DEBUG_MODE) System.out.println("Mi=" + this.monthPos + " Di=" + this.dayPos + " Yi=" + this.yearPos);
     
   }
   
@@ -205,14 +222,19 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
    */
   private final void parseAtClause(final String atClause) {
     
+    if (DEBUG_MODE) System.out.println("Parsing at-clause.");
+    
     // Split the at-clause into tokens and handle each
     final String[] atTokens = atClause.split(REGEX_SPLIT_AT_CLAUSE);
     if (atTokens == null || atTokens.length < 2 || atTokens.length > 3) {
+      if (DEBUG_MODE) System.out.println("ERR004");
       throw new BadTimeConfigException();
     }
     
     // Military or hour-only ({19, 00} or {7, PM})
     if (atTokens.length == 2) {
+      
+      if (DEBUG_MODE) System.out.println("Military or hour-only");
       
       // If the 2nd letter of the 2nd token is an M, it's in hour-only format
       if (atTokens[1].toLowerCase().charAt(1) == 'm') {
@@ -223,10 +245,13 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       
       // Standard
     } else {
+      
+      if (DEBUG_MODE) System.out.println("Standard format");
       handleStandard(atTokens[0], atTokens[1], atTokens[2]);
     }
     
     this.parsedAt = true;
+    if (DEBUG_MODE) System.out.println("At-clause parse finished.");
   }
   
   /**
@@ -238,22 +263,29 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
    */
   private final void handleHourOnly(final String hourString, final String amPmString) {
     
+    if (DEBUG_MODE) System.out.println("Hour only.");
+    
     // Parse the hour string
     int h = -1;
     try {
       h = Integer.parseInt(hourString);
+      if (DEBUG_MODE) System.out.println("Hour only: Parsed " + h + ".");
     } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+      if (DEBUG_MODE) System.out.println("ERR005");
       throw new BadTimeConfigException();
     }
     
     // Check out of bounds
     if (h < HOUR_12_MIN || h > HOUR_12_MAX) {
+      if (DEBUG_MODE) System.out.println("ERR006");
       throw new BadTimeConfigException();
     }
     
     // Convert to 24-hour time
     if (amPmString.toLowerCase().charAt(0) == 'p') {
+      if (DEBUG_MODE) System.out.println("Converted to 24-hour.");
       h = (h + HOUR_12_MAX) % (HOUR_24_MAX + 1);
+      if (DEBUG_MODE) System.out.println("Hour is now " + h + ".");
     }
     
     // Set time fields
@@ -269,6 +301,8 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
    */
   private final void handleMilitary(final String hourString, final String minutesString) {
     
+    if (DEBUG_MODE) System.out.println("Military format.");
+    
     // Parse the hour and minute strings
     int h = -1;
     int m = -1;
@@ -276,11 +310,13 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       h = Integer.parseInt(hourString);
       m = Integer.parseInt(minutesString);
     } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+      if (DEBUG_MODE) System.out.println("ERR007");
       throw new BadTimeConfigException();
     }
     
     // Check out of bounds
     if (h < HOUR_24_MIN || h > HOUR_24_MAX || m < MINUTE_MIN || m > MINUTE_MAX) {
+      if (DEBUG_MODE) System.out.println("ERR008");
       throw new BadTimeConfigException();
     }
     
@@ -306,11 +342,13 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       h = Integer.parseInt(hourString);
       m = Integer.parseInt(minutesString);
     } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+      if (DEBUG_MODE) System.out.println("ERR009");
       throw new BadTimeConfigException();
     }
     
     // Check out of bounds
     if (h < HOUR_12_MIN || h > HOUR_12_MAX || m < MINUTE_MIN || m > MINUTE_MAX) {
+      if (DEBUG_MODE) System.out.println("ERR010");
       throw new BadTimeConfigException();
     }
     
@@ -335,6 +373,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     // Split the at-clause into tokens and handle each
     final String[] onTokens = onClause.split(REGEX_SPLIT_ON_CLAUSE);
     if (onTokens == null || onTokens.length < 2 || onTokens.length > 3) {
+      if (DEBUG_MODE) System.out.println("ERR011");
       throw new BadTimeConfigException();
     }
     
@@ -348,19 +387,22 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       
       // If not, check if there is only one month/day
       if (this.monthList.size() != 1 || this.dayList.size() != 1) {
+        if (DEBUG_MODE) System.out.println("ERR012");
         throw new BadTimeConfigException();
       }
       
-      LocalDateTime desiredLdt = LocalDateTime.now(this.fromTimeZone).withMonth(this.monthList.get(0)).withDayOfMonth(
+      ZonedDateTime desiredZdt = ZonedDateTime.now(this.fromTimeZone).withMonth(this.monthList.get(0)).withDayOfMonth(
           this.dayList.get(0));
+      // LocalDateTime desiredLdt =
+      // LocalDateTime.now(this.fromTimeZone).withMonth(this.monthList.get(0)).withDayOfMonth(this.dayList.get(0));
       
       // If the desired time has already passed for today, use tomorrow's date
-      if (LocalDateTime.now(this.fromTimeZone).compareTo(desiredLdt) >= 0) {
-        desiredLdt = desiredLdt.plusYears(1);
+      if (ZonedDateTime.now(this.fromTimeZone).compareTo(desiredZdt) >= 0) {
+        desiredZdt = desiredZdt.plusYears(1);
       }
       
       this.yearList = new ArrayList<Integer>();
-      this.yearList.add(desiredLdt.getYear());
+      this.yearList.add(desiredZdt.getYear());
       this.yearPos = 0;
     }
     
@@ -398,6 +440,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
           try {
             m = Integer.parseInt(monthsString);
           } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+            if (DEBUG_MODE) System.out.println("ERR013");
             throw new BadTimeConfigException();
           }
           
@@ -427,6 +470,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         try {
           m = Integer.parseInt(monthTok);
         } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+          if (DEBUG_MODE) System.out.println("ERR014");
           throw new BadTimeConfigException();
         }
         
@@ -434,6 +478,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       
       // Check out of bounds
       if (m < MONTH_MIN || m > MONTH_MAX) {
+        if (DEBUG_MODE) System.out.println("ERR015");
         throw new BadTimeConfigException();
       }
       
@@ -468,6 +513,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         try {
           d = Integer.parseInt(daysString);
         } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+          if (DEBUG_MODE) System.out.println("ERR016");
           throw new BadTimeConfigException();
         }
         
@@ -489,11 +535,13 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       try {
         d = Integer.parseInt(dayTok);
       } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+        if (DEBUG_MODE) System.out.println("ERR017");
         throw new BadTimeConfigException();
       }
       
       // Check out of bounds
       if (d < DAY_MIN || d > DAY_MAX) {
+        if (DEBUG_MODE) System.out.println("ERR018");
         throw new BadTimeConfigException();
       }
       
@@ -519,7 +567,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       // Translate the asterisk to its alias
       if (yearsString.equals("*")) {
         
-        yearsString = ASTERISK_DAYS;
+        yearsString = ASTERISK_YEARS;
         
       } else {
         
@@ -528,6 +576,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         try {
           y = Integer.parseInt(yearsString);
         } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+          if (DEBUG_MODE) System.out.println("ERR019");
           throw new BadTimeConfigException();
         }
         
@@ -538,6 +587,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         
         // Check out of bounds
         if (y < YEAR_MIN || y > YEAR_MAX) {
+          if (DEBUG_MODE) System.out.println("ERR020");
           throw new BadTimeConfigException();
         }
         
@@ -559,6 +609,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       try {
         d = Integer.parseInt(yearTok);
       } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+        if (DEBUG_MODE) System.out.println("ERR021");
         throw new BadTimeConfigException();
       }
       
@@ -591,13 +642,26 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         // TODO: Implement next() in AbsoluteTimeConfiguration.iterator()
         // TODO: DON'T FORGET TO ACCOUNT FOR NONEXISTENT DATES! (February 30, November 31, etc.)
         // TODO: Make the year wildcard store the current year in its pos field
+        // Use ZonedDateTime.now(ZoneId.of(INSERT_ISSUERS_TZ_HERE).withZoneSameInstant(ZoneId.of("America/New_York"));
+        // LocalDateTime.atZone(ZoneId)
+        
+        final ZonedDateTime zdt = ZonedDateTime.of(getAndIncrementYear(), getAndIncrementMonth(), getAndIncrementDay(),
+            getHour(), getMinute(), 0, 0, getFromTimeZone());
+        System.out.println("\nIssuer's LDT: " + zdt.toString() + ".");
+        
+        // final ZonedDateTime issuerDateTime = ldt.atZone(getFromTimeZone());
+        // System.out.println("Issuer's datetime: " + issuerDateTime.toString() + ".");
+        
+        // final ZonedDateTime myDateTime = zdt.atZone(ZoneId.of("America/New_York"));
+        final ZonedDateTime myDateTime = zdt.withZoneSameLocal((ZoneId.of("America/New_York")));
+        System.out.println("Bot's LDT: " + myDateTime.toString() + ".");
         
         // Construct new local datetime with current list pointers
         // Convert from issuer's time zone -> my time zone
         // Increment day, ripple carry through months/years
         // RBConfig.getTimeZone()
         
-        return null;
+        return myDateTime.toEpochSecond();
       }
       
     };
@@ -609,8 +673,28 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
    * @return true if there are still more dates to go; false if not.
    */
   final protected boolean absTimeConfigNextAvailable() {
-    return this.monthPos < this.monthList.size() - 1 && this.dayPos < this.dayList.size() - 1
-        && this.yearPos < this.yearList.size() - 1;
+    return this.monthPos < this.monthList.size() && this.dayPos < this.dayList.size()
+        && this.yearPos < this.yearList.size();
+  }
+  
+  final protected Integer getAndIncrementYear() {
+    return this.yearList.get(this.yearPos++);
+  }
+  
+  final protected Integer getAndIncrementMonth() {
+    return this.monthList.get(this.monthPos++);
+  }
+  
+  final protected Integer getAndIncrementDay() {
+    return this.dayList.get(this.dayPos++);
+  }
+  
+  final protected Integer getHour() {
+    return this.hour;
+  }
+  
+  final protected Integer getMinute() {
+    return this.minute;
   }
   
 }

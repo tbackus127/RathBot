@@ -74,6 +74,8 @@ public class TestTimeConfigurations {
   
   @SuppressWarnings("serial")
   private static final AbsTimeTestEntry[] GOOD_SINGLE_ABS_CONFIGS = {
+      
+      // TODO: Fix this one
       new AbsTimeTestEntry("at 6pm", new ArrayList<Long>() {
         { 
           add( (TODAY_INST.plus(18, ChronoUnit.HOURS).compareTo(Instant.now()) > 0 ) ? 
@@ -82,6 +84,8 @@ public class TestTimeConfigurations {
           ); 
         }
       }),
+      
+      // TODO: Fix this one
       new AbsTimeTestEntry("at 2100", new ArrayList<Long>() {
         { 
           add( (TODAY_INST.plus(21, ChronoUnit.HOURS).compareTo(Instant.now()) > 0 ) ? 
@@ -90,6 +94,8 @@ public class TestTimeConfigurations {
           ); 
         }
       }),
+      
+      // TODO: Fix this one
       new AbsTimeTestEntry("at 2AM", new ArrayList<Long>() {
         { 
           add( (TODAY_INST.plus(2, ChronoUnit.HOURS).compareTo(Instant.now()) > 0 ) ? 
@@ -98,6 +104,8 @@ public class TestTimeConfigurations {
           ); 
         }
       }),
+      
+      // TODO: Fix this one
       new AbsTimeTestEntry("at 7 AM", new ArrayList<Long>() {
         { 
           add( (TODAY_INST.plus(7, ChronoUnit.HOURS).compareTo(Instant.now()) > 0 ) ? 
@@ -122,6 +130,8 @@ public class TestTimeConfigurations {
       new AbsTimeTestEntry("on 8/11/19", new ArrayList<Long>() {
         { add(LocalDate.of(2019, 8, 11).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond()); }
       }),
+      
+      // TODO: Fix this one
       new AbsTimeTestEntry("on feb 14", new ArrayList<Long>() {
         { add(LocalDate.of(THIS_YEAR, 2, 14).atTime(0, 0, 0).toInstant(TEST_ZONE).compareTo(Instant.now()) > 0 ?
             LocalDate.of(THIS_YEAR, 2, 14).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond() :
@@ -140,6 +150,8 @@ public class TestTimeConfigurations {
             LocalDate.of(THIS_YEAR, 10, 21).atTime(18, 0, 0).toInstant(TEST_ZONE).getEpochSecond() :
             LocalDate.of(NEXT_YEAR, 10, 21).atTime(18, 0, 0).toInstant(TEST_ZONE).getEpochSecond()); }
       }),
+      
+      // TODO: Fix this one
       new AbsTimeTestEntry("on nov 26 at 2200", new ArrayList<Long>() {
         { add(LocalDate.of(THIS_YEAR, 11, 26).atTime(22, 0, 0).toInstant(TEST_ZONE).compareTo(Instant.now()) > 0 ?
             LocalDate.of(THIS_YEAR, 11, 26).atTime(22, 0, 0).toInstant(TEST_ZONE).getEpochSecond() :
@@ -433,7 +445,7 @@ public class TestTimeConfigurations {
       
       AbsoluteTimeConfiguration atc = null;
       try {
-        atc = new AbsoluteTimeConfiguration(entry.getConfigString(), TEST_ZONE);
+        atc = new AbsoluteTimeConfiguration(entry.getConfigString(), TEST_ZONE_ID);
       } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
         System.out.println(" EXCEPTION");
         failCount++;
@@ -456,8 +468,12 @@ public class TestTimeConfigurations {
         continue;
       }
       
-      // TODO: Print expected and actual epoch seconds
-      String resultStr = (actualVal.equals(expectedVal)) ? " OK" : " MISMATCH";
+      String resultStr = " OK";
+      if (!actualVal.equals(expectedVal)) {
+        resultStr = "Expected " + expectedVal + ", but got " + actualVal + "!";
+        failCount++;
+      }
+      
       System.out.println(resultStr);
       
     }

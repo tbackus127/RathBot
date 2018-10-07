@@ -10,7 +10,7 @@ public class PurgeWarnTask extends RBTask {
   
   private static final String TASK_NAME = "purgewarn";
   
-  private static final String CONFIG_STRING = "on [Jan,Apr,Jul,Nov] 1 at 06:00";
+  private static final String CONFIG_STRING = "on [jan,apr,jul,nov] 1 * at 06:00";
   
   // Month, day, year, hour, minute, timezone
   private static final TimeConfiguration TIME_CONFIG = new AbsoluteTimeConfiguration(CONFIG_STRING,

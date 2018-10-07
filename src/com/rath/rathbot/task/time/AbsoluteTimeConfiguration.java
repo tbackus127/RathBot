@@ -1,6 +1,7 @@
 
 package com.rath.rathbot.task.time;
 
+import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -30,6 +31,9 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
   
   /** Match a sequence of comma-separated numbers inside of square brackets. */
   private static final String REGEX_MATCH_BRACKET_LIST = "\\[((\\d+)|(\\w{3}))(\\s*,\\s*((\\d+)|(\\w{3})))*\\]";
+  
+  /** The number of next configurations to try before giving up. */
+  private static final int VALID_DATE_SEARCH_MAX_ITERATIONS = 8;
   
   /** The minimum year that can be specified. */
   private static final int YEAR_MIN = 2018;
@@ -220,12 +224,113 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     return this.fromTimeZone;
   }
   
+  public final Integer getCurrentYear() {
+    return this.yearList.get(this.yearPos);
+  }
+  
+  public final Integer getCurrentMonth() {
+    return this.monthList.get(this.monthPos);
+  }
+  
+  public final Integer getCurrentDay() {
+    return this.dayList.get(this.dayPos);
+  }
+  
+  public final Integer getHour() {
+    return this.hour;
+  }
+  
+  public final Integer getMinute() {
+    return this.minute;
+  }
+  
+  @Override
+  public Iterator<Long> iterator() {
+    return new Iterator<Long>() {
+      
+      @Override
+      public boolean hasNext() {
+        return absTimeConfigNextAvailable();
+      }
+      
+      @Override
+      public Long next() {
+        
+        // TODO: Make the year wildcard store the current year in its pos field
+        
+        boolean validDateFound = false;
+        ZonedDateTime zdt = null;
+        
+        for (int i = 0; !validDateFound && i < VALID_DATE_SEARCH_MAX_ITERATIONS; i++) {
+          
+          try {
+            zdt = ZonedDateTime.of(getCurrentYear(), getCurrentMonth(), getCurrentDay(), getHour(), getMinute(), 0, 0,
+                getFromTimeZone());
+          } catch (@SuppressWarnings("unused") DateTimeException dte) {
+            propogateCounters();
+            continue;
+          }
+          validDateFound = true;
+          
+        }
+        
+        if (zdt == null) {
+          System.err.println("Could not find the next valid date/time!");
+          return null;
+        }
+        
+        // System.out.println("\nIssuer's LDT: " + zdt.toString() + ", T=" + zdt.toEpochSecond() + ".");
+        
+        // TODO: Use RBConfig.getTimeZone() in production (surround the get with a try/catch?)
+        final ZonedDateTime myDateTime = zdt.withZoneSameLocal((ZoneId.of("America/New_York")));
+        // System.out.println("Bot's LDT: " + myDateTime.toString() + ", T=" + myDateTime.toEpochSecond() + ".");
+        
+        // Increment day, ripple carry through months/years
+        propogateCounters();
+        
+        return myDateTime.toEpochSecond();
+      }
+      
+    };
+  }
+  
+  // Dy 0
+  // Mn 0
+  // Yr 2
+  //
+  // Dy {1, 5, 9} (size-1 = 2)
+  // ^
+  // Mn {4, 9} (size-1 = 1)
+  // ^
+  // Yr {2018, 2019} (size-1 = 1)
+  // ^
+  final void propogateCounters() {
+    
+    if (this.dayPos >= this.dayList.size() - 1) {
+      
+      this.dayPos = 0;
+      
+      if (this.monthPos >= this.monthList.size() - 1) {
+        
+        this.monthPos = 0;
+        this.yearPos++;
+        
+      } else {
+        this.monthPos++;
+      }
+      
+    } else {
+      this.dayPos++;
+    }
+    
+  }
+  
   private static final String generateAsteriskString(final int min, final int max) {
     String result = "[" + min;
     for (int i = min + 1; i <= max; i++) {
       result += "," + i;
     }
-    return result;
+    return result + "]";
   }
   
   /**
@@ -383,6 +488,8 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
    */
   private final void parseOnClause(final String onClause) {
     
+    if (DEBUG_MODE) System.out.println("Parsing on-clause.");
+    
     // Split the at-clause into tokens and handle each
     final String[] onTokens = onClause.split(REGEX_SPLIT_ON_CLAUSE);
     if (onTokens == null || onTokens.length < 2 || onTokens.length > 3) {
@@ -406,8 +513,6 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       
       ZonedDateTime desiredZdt = ZonedDateTime.now(this.fromTimeZone).withMonth(this.monthList.get(0)).withDayOfMonth(
           this.dayList.get(0));
-      // LocalDateTime desiredLdt =
-      // LocalDateTime.now(this.fromTimeZone).withMonth(this.monthList.get(0)).withDayOfMonth(this.dayList.get(0));
       
       // If the desired time has already passed for today, use tomorrow's date
       if (ZonedDateTime.now(this.fromTimeZone).compareTo(desiredZdt) >= 0) {
@@ -420,6 +525,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     }
     
     this.parsedOn = true;
+    if (DEBUG_MODE) System.out.println("On-clause parse finished.");
   }
   
   /**
@@ -446,7 +552,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         // Check if the current token is a three-letter month abbreviation
         int m = -1;
         if (MONTH_ALIASES.containsKey(monthsString.toLowerCase())) {
-          m = MONTH_ALIASES.get(monthsString);
+          m = MONTH_ALIASES.get(monthsString.toLowerCase());
         } else {
           
           // Otherwise, parse as a single value and surround in square brackets
@@ -469,6 +575,8 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     monthsString = monthsString.substring(1, monthsString.length() - 1);
     monthTokens = monthsString.split("\\s*,\\s*");
     
+    if (DEBUG_MODE) System.out.println("Month tokens: " + monthTokens.toString());
+    
     // Convert each index to an integer and add it to the months list
     for (final String monthTok : monthTokens) {
       
@@ -476,7 +584,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       
       // Check if the current token is a three-letter month abbreviation
       if (MONTH_ALIASES.containsKey(monthTok.toLowerCase())) {
-        m = MONTH_ALIASES.get(monthTok);
+        m = MONTH_ALIASES.get(monthTok.toLowerCase());
       } else {
         
         // If not, parse it as a number
@@ -631,65 +739,14 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     this.yearPos = 0;
   }
   
-  @Override
-  public Iterator<Long> iterator() {
-    return new Iterator<Long>() {
-      
-      @Override
-      public boolean hasNext() {
-        return absTimeConfigNextAvailable();
-      }
-      
-      @Override
-      public Long next() {
-        
-        // TODO: DON'T FORGET TO ACCOUNT FOR NONEXISTENT DATES! (February 30, November 31, etc.)
-        // TODO: Make the year wildcard store the current year in its pos field
-        
-        final ZonedDateTime zdt = ZonedDateTime.of(getAndIncrementYear(), getAndIncrementMonth(), getAndIncrementDay(),
-            getHour(), getMinute(), 0, 0, getFromTimeZone());
-        // System.out.println("\nIssuer's LDT: " + zdt.toString() + ", T=" + zdt.toEpochSecond() + ".");
-        
-        // TODO: Use RBConfig.getTimeZone() in production (surround the get with a try/catch?)
-        final ZonedDateTime myDateTime = zdt.withZoneSameLocal((ZoneId.of("America/New_York")));
-        // System.out.println("Bot's LDT: " + myDateTime.toString() + ", T=" + myDateTime.toEpochSecond() + ".");
-        
-        // TODO: Increment day, ripple carry through months/years
-        
-        return myDateTime.toEpochSecond();
-      }
-      
-    };
-  }
-  
   /**
    * Wrapper for this class' Iterator.hasNext() method to prevent fields from not being private.
    * 
    * @return true if there are still more dates to go; false if not.
    */
-  final protected boolean absTimeConfigNextAvailable() {
-    return this.monthPos < this.monthList.size() && this.dayPos < this.dayList.size()
-        && this.yearPos < this.yearList.size();
-  }
-  
-  final protected Integer getAndIncrementYear() {
-    return this.yearList.get(this.yearPos++);
-  }
-  
-  final protected Integer getAndIncrementMonth() {
-    return this.monthList.get(this.monthPos++);
-  }
-  
-  final protected Integer getAndIncrementDay() {
-    return this.dayList.get(this.dayPos++);
-  }
-  
-  final protected Integer getHour() {
-    return this.hour;
-  }
-  
-  final protected Integer getMinute() {
-    return this.minute;
+  protected final boolean absTimeConfigNextAvailable() {
+    return this.yearPos < this.yearList.size() && this.dayPos < this.dayList.size()
+        && this.monthPos < this.monthList.size();
   }
   
 }
@@ -727,14 +784,6 @@ Shortcuts (at-clause):
 * "evening"/"in the evening" -> 1800 (today)
 * "night"/"at night" -> 2200 (today)
 * "midnight"/"at midnight" -> 0000 (tomorrow)
-
-
-
-
-
-
-
-
 
 
 

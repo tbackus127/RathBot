@@ -308,11 +308,9 @@ public class TestTimeConfigurations {
     
     for (int year = THIS_YEAR; year <= 2026; year++) {
       
-      for (int month = ZonedDateTime.now(TEST_ZONE_ID).getMonthValue(); month <= 12; month++) {
+      for (int month = 1; month <= 12; month++) {
         
-        for (int day = (ZDT_START_OF_TODAY.plusHours(14).compareTo(ZDT_NOW) > 0)
-            ? (ZDT_START_OF_TODAY.plusHours(14)).getDayOfMonth()
-            : (ZDT_START_OF_TOMORROW.plusHours(14)).getDayOfMonth(); day <= 31; day++) {
+        for (int day = 1; day <= 31; day++) {
           
           if (iterations >= MAX_WILDCARD_ITERATIONS) {
             break;
@@ -320,7 +318,7 @@ public class TestTimeConfigurations {
           
           LocalDate d;
           try {
-            d = LocalDate.of(2026, month, day);
+            d = LocalDate.of(year, month, day);
           } catch (@SuppressWarnings("unused") DateTimeException dte) {
             continue;
           }
@@ -349,7 +347,7 @@ public class TestTimeConfigurations {
         
         ZonedDateTime zdt;
         try {
-          zdt = ZonedDateTime.of(2024, month, day, 0, 0, 0, 0, TEST_ZONE_ID);
+          zdt = ZonedDateTime.of(2024, month, day, 17, 0, 0, 0, TEST_ZONE_ID);
         } catch (@SuppressWarnings("unused") DateTimeException dte) {
           continue;
         }
@@ -539,6 +537,66 @@ public class TestTimeConfigurations {
       }
       
       System.out.println(resultStr);
+      
+    }
+    
+    System.out.println();
+    
+    assertEquals(failCount, 0);
+    
+  }
+  
+  @Test
+  @SuppressWarnings("static-method")
+  public void testGoodMultiAbsConfigs() {
+    
+    System.out.println("=== Testing good single absolute time configs ===");
+    
+    int failCount = 0;
+    for (int i = 0; i < GOOD_MULTI_ABS_CONFIGS.length; i++) {
+      
+      final AbsTimeTestEntry entry = GOOD_MULTI_ABS_CONFIGS[i];
+      System.out.println("Testing config \"" + entry.getConfigString() + "\":");
+      
+      AbsoluteTimeConfiguration atc = null;
+      try {
+        atc = new AbsoluteTimeConfiguration(entry.getConfigString(), TEST_ZONE_ID);
+      } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
+        System.out.println(" EXCEPTION");
+        
+        // TODO: Stuff here
+        
+        continue;
+      }
+      
+      final Iterator<Long> itr = atc.iterator();
+      for (int j = 0; j < entry.getExpected().size(); j++) {
+        
+        final Long expectedVal = entry.getExpected().get(j);
+        System.out.print("  Timepoint " + j + " (" + expectedVal + "):");
+        
+        if (!itr.hasNext()) {
+          System.out.println(" EMPTY");
+          failCount++;
+          continue;
+        }
+        
+        final Long actualVal = itr.next();
+        if (actualVal == null) {
+          System.out.println(" NULL");
+          failCount++;
+          continue;
+        }
+        
+        String resultStr = " OK";
+        if (!actualVal.equals(expectedVal)) {
+          resultStr = " Expected " + expectedVal + ", but got " + actualVal + "!";
+          failCount++;
+        }
+        
+        System.out.println(resultStr);
+        
+      }
       
     }
     

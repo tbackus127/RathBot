@@ -9,7 +9,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -29,15 +31,22 @@ public class TestTimeConfigurations {
   
   private static final int MAX_WILDCARD_ITERATIONS = 1000;
   
+  static final ZonedDateTime ZDT_NOW = ZonedDateTime.now(TEST_ZONE_ID);
+  static final ZonedDateTime ZDT_START_OF_TODAY = ZDT_NOW.truncatedTo(ChronoUnit.DAYS);
+  static final ZonedDateTime ZDT_START_OF_TOMORROW = ZDT_START_OF_TODAY.plusDays(1);
+  
+  static final ZonedDateTime ZDT_START_OF_THIS_YEAR = ZDT_START_OF_TODAY.withDayOfYear(1);
+  static final ZonedDateTime ZDT_START_OF_NEXT_YEAR = ZDT_START_OF_THIS_YEAR.plusYears(1);
+  
+  // Delete these when done
   static final Instant TODAY_INST = Instant.now().truncatedTo(ChronoUnit.DAYS);
   static final long TODAY_ES = TODAY_INST.getEpochSecond();
-  static final LocalDateTime TODAY_LDT = LocalDateTime.ofInstant(TODAY_INST, TEST_ZONE);
-  
+  static final ZonedDateTime TODAY_ZDT = ZonedDateTime.ofInstant(TODAY_INST, TEST_ZONE_ID);
   static final Instant TOMORROW_INST = Instant.now().plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
   static final long TOMORROW_ES = TOMORROW_INST.getEpochSecond();
-  static final LocalDateTime TOMORROW_LDT = LocalDateTime.ofInstant(TOMORROW_INST, TEST_ZONE);
+  static final LocalDateTime TOMORROW_LDT = LocalDateTime.ofInstant(TOMORROW_INST, TEST_ZONE_ID);
   
-  static final int THIS_YEAR = TODAY_LDT.getYear();
+  static final int THIS_YEAR = ZDT_START_OF_TODAY.getYear();
   static final int NEXT_YEAR = THIS_YEAR + 1;
   
   //@formatter:off
@@ -75,95 +84,155 @@ public class TestTimeConfigurations {
   @SuppressWarnings("serial")
   private static final AbsTimeTestEntry[] GOOD_SINGLE_ABS_CONFIGS = {
       
-      // TODO: Fix this one
       new AbsTimeTestEntry("at 6pm", new ArrayList<Long>() {
         { 
-          add( (TODAY_INST.plus(18, ChronoUnit.HOURS).compareTo(Instant.now()) > 0 ) ? 
-            (TODAY_INST.plus(18, ChronoUnit.HOURS)).getEpochSecond() :
-            (TOMORROW_INST.plus(18, ChronoUnit.HOURS)).getEpochSecond() 
-          ); 
+          
+          add( (ZDT_START_OF_TODAY.plusHours(18).compareTo(ZDT_NOW) > 0 ) ?
+              (ZDT_START_OF_TODAY.plusHours(18)).toEpochSecond() :
+              (ZDT_START_OF_TOMORROW.plusHours(18)).toEpochSecond()
+          );
+          
         }
       }),
       
-      // TODO: Fix this one
       new AbsTimeTestEntry("at 2100", new ArrayList<Long>() {
         { 
-          add( (TODAY_INST.plus(21, ChronoUnit.HOURS).compareTo(Instant.now()) > 0 ) ? 
-            (TODAY_INST.plus(21, ChronoUnit.HOURS)).getEpochSecond() :
-            (TOMORROW_INST.plus(21, ChronoUnit.HOURS)).getEpochSecond() 
-          ); 
+          
+          add( (ZDT_START_OF_TODAY.plusHours(21).compareTo(ZDT_NOW) > 0 ) ?
+              (ZDT_START_OF_TODAY.plusHours(21)).toEpochSecond() :
+              (ZDT_START_OF_TOMORROW.plusHours(21)).toEpochSecond()
+          );
+          
         }
       }),
       
-      // TODO: Fix this one
       new AbsTimeTestEntry("at 2AM", new ArrayList<Long>() {
         { 
-          add( (TODAY_INST.plus(2, ChronoUnit.HOURS).compareTo(Instant.now()) > 0 ) ? 
-            (TODAY_INST.plus(2, ChronoUnit.HOURS)).getEpochSecond() :
-            (TOMORROW_INST.plus(2, ChronoUnit.HOURS)).getEpochSecond() 
-          ); 
+          
+          add( (ZDT_START_OF_TODAY.plusHours(2).compareTo(ZDT_NOW) > 0 ) ?
+              (ZDT_START_OF_TODAY.plusHours(2)).toEpochSecond() :
+              (ZDT_START_OF_TOMORROW.plusHours(2)).toEpochSecond()
+          );
+          
         }
       }),
       
-      // TODO: Fix this one
       new AbsTimeTestEntry("at 7 AM", new ArrayList<Long>() {
         { 
-          add( (TODAY_INST.plus(7, ChronoUnit.HOURS).compareTo(Instant.now()) > 0 ) ? 
-            (TODAY_INST.plus(7, ChronoUnit.HOURS)).getEpochSecond() :
-            (TOMORROW_INST.plus(7, ChronoUnit.HOURS)).getEpochSecond() 
-          ); 
+          
+          add( (ZDT_START_OF_TODAY.plusHours(7).compareTo(ZDT_NOW) > 0 ) ?
+              (ZDT_START_OF_TODAY.plusHours(7)).toEpochSecond() :
+              (ZDT_START_OF_TOMORROW.plusHours(7)).toEpochSecond()
+          );
+          
         }
       }),
+      
       new AbsTimeTestEntry("on 4 1", new ArrayList<Long>() {
         { 
-          add(LocalDate.of(THIS_YEAR, 4, 1).atTime(0, 0, 0).toInstant(TEST_ZONE).compareTo(Instant.now()) > 0 ?
-              LocalDate.of(THIS_YEAR, 4, 1).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond() :
-              LocalDate.of(NEXT_YEAR, 4, 1).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
+          
+          add( (ZDT_START_OF_THIS_YEAR.plusMonths(3).compareTo(ZDT_NOW) > 0 ) ?
+              (ZDT_START_OF_THIS_YEAR.plusMonths(3).toEpochSecond()) :
+              (ZDT_START_OF_NEXT_YEAR.plusMonths(3).toEpochSecond())
+              
+          );
+          
         }
       }),
+      
+      // TODO: Use the ZDTs for this one
       new AbsTimeTestEntry("on 6 28 2029", new ArrayList<Long>() {
-        { add(LocalDate.of(2029, 6, 28).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond()); }
+        { 
+          
+          add(ZonedDateTime.of(2029, 6, 28, 0, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          
+        }
       }),
+      
+      // TODO: Use the ZDTs for this one
       new AbsTimeTestEntry("on 7/7/2019", new ArrayList<Long>() {
-        { add(LocalDate.of(2019, 7, 7).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond()); }
+        {
+          
+          add(ZonedDateTime.of(2019, 7, 7, 0, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          
+        }
       }),
+      
+      // TODO: Use the ZDTs for this one
       new AbsTimeTestEntry("on 8/11/19", new ArrayList<Long>() {
-        { add(LocalDate.of(2019, 8, 11).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond()); }
+        {
+          
+          add(ZonedDateTime.of(2019, 8, 11, 0, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          
+        }
       }),
       
       // TODO: Fix this one
       new AbsTimeTestEntry("on feb 14", new ArrayList<Long>() {
-        { add(LocalDate.of(THIS_YEAR, 2, 14).atTime(0, 0, 0).toInstant(TEST_ZONE).compareTo(Instant.now()) > 0 ?
-            LocalDate.of(THIS_YEAR, 2, 14).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond() :
-            LocalDate.of(NEXT_YEAR, 2, 14).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond()); }
+        {
+          
+          add( (ZDT_START_OF_THIS_YEAR.plusMonths(1).plusDays(13).compareTo(ZDT_NOW) > 0 ) ?
+              (ZDT_START_OF_THIS_YEAR.plusMonths(1).plusDays(13).toInstant().getEpochSecond()) :
+              (ZDT_START_OF_NEXT_YEAR.plusMonths(1).plusDays(13).toInstant().getEpochSecond())
+          );
+          
+        }
       }),
+      
       new AbsTimeTestEntry("on may 10 2020", new ArrayList<Long>() {
-        { add(LocalDate.of(2020, 5, 10).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond()); }
+        {
+          
+          add(ZonedDateTime.of(2020, 5, 10, 0, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          
+        }
       }),
+      
       new AbsTimeTestEntry("on jun 14 at 4pm", new ArrayList<Long>() {
-        { add(LocalDate.of(THIS_YEAR, 6, 14).atTime(16, 0, 0).toInstant(TEST_ZONE).compareTo(Instant.now()) > 0 ?
-            LocalDate.of(THIS_YEAR, 6, 14).atTime(16, 0, 0).toInstant(TEST_ZONE).getEpochSecond() :
-            LocalDate.of(NEXT_YEAR, 6, 14).atTime(16, 0, 0).toInstant(TEST_ZONE).getEpochSecond()); }
+        {
+
+          add( (ZDT_START_OF_THIS_YEAR.plusMonths(5).plusDays(13).plusHours(16).compareTo(ZDT_NOW) > 0 ) ?
+              (ZDT_START_OF_THIS_YEAR.plusMonths(5).plusDays(13).plusHours(16).toInstant().getEpochSecond()) :
+              (ZDT_START_OF_NEXT_YEAR.plusMonths(5).plusDays(13).plusHours(16).toInstant().getEpochSecond())
+          );
+          
+        }
       }),
+      
       new AbsTimeTestEntry("on oct 21 at 6:00 PM", new ArrayList<Long>() {
-        { add(LocalDate.of(THIS_YEAR, 10, 21).atTime(18, 0, 0).toInstant(TEST_ZONE).compareTo(Instant.now()) > 0 ?
-            LocalDate.of(THIS_YEAR, 10, 21).atTime(18, 0, 0).toInstant(TEST_ZONE).getEpochSecond() :
-            LocalDate.of(NEXT_YEAR, 10, 21).atTime(18, 0, 0).toInstant(TEST_ZONE).getEpochSecond()); }
+        {
+          
+          add( (ZDT_START_OF_THIS_YEAR.plusMonths(9).plusDays(20).plusHours(18).compareTo(ZDT_NOW) > 0 ) ?
+              (ZDT_START_OF_THIS_YEAR.plusMonths(9).plusDays(20).plusHours(18).toInstant().getEpochSecond()) :
+              (ZDT_START_OF_NEXT_YEAR.plusMonths(9).plusDays(20).plusHours(18).toInstant().getEpochSecond())
+          );
+                    
+        }
       }),
       
       // TODO: Fix this one
       new AbsTimeTestEntry("on nov 26 at 2200", new ArrayList<Long>() {
-        { add(LocalDate.of(THIS_YEAR, 11, 26).atTime(22, 0, 0).toInstant(TEST_ZONE).compareTo(Instant.now()) > 0 ?
-            LocalDate.of(THIS_YEAR, 11, 26).atTime(22, 0, 0).toInstant(TEST_ZONE).getEpochSecond() :
-            LocalDate.of(NEXT_YEAR, 11, 26).atTime(22, 0, 0).toInstant(TEST_ZONE).getEpochSecond()); }
+        { 
+          
+          add( (ZDT_START_OF_THIS_YEAR.plusMonths(10).plusDays(25).plusHours(22).compareTo(ZDT_NOW) > 0 ) ?
+              (ZDT_START_OF_THIS_YEAR.plusMonths(10).plusDays(25).plusHours(22).toInstant().getEpochSecond()) :
+              (ZDT_START_OF_NEXT_YEAR.plusMonths(10).plusDays(25).plusHours(22).toInstant().getEpochSecond())
+          );
+          
+        }
       }),
+      
       new AbsTimeTestEntry("on feb/14/2024", new ArrayList<Long>() {
-        { add(LocalDate.of(2024, 2, 14).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond()); }
+        {
+          
+          add(ZonedDateTime.of(2024, 2, 14, 0, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          
+        }
       })
   };
   
   @SuppressWarnings("serial")
   private static final AbsTimeTestEntry[] GOOD_MULTI_ABS_CONFIGS = {
+      
       new AbsTimeTestEntry("on [1,4, 5] 1 2021", new ArrayList<Long>() {
         {
           add(LocalDate.of(2021, 1, 1).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
@@ -171,6 +240,7 @@ public class TestTimeConfigurations {
           add(LocalDate.of(2021, 5, 1).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
         }
       }),
+      
       new AbsTimeTestEntry("on feb [2,10,18,24] 2023", new ArrayList<Long>() {
         {
           add(LocalDate.of(2023, 2, 2).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
@@ -179,6 +249,7 @@ public class TestTimeConfigurations {
           add(LocalDate.of(2023, 2, 24).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
         }
       }),
+      
       new AbsTimeTestEntry("on [mar, may, aug, dec] [1] 2025", new ArrayList<Long>() {
         {
           add(LocalDate.of(2025, 3, 1).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
@@ -187,6 +258,7 @@ public class TestTimeConfigurations {
           add(LocalDate.of(2025, 12, 1).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
         }
       }),
+      
       new AbsTimeTestEntry("on [jan] [1,7,28] [2023, 2024]", new ArrayList<Long>() {
         {
           add(LocalDate.of(2023, 1, 1).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
@@ -197,6 +269,7 @@ public class TestTimeConfigurations {
           add(LocalDate.of(2024, 1, 28).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
         }
       }),
+      
       new AbsTimeTestEntry("on [may, sep, oct, dec] [1,15,30] [2024]", new ArrayList<Long>() {
         {
           add(LocalDate.of(2024, 5, 1).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
@@ -213,6 +286,7 @@ public class TestTimeConfigurations {
           add(LocalDate.of(2024, 12, 30).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
         }
       }),
+      
       new AbsTimeTestEntry("on dec 25 [2021,2022, 2023, 2024, 2025]", new ArrayList<Long>() {
         {
           add(LocalDate.of(2021, 12, 25).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
@@ -222,13 +296,16 @@ public class TestTimeConfigurations {
           add(LocalDate.of(2025, 12, 25).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
         }
       }),
+      
       new AbsTimeTestEntry("on * * 2026", generateAll2026()),
+      
       new AbsTimeTestEntry("on [5,7]/14/2020", new ArrayList<Long>() {
         {
           add(LocalDate.of(2020, 5, 14).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
           add(LocalDate.of(2020, 7, 14).atTime(0, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
         }
       }),
+      
       new AbsTimeTestEntry("at 10:00 AM on jan/[1, 27]/[2023]", new ArrayList<Long>() {
         {
           add(LocalDate.of(2023, 1, 1).atTime(10, 0, 0).toInstant(TEST_ZONE).getEpochSecond());
@@ -236,6 +313,7 @@ public class TestTimeConfigurations {
         }
       }),
       new AbsTimeTestEntry("at 1700 on */[1,8,20]/2024", generate1820()),
+      
       new AbsTimeTestEntry("on */*/* at 1400", generateAll14()),
   };
   //@formatter:on
@@ -435,6 +513,14 @@ public class TestTimeConfigurations {
   @SuppressWarnings("static-method")
   public void testGoodSingleAbsConfigs() {
     
+    System.out.println("ZDT_NOW: " + ZDT_NOW.toEpochSecond());
+    System.out.println("ZDT_START_OF_TODAY: " + ZDT_START_OF_TODAY.toEpochSecond());
+    System.out.println("ZDT_START_OF_TOMORROW: " + ZDT_START_OF_TOMORROW.toEpochSecond());
+    System.out.println("ZDT_START_OF_THIS_YEAR: " + ZDT_START_OF_THIS_YEAR.toEpochSecond());
+    System.out.println("ZDT_START_OF_NEXT_YEAR: " + ZDT_START_OF_NEXT_YEAR.toEpochSecond());
+    System.out.println("THIS_YEAR: " + THIS_YEAR);
+    System.out.println("NEXT_YEAR: " + NEXT_YEAR);
+    
     System.out.println("=== Testing good single absolute time configs ===");
     
     int failCount = 0;
@@ -468,9 +554,9 @@ public class TestTimeConfigurations {
         continue;
       }
       
-      String resultStr = " OK";
+      String resultStr = "   OK, got " + actualVal + ".";
       if (!actualVal.equals(expectedVal)) {
-        resultStr = "Expected " + expectedVal + ", but got " + actualVal + "!";
+        resultStr = "  Expected " + expectedVal + ", but got " + actualVal + "!";
         failCount++;
       }
       

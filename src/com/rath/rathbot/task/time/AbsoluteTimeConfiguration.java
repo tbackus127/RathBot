@@ -3,7 +3,6 @@ package com.rath.rathbot.task.time;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -163,16 +162,21 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       
       if (DEBUG_MODE) System.out.println("Only at-clause specified.");
       
-      ZonedDateTime desiredZdt = ZonedDateTime.now(this.fromTimeZone).truncatedTo(ChronoUnit.DAYS).with(
-          ChronoField.HOUR_OF_DAY, this.hour).with(ChronoField.MINUTE_OF_DAY, this.minute);
-      // LocalDateTime desiredLdt =
-      // LocalDateTime.now(this.fromTimeZone).truncatedTo(ChronoUnit.DAYS).with(ChronoField.HOUR_OF_DAY,
-      // this.hour).with(ChronoField.MINUTE_OF_DAY, this.minute);
+      final ZonedDateTime zdtNow = ZonedDateTime.now(this.fromTimeZone);
       
-      // If the desired time has already passed for today, use tomorrow's date
-      if (ZonedDateTime.now(this.fromTimeZone).compareTo(desiredZdt) >= 0) {
+      // Initialize the issuer's desired date/time to the start of today, plus the number of hours and minutes specified
+      // in the at-clause
+      ZonedDateTime desiredZdt = zdtNow.truncatedTo(ChronoUnit.DAYS);
+      desiredZdt = desiredZdt.plusHours(this.hour).plusMinutes(this.minute);
+      
+      if (DEBUG_MODE) System.out.println("Raw desired ZDT=" + desiredZdt + ".");
+      
+      // If the desired time has already passed for today, use tomorrow instead
+      if (zdtNow.compareTo(desiredZdt) >= 0) {
         desiredZdt = desiredZdt.plusDays(1);
       }
+      
+      if (DEBUG_MODE) System.out.println("Desired ZDT=" + desiredZdt + ".");
       
       this.monthList = new ArrayList<Integer>();
       this.monthList.add(desiredZdt.getMonthValue());
@@ -205,6 +209,15 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         + this.yearList.toString() + " H=" + this.hour + " M=" + this.minute);
     if (DEBUG_MODE) System.out.println("Mi=" + this.monthPos + " Di=" + this.dayPos + " Yi=" + this.yearPos);
     
+  }
+  
+  /**
+   * Gets the time zone the dates/times are expected to be converted from.
+   * 
+   * @return the time zone as a {@link ZoneId}.
+   */
+  public ZoneId getFromTimeZone() {
+    return this.fromTimeZone;
   }
   
   private static final String generateAsteriskString(final int min, final int max) {
@@ -618,15 +631,6 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     this.yearPos = 0;
   }
   
-  /**
-   * Gets the time zone the dates/times are expected to be converted from.
-   * 
-   * @return the time zone as a {@link ZoneId}.
-   */
-  public ZoneId getFromTimeZone() {
-    return this.fromTimeZone;
-  }
-  
   @Override
   public Iterator<Long> iterator() {
     return new Iterator<Long>() {
@@ -639,27 +643,18 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       @Override
       public Long next() {
         
-        // TODO: Implement next() in AbsoluteTimeConfiguration.iterator()
         // TODO: DON'T FORGET TO ACCOUNT FOR NONEXISTENT DATES! (February 30, November 31, etc.)
         // TODO: Make the year wildcard store the current year in its pos field
-        // Use ZonedDateTime.now(ZoneId.of(INSERT_ISSUERS_TZ_HERE).withZoneSameInstant(ZoneId.of("America/New_York"));
-        // LocalDateTime.atZone(ZoneId)
         
         final ZonedDateTime zdt = ZonedDateTime.of(getAndIncrementYear(), getAndIncrementMonth(), getAndIncrementDay(),
             getHour(), getMinute(), 0, 0, getFromTimeZone());
-        System.out.println("\nIssuer's LDT: " + zdt.toString() + ".");
+        // System.out.println("\nIssuer's LDT: " + zdt.toString() + ", T=" + zdt.toEpochSecond() + ".");
         
-        // final ZonedDateTime issuerDateTime = ldt.atZone(getFromTimeZone());
-        // System.out.println("Issuer's datetime: " + issuerDateTime.toString() + ".");
-        
-        // final ZonedDateTime myDateTime = zdt.atZone(ZoneId.of("America/New_York"));
+        // TODO: Use RBConfig.getTimeZone() in production (surround the get with a try/catch?)
         final ZonedDateTime myDateTime = zdt.withZoneSameLocal((ZoneId.of("America/New_York")));
-        System.out.println("Bot's LDT: " + myDateTime.toString() + ".");
+        // System.out.println("Bot's LDT: " + myDateTime.toString() + ", T=" + myDateTime.toEpochSecond() + ".");
         
-        // Construct new local datetime with current list pointers
-        // Convert from issuer's time zone -> my time zone
-        // Increment day, ripple carry through months/years
-        // RBConfig.getTimeZone()
+        // TODO: Increment day, ripple carry through months/years
         
         return myDateTime.toEpochSecond();
       }

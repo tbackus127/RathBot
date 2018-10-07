@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.TreeMap;
 
@@ -30,7 +31,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
   private static final String REGEX_SPLIT_ON_CLAUSE = "(\\s+(?![^\\[]*\\]))|(\\s*/\\s*)";
   
   /** Match a sequence of comma-separated numbers inside of square brackets. */
-  private static final String REGEX_MATCH_BRACKET_LIST = "\\[((\\d+)|(\\w{3}))(\\s*,\\s*((\\d+)|(\\w{3})))*\\]";
+  private static final String REGEX_MATCH_BRACKET_LIST = "\\[\\s*((\\d+)|(\\w{3}))(\\s*,\\s*((\\d+)|(\\w{3}))\\s*)*\\s*\\]";
   
   /** The number of next configurations to try before giving up. */
   private static final int VALID_DATE_SEARCH_MAX_ITERATIONS = 8;
@@ -586,18 +587,25 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     String[] monthTokens = null;
     if (!monthsString.matches(REGEX_MATCH_BRACKET_LIST)) {
       
+      if (DEBUG_MODE) System.out.println("Is not bracket list.");
+      
       // Translate the asterisk to its alias
       if (monthsString.equals("*")) {
         
+        if (DEBUG_MODE) System.out.println("Is asterisk.");
         monthsString = ASTERISK_MONTHS;
         
       } else {
         
         // Check if the current token is a three-letter month abbreviation
         int m = -1;
-        if (MONTH_ALIASES.containsKey(monthsString.toLowerCase())) {
-          m = MONTH_ALIASES.get(monthsString.toLowerCase());
+        monthsString = monthsString.trim().toLowerCase();
+        
+        if (MONTH_ALIASES.containsKey(monthsString)) {
+          m = MONTH_ALIASES.get(monthsString);
         } else {
+          
+          if (DEBUG_MODE) System.out.println("Months string: " + monthsString);
           
           // Otherwise, parse as a single value and surround in square brackets
           try {
@@ -613,22 +621,29 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         
       }
       
+    } else {
+      if (DEBUG_MODE) System.out.println("Is bracket list.");
     }
     
     // Trim square brackets and split on comma
+    monthsString = monthsString.trim();
     monthsString = monthsString.substring(1, monthsString.length() - 1);
     monthTokens = monthsString.split("\\s*,\\s*");
     
-    if (DEBUG_MODE) System.out.println("Month tokens: " + monthTokens.toString());
+    if (DEBUG_MODE) System.out.println("Month tokens: " + Arrays.toString(monthTokens));
     
     // Convert each index to an integer and add it to the months list
-    for (final String monthTok : monthTokens) {
+    for (String monthTok : monthTokens) {
       
       int m = -1;
+      monthTok = monthTok.trim();
+      
+      if (DEBUG_MODE) System.out.println("Month token: \"" + monthTok + "\".");
       
       // Check if the current token is a three-letter month abbreviation
       if (MONTH_ALIASES.containsKey(monthTok.toLowerCase())) {
         m = MONTH_ALIASES.get(monthTok.toLowerCase());
+        if (DEBUG_MODE) System.out.println("Translated to " + m + ".");
       } else {
         
         // If not, parse it as a number
@@ -675,6 +690,8 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         
         // Otherwise, parse as a single value and surround in square brackets
         int d = -1;
+        daysString = daysString.trim();
+        
         try {
           d = Integer.parseInt(daysString);
         } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
@@ -689,13 +706,15 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     }
     
     // Trim square brackets and split on comma
+    daysString = daysString.trim();
     daysString = daysString.substring(1, daysString.length() - 1);
     dayTokens = daysString.split("\\s*,\\s*");
     
     // Convert each index to an integer and add it to the days list
-    for (final String dayTok : dayTokens) {
+    for (String dayTok : dayTokens) {
       
       int d = -1;
+      dayTok = dayTok.trim();
       
       try {
         d = Integer.parseInt(dayTok);
@@ -738,6 +757,8 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         
         // Otherwise, parse as a single value and surround in square brackets
         int y = -1;
+        yearsString = yearsString.trim();
+        
         try {
           y = Integer.parseInt(yearsString);
         } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
@@ -763,13 +784,15 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     }
     
     // Trim square brackets and split on comma
+    yearsString = yearsString.trim();
     yearsString = yearsString.substring(1, yearsString.length() - 1);
     yearTokens = yearsString.split("\\s*,\\s*");
     
     // Convert each index to an integer and add it to the years list
-    for (final String yearTok : yearTokens) {
+    for (String yearTok : yearTokens) {
       
       int d = -1;
+      yearTok = yearTok.trim();
       
       try {
         d = Integer.parseInt(yearTok);
@@ -810,6 +833,9 @@ HELP message:
     Years: Specify the 4-digit year. Lists and asterisks are supported.
     Examples: "on 7/21/2020", "on dec 25 *", "on [1, 15] * 2019", "on * * *", "on [1,7] [1,7,14,21,28] [2018,2019,2020]"
     (If no date is specified, today will be used unless the time has expired, then tomorrow will be used)
+    
+    
+    
   Reminder Message
     Must start with the word "to".
 

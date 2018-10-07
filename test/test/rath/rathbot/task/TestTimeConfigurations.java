@@ -209,7 +209,15 @@ public class TestTimeConfigurations {
           add(ZonedDateTime.of(2024, 2, 14, 0, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
           
         }
-      })
+      }),
+      
+      new AbsTimeTestEntry("at 4:53 pm on dec 31 2021", new ArrayList<Long>() {
+        {
+          
+          add(ZonedDateTime.of(2021, 12, 31, 16, 53, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          
+        }
+      }),
   };
   
   @SuppressWarnings("serial")
@@ -288,17 +296,35 @@ public class TestTimeConfigurations {
         }
       }),
       
-      new AbsTimeTestEntry("at 10:00 AM on jan/[1, 27]/[2023]", new ArrayList<Long>() {
+      new AbsTimeTestEntry("at 10:05 AM on jan/[1, 27]/[2023]", new ArrayList<Long>() {
         {
-          add(ZonedDateTime.of(2023, 1, 1, 10, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
-          add(ZonedDateTime.of(2023, 1, 27, 10, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          add(ZonedDateTime.of(2023, 1, 1, 10, 5, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          add(ZonedDateTime.of(2023, 1, 27, 10, 5, 0, 0, TEST_ZONE_ID).toEpochSecond());
         }
       }),
       new AbsTimeTestEntry("at 1700 on */[1,8,20]/2024", generate1820()),
       
       new AbsTimeTestEntry("on */*/* at 1400", generateAll14()),
+      
+      new AbsTimeTestEntry("on [ jan , dec ] [ 30 , 31 ] [ 2020, 2022] at 21:30", new ArrayList<Long>() {
+        {
+          add(ZonedDateTime.of(2020, 1, 30, 21, 30, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          add(ZonedDateTime.of(2020, 1, 31, 21, 30, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          add(ZonedDateTime.of(2020, 12, 30, 21, 30, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          add(ZonedDateTime.of(2020, 12, 31, 21, 30, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          add(ZonedDateTime.of(2022, 1, 30, 21, 30, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          add(ZonedDateTime.of(2022, 1, 31, 21, 30, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          add(ZonedDateTime.of(2022, 12, 30, 21, 30, 0, 0, TEST_ZONE_ID).toEpochSecond());
+          add(ZonedDateTime.of(2022, 12, 31, 21, 30, 0, 0, TEST_ZONE_ID).toEpochSecond());
+        }
+      }),
   };
   //@formatter:on
+  
+  // TODO: Put relative config tests here
+  private static final AbsTimeTestEntry[] GOOD_RELATIVE_CONFIGS = {
+      
+  };
   
   // at */*/* at 1400
   private static final ArrayList<Long> generateAll14() {
@@ -570,6 +596,8 @@ public class TestTimeConfigurations {
       }
       
       final Iterator<Long> itr = atc.iterator();
+      
+      // for (int j = 0; j < 50 && j < entry.getExpected().size(); j++) {
       for (int j = 0; j < entry.getExpected().size(); j++) {
         
         final Long expectedVal = entry.getExpected().get(j);

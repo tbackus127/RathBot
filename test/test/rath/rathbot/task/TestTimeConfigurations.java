@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import com.rath.rathbot.task.time.AbsoluteTimeConfiguration;
 import com.rath.rathbot.task.time.BadTimeConfigException;
+import com.rath.rathbot.task.time.InternalTimeConfigException;
 
 public class TestTimeConfigurations {
   
@@ -329,6 +330,8 @@ public class TestTimeConfigurations {
   // at */*/* at 1400
   private static final ArrayList<Long> generateAll14() {
     
+    final ZonedDateTime currZdt = ZonedDateTime.now(TEST_ZONE_ID);
+    
     final ArrayList<Long> result = new ArrayList<Long>();
     int iterations = 0;
     
@@ -349,7 +352,13 @@ public class TestTimeConfigurations {
             continue;
           }
           
-          result.add(ZonedDateTime.of(d, LocalTime.of(14, 0), TEST_ZONE_ID).toEpochSecond());
+          final ZonedDateTime genZdt = ZonedDateTime.of(d, LocalTime.of(14, 0), TEST_ZONE_ID);
+          
+          if(genZdt.compareTo(currZdt) <= 0) {
+            continue; 
+          }
+          
+          result.add(genZdt.toEpochSecond());
           iterations++;
           
         }
@@ -434,6 +443,8 @@ public class TestTimeConfigurations {
       try {
         new AbsoluteTimeConfiguration(config, TEST_ZONE_ID);
       } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
+        caughtExc = true;
+      } catch (@SuppressWarnings("unused") InternalTimeConfigException itc) {
         caughtExc = true;
       }
       

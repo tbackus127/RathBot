@@ -38,7 +38,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
   private static final String REGEX_MATCH_BRACKET_LIST = "\\[\\s*((\\d+)|(\\w{3}))(\\s*,\\s*((\\d+)|(\\w{3}))\\s*)*\\s*\\]";
   
   /** The number of next configurations to try before giving up. */
-  private static final int VALID_DATE_SEARCH_MAX_ITERATIONS = 8;
+  private static final int VALID_DATE_SEARCH_MAX_ITERATIONS = 10000;
   
   /** The minimum year that can be specified. */
   private static final int YEAR_MIN = 2018;
@@ -302,39 +302,48 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       @Override
       public Long next() {
         
-        boolean validDateFound = false;
-        ZonedDateTime zdt = null;
+        final ZonedDateTime currentZdt = ZonedDateTime.now(getFromTimeZone());
         
         // If we haven't found a valid date yet, keep looping until we do, or until we run out of tries
+        boolean validDateFound = false;
+        ZonedDateTime genZdt = null;
         for (int i = 0; !validDateFound && i < VALID_DATE_SEARCH_MAX_ITERATIONS; i++) {
           
           // If a combination isn't valid, try the next one
           try {
-            zdt = ZonedDateTime.of(getCurrentYear(), getCurrentMonth(), getCurrentDay(), getHour(), getMinute(), 0, 0,
-                getFromTimeZone());
+            genZdt = ZonedDateTime.of(getCurrentYear(), getCurrentMonth(), getCurrentDay(), getHour(), getMinute(), 0,
+                0, getFromTimeZone());
           } catch (@SuppressWarnings("unused") DateTimeException dte) {
             propogateCounters();
             continue;
           }
+          
+          // If a past date is generated, try the next one
+          if (genZdt.compareTo(currentZdt) <= 0) {
+            propogateCounters();
+            continue;
+          }
+          
           validDateFound = true;
           
         }
         
         // If we couldn't find a valid date/time, stop.
         // TODO: Handle this null return
-        if (zdt == null) {
+        if (genZdt == null) {
           System.err.println("Could not find the next valid date/time!");
           return null;
         }
         
-        if (DEBUG_MODE) System.out.println("\nIssuer's LDT: " + zdt.toString() + ", T=" + zdt.toEpochSecond() + ".");
+        if (DEBUG_MODE)
+          System.out.println("\nIssuer's LDT: " + genZdt.toString() + ", T=" + genZdt.toEpochSecond() + ".");
         
         // If in production, load from the config file. If not, use the test zone ID
         ZonedDateTime botZdt;
         try {
-          botZdt = zdt.withZoneSameLocal(RBConfig.getTimeZone());
+          botZdt = genZdt.withZoneSameLocal(RBConfig.getTimeZone());
         } catch (@SuppressWarnings("unused") NullPointerException npe) {
-          botZdt = zdt.withZoneSameLocal((TestTimeConfigurations.TEST_ZONE_ID));
+          botZdt = genZdt.withZoneSameLocal((TestTimeConfigurations.TEST_ZONE_ID));
         }
         
         if (DEBUG_MODE) System.out.println("Bot's LDT: " + botZdt.toString() + ", T=" + botZdt.toEpochSecond() + ".");

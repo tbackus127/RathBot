@@ -3,12 +3,12 @@ package test.rath.rathbot.task;
 
 import java.util.ArrayList;
 
-public class AbsTimeTestEntry {
+public class AbsoluteTimeTestEntry {
   
   private final String configString;
   private final ArrayList<Long> expected;
   
-  public AbsTimeTestEntry(final String config, ArrayList<Long> exp) {
+  public AbsoluteTimeTestEntry(final String config, ArrayList<Long> exp) {
     this.configString = config;
     this.expected = exp;
   }

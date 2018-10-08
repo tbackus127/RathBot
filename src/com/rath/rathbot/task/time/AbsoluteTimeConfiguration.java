@@ -149,10 +149,12 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
    * 
    * @throws BadTimeConfigException when the configString parameter is invalid.
    */
-  public AbsoluteTimeConfiguration(final String configString, final ZoneId timeZone) throws BadTimeConfigException {
-    super(TimeConfigurationType.ABSOLUTE, configString);
+  public AbsoluteTimeConfiguration(String configString, final ZoneId timeZone) throws BadTimeConfigException {
+    super(TimeConfigurationType.ABSOLUTE, configString.trim());
     
     if (DEBUG_MODE) System.out.println("Entered constructor.");
+    
+    configString = configString.trim();
     
     this.fromTimeZone = timeZone;
     
@@ -171,9 +173,9 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     if (DEBUG_MODE) System.out.println("Parsing clauses.");
     for (int i = 0; i < clauseTokens.length; i += 2) {
       if (clauseTokens[i].equals("at")) {
-        parseAtClause(clauseTokens[i + 1]);
+        parseAtClause(clauseTokens[i + 1].trim());
       } else if (clauseTokens[i].equals("on")) {
-        parseOnClause(clauseTokens[i + 1]);
+        parseOnClause(clauseTokens[i + 1].trim());
       }
     }
     
@@ -329,10 +331,9 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         }
         
         // If we couldn't find a valid date/time, stop.
-        // TODO: Handle this null return
         if (genZdt == null) {
           System.err.println("Could not find the next valid date/time!");
-          return null;
+          throw new InternalTimeConfigException("Could not find the next valid date/time!");
         }
         
         if (DEBUG_MODE)
@@ -576,12 +577,6 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     if (onTokens.length == 3) {
       handleYears(onTokens[2].trim());
     } else {
-      
-      // If not, check if there is only one month/day
-      // TODO: Why is "on [Jan,Feb] [1,17] *" not allowed?
-      if (this.monthList.size() != 1 || this.dayList.size() != 1) {
-        throw new BadTimeConfigException(TimeExceptionReason.ABS_YEAR_REQUIRED);
-      }
       
       ZonedDateTime desiredZdt = ZonedDateTime.now(this.fromTimeZone).withMonth(this.monthList.get(0)).withDayOfMonth(
           this.dayList.get(0));
@@ -841,22 +836,16 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
 /*
 
 HELP message:
-  Time Clause: "at [4-digit military time (":" is optional)] or [ Hours:Minutes (AM or PM) ] or [Hours (am or pm)]
+  At-clause: "at [4-digit military time (":" is optional)] or [ Hours:Minutes (AM or PM) ] or [Hours (am or pm)]
     Examples: "at 6pm", "at 1900", "at 5:45 PM"
-    (If no time is specified, 6:00 AM will be used)
-  Date Clause: "on ( [Months] [Days] [Years] ) or (Month#/Day#/Year#)"
+    (If no time is specified, midnight will be used)
+  On-clause: "on ( [Months] [Days] [Years (optional)] ) or ([Months]/[Days]/[Years (optional)])"
     Months: Specify the month number (1-12) or the first three letters of the month. List them in []'s with a comma separating them. Replace this
       field with an asterisk (*) to specify all months.
     Days: Specify the day number. Lists and asterisks are supported.
     Years: Specify the 4-digit year. Lists and asterisks are supported.
-    Examples: "on 7/21/2020", "on dec 25 *", "on [1, 15] * 2019", "on * * *", "on [1,7] [1,7,14,21,28] [2018,2019,2020]"
-    (If no date is specified, today will be used unless the time has expired, then tomorrow will be used)
-    
-    
-    
-  Reminder Message
-    Must start with the word "to".
-
+    Examples: "on 7/21/2020", "on dec 25 *", "on [1, 15] * 2019", "on * * *", "on [1,7] [1,7,14,21,28]"
+    If no on-clause is specified, today will be used unless the time has expired. In that case, tomorrow will be used.
 
 
 :: Ideas ::
@@ -865,7 +854,7 @@ Shortcut aliases (on-clause):
 * "every month" -> "on * 1 *"
 * "every day" -> "on * * *"
 * "every week" -> "on * [1,7,14,21,28] *"
-("tomorrow", "next week", and "next month" are handled by the relative time configuration)
+("next week", and "next month" are handled by the relative time configuration)
 
 Shortcuts (at-clause):
 * "noon"/"in the afternoon" -> 1200 (today)

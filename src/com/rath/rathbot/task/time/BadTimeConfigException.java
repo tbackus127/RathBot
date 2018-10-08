@@ -5,8 +5,14 @@ public class BadTimeConfigException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
   
-  public BadTimeConfigException() {
-    
+  private final TimeExceptionReason reason;
+  
+  public BadTimeConfigException(final TimeExceptionReason reason) {
+    this.reason = reason;
+  }
+  
+  public String getReason() {
+    return this.reason.getReasonString();
   }
   
 }

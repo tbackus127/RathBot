@@ -19,7 +19,7 @@ import com.rath.rathbot.task.time.BadTimeConfigException;
 
 public class TestTimeConfigurations {
   
-  static final ZoneId TEST_ZONE_ID = ZoneId.of("America/New_York");
+  public static final ZoneId TEST_ZONE_ID = ZoneId.of("America/New_York");
   
   private static final int MAX_WILDCARD_ITERATIONS = 1000;
   

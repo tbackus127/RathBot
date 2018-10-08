@@ -10,6 +10,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import com.rath.rathbot.RBConfig;
+
+import test.rath.rathbot.task.TestTimeConfigurations;
+
 /**
  * This class handles all time configurations that happen at specific points in time. e.g.: at February 10, 2019 at 6:00
  * PM CST.
@@ -152,17 +156,15 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     
     this.fromTimeZone = timeZone;
     
-    // At least 4 tokens are required ("on"/"at", on/at-clause, "to", to-clause)
+    // At least 2 tokens are required ("on"/"at", on/at-clause)
     final String[] clauseTokens = configString.split(REGEX_SPLIT_CLAUSES);
     if (clauseTokens == null || clauseTokens.length < 2) {
-      if (DEBUG_MODE) System.out.println("ERR001.");
-      throw new BadTimeConfigException();
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_MISSING_CLAUSES);
     }
     
     // If the clause tokens length is not even, throw an exception
     if (clauseTokens.length % 2 == 1) {
-      if (DEBUG_MODE) System.out.println("ERR002.");
-      throw new BadTimeConfigException();
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_MISSING_CLAUSE_ARGS);
     }
     
     // Parse both at/on-clauses
@@ -224,8 +226,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     // Check if every field was initialized; if not, throw an exception
     if (this.monthPos == -1 || this.dayPos == -1 || this.yearPos == -1 || this.monthList == null || this.dayList == null
         || this.yearList == null) {
-      if (DEBUG_MODE) System.out.println("ERR003");
-      throw new BadTimeConfigException();
+      throw new InternalTimeConfigException("A field in the time configuration object was not initialized!");
     }
     
     if (DEBUG_MODE) System.out.println("Finished construction.");
@@ -301,13 +302,13 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       @Override
       public Long next() {
         
-        // TODO: Make the year wildcard store the current year in its pos field
-        
         boolean validDateFound = false;
         ZonedDateTime zdt = null;
         
+        // If we haven't found a valid date yet, keep looping until we do, or until we run out of tries
         for (int i = 0; !validDateFound && i < VALID_DATE_SEARCH_MAX_ITERATIONS; i++) {
           
+          // If a combination isn't valid, try the next one
           try {
             zdt = ZonedDateTime.of(getCurrentYear(), getCurrentMonth(), getCurrentDay(), getHour(), getMinute(), 0, 0,
                 getFromTimeZone());
@@ -319,21 +320,29 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
           
         }
         
+        // If we couldn't find a valid date/time, stop.
+        // TODO: Handle this null return
         if (zdt == null) {
           System.err.println("Could not find the next valid date/time!");
           return null;
         }
         
-        // System.out.println("\nIssuer's LDT: " + zdt.toString() + ", T=" + zdt.toEpochSecond() + ".");
+        if (DEBUG_MODE) System.out.println("\nIssuer's LDT: " + zdt.toString() + ", T=" + zdt.toEpochSecond() + ".");
         
-        // TODO: Use RBConfig.getTimeZone() in production (surround the get with a try/catch?)
-        final ZonedDateTime myDateTime = zdt.withZoneSameLocal((ZoneId.of("America/New_York")));
-        // System.out.println("Bot's LDT: " + myDateTime.toString() + ", T=" + myDateTime.toEpochSecond() + ".");
+        // If in production, load from the config file. If not, use the test zone ID
+        ZonedDateTime botZdt;
+        try {
+          botZdt = zdt.withZoneSameLocal(RBConfig.getTimeZone());
+        } catch (@SuppressWarnings("unused") NullPointerException npe) {
+          botZdt = zdt.withZoneSameLocal((TestTimeConfigurations.TEST_ZONE_ID));
+        }
+        
+        if (DEBUG_MODE) System.out.println("Bot's LDT: " + botZdt.toString() + ", T=" + botZdt.toEpochSecond() + ".");
         
         // Increment day, ripple carry through months/years
         propogateCounters();
         
-        return myDateTime.toEpochSecond();
+        return botZdt.toEpochSecond();
       }
       
     };
@@ -390,8 +399,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     // Split the at-clause into tokens and handle each
     final String[] atTokens = atClause.split(REGEX_SPLIT_AT_CLAUSE);
     if (atTokens == null || atTokens.length < 2 || atTokens.length > 3) {
-      if (DEBUG_MODE) System.out.println("ERR004");
-      throw new BadTimeConfigException();
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_BAD_AT_CLAUSE);
     }
     
     // Military or hour-only ({19, 00} or {7, PM})
@@ -434,14 +442,12 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       h = Integer.parseInt(hourString);
       if (DEBUG_MODE) System.out.println("Hour only: Parsed " + h + ".");
     } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
-      if (DEBUG_MODE) System.out.println("ERR005");
-      throw new BadTimeConfigException();
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_HOUR_NAN);
     }
     
     // Check out of bounds
     if (h < HOUR_12_MIN || h > HOUR_12_MAX) {
-      if (DEBUG_MODE) System.out.println("ERR006");
-      throw new BadTimeConfigException();
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_12HOUR_OOB);
     }
     
     // Convert to 24-hour time
@@ -468,19 +474,26 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     
     // Parse the hour and minute strings
     int h = -1;
-    int m = -1;
     try {
       h = Integer.parseInt(hourString);
+    } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_HOUR_NAN);
+    }
+    
+    int m = -1;
+    
+    try {
       m = Integer.parseInt(minutesString);
     } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
-      if (DEBUG_MODE) System.out.println("ERR007");
-      throw new BadTimeConfigException();
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_MINUTE_NAN);
     }
     
     // Check out of bounds
-    if (h < HOUR_24_MIN || h > HOUR_24_MAX || m < MINUTE_MIN || m > MINUTE_MAX) {
-      if (DEBUG_MODE) System.out.println("ERR008");
-      throw new BadTimeConfigException();
+    if (h < HOUR_24_MIN || h > HOUR_24_MAX) {
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_24HOUR_OOB);
+    }
+    if (m < MINUTE_MIN || m > MINUTE_MAX) {
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_MINUTE_OOB);
     }
     
     // Set time fields
@@ -500,19 +513,25 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     
     // Parse the hour and minute strings
     int h = -1;
-    int m = -1;
     try {
       h = Integer.parseInt(hourString);
+    } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_HOUR_NAN);
+    }
+    
+    int m = -1;
+    try {
       m = Integer.parseInt(minutesString);
     } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
-      if (DEBUG_MODE) System.out.println("ERR009");
-      throw new BadTimeConfigException();
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_MINUTE_NAN);
     }
     
     // Check out of bounds
-    if (h < HOUR_12_MIN || h > HOUR_12_MAX || m < MINUTE_MIN || m > MINUTE_MAX) {
-      if (DEBUG_MODE) System.out.println("ERR010");
-      throw new BadTimeConfigException();
+    if (h < HOUR_12_MIN || h > HOUR_12_MAX) {
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_12HOUR_OOB);
+    }
+    if (m < MINUTE_MIN || m > MINUTE_MAX) {
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_MINUTE_OOB);
     }
     
     // Convert to 24-hour time
@@ -538,8 +557,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     // Split the at-clause into tokens and handle each
     final String[] onTokens = onClause.split(REGEX_SPLIT_ON_CLAUSE);
     if (onTokens == null || onTokens.length < 2 || onTokens.length > 3) {
-      if (DEBUG_MODE) System.out.println("ERR011");
-      throw new BadTimeConfigException();
+      throw new BadTimeConfigException(TimeExceptionReason.ABS_BAD_ON_CLAUSE);
     }
     
     handleMonths(onTokens[0].trim());
@@ -551,9 +569,9 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     } else {
       
       // If not, check if there is only one month/day
+      // TODO: Why is "on [Jan,Feb] [1,17] *" not allowed?
       if (this.monthList.size() != 1 || this.dayList.size() != 1) {
-        if (DEBUG_MODE) System.out.println("ERR012");
-        throw new BadTimeConfigException();
+        throw new BadTimeConfigException(TimeExceptionReason.ABS_YEAR_REQUIRED);
       }
       
       ZonedDateTime desiredZdt = ZonedDateTime.now(this.fromTimeZone).withMonth(this.monthList.get(0)).withDayOfMonth(
@@ -611,8 +629,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
           try {
             m = Integer.parseInt(monthsString);
           } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
-            if (DEBUG_MODE) System.out.println("ERR013");
-            throw new BadTimeConfigException();
+            throw new BadTimeConfigException(TimeExceptionReason.ABS_MONTH_NAN);
           }
           
         }
@@ -650,16 +667,14 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         try {
           m = Integer.parseInt(monthTok);
         } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
-          if (DEBUG_MODE) System.out.println("ERR014");
-          throw new BadTimeConfigException();
+          throw new BadTimeConfigException(TimeExceptionReason.ABS_MONTH_NAN);
         }
         
       }
       
       // Check out of bounds
       if (m < MONTH_MIN || m > MONTH_MAX) {
-        if (DEBUG_MODE) System.out.println("ERR015");
-        throw new BadTimeConfigException();
+        throw new BadTimeConfigException(TimeExceptionReason.ABS_MONTH_OOB);
       }
       
       this.monthList.add(m);
@@ -695,8 +710,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         try {
           d = Integer.parseInt(daysString);
         } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
-          if (DEBUG_MODE) System.out.println("ERR016");
-          throw new BadTimeConfigException();
+          throw new BadTimeConfigException(TimeExceptionReason.ABS_DAY_NAN);
         }
         
         daysString = "[" + d + "]";
@@ -719,14 +733,12 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       try {
         d = Integer.parseInt(dayTok);
       } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
-        if (DEBUG_MODE) System.out.println("ERR017");
-        throw new BadTimeConfigException();
+        throw new BadTimeConfigException(TimeExceptionReason.ABS_DAY_NAN);
       }
       
       // Check out of bounds
       if (d < DAY_MIN || d > DAY_MAX) {
-        if (DEBUG_MODE) System.out.println("ERR018");
-        throw new BadTimeConfigException();
+        throw new BadTimeConfigException(TimeExceptionReason.ABS_DAY_OOB);
       }
       
       this.dayList.add(d);
@@ -762,8 +774,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         try {
           y = Integer.parseInt(yearsString);
         } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
-          if (DEBUG_MODE) System.out.println("ERR019");
-          throw new BadTimeConfigException();
+          throw new BadTimeConfigException(TimeExceptionReason.ABS_YEAR_NAN);
         }
         
         // If the year was specified with two digits, add 2000 to the year
@@ -773,8 +784,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
         
         // Check out of bounds
         if (y < YEAR_MIN || y > YEAR_MAX) {
-          if (DEBUG_MODE) System.out.println("ERR020");
-          throw new BadTimeConfigException();
+          throw new BadTimeConfigException(TimeExceptionReason.ABS_YEAR_OOB);
         }
         
         yearsString = "[" + y + "]";
@@ -797,8 +807,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       try {
         d = Integer.parseInt(yearTok);
       } catch (@SuppressWarnings("unused") NumberFormatException nfe) {
-        if (DEBUG_MODE) System.out.println("ERR021");
-        throw new BadTimeConfigException();
+        throw new BadTimeConfigException(TimeExceptionReason.ABS_DAY_NAN);
       }
       
       this.yearList.add(d);

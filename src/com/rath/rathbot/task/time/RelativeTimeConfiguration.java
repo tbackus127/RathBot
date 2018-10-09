@@ -2,13 +2,14 @@
 package com.rath.rathbot.task.time;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Iterator;
 
 public class RelativeTimeConfiguration extends TimeConfiguration {
   
   private final long scheduleTime;
   
-  public RelativeTimeConfiguration(final String timeString) {
+  public RelativeTimeConfiguration(final String timeString, final ZoneId testZoneId) {
     super(TimeConfigurationType.RELATIVE, timeString);
     this.scheduleTime = Instant.now().getEpochSecond();
   }

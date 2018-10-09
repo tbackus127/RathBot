@@ -17,12 +17,23 @@ import org.junit.Test;
 import com.rath.rathbot.task.time.AbsoluteTimeConfiguration;
 import com.rath.rathbot.task.time.BadTimeConfigException;
 import com.rath.rathbot.task.time.InternalTimeConfigException;
+import com.rath.rathbot.task.time.RelativeTimeConfiguration;
 
 public class TestTimeConfigurations {
   
   public static final ZoneId TEST_ZONE_ID = ZoneId.of("America/New_York");
   
+  public static final int SPAN_FLAG_MINUTE = 1;
+  public static final int SPAN_FLAG_HOUR = 2;
+  public static final int SPAN_FLAG_DAY = 4;
+  public static final int SPAN_FLAG_WEEK = 8;
+  public static final int SPAN_FLAG_MONTH = 16;
+  public static final int SPAN_FLAG_YEAR = 32;
+  
   private static final int MAX_WILDCARD_ITERATIONS = 1000;
+  private static final int RELATIVE_TEST_SIZE = 10;
+  
+  private static final long RELATIVE_EPOCH_SECOND_ERR = 3;
   
   static final ZonedDateTime ZDT_NOW = ZonedDateTime.now(TEST_ZONE_ID);
   static final ZonedDateTime ZDT_START_OF_TODAY = ZDT_NOW.truncatedTo(ChronoUnit.DAYS);
@@ -343,36 +354,286 @@ public class TestTimeConfigurations {
       }),
   };
   
-  // TODO: Figure out if an interval produces equal epoch time deltas between each iteration
   @SuppressWarnings("serial")
   private static final RelativeTimeTestEntry[] GOOD_RELATIVE_CONFIGS = {
-      new RelativeTimeTestEntry("1m", 0, 0, 0, 0, 0, 1),
-      new RelativeTimeTestEntry("7m", 0, 0, 0, 0, 0, 7),
-      new RelativeTimeTestEntry("40m", 0, 0, 0, 0, 0, 40),
-      new RelativeTimeTestEntry("1h", 0, 0, 0, 0, 1, 0),
-      new RelativeTimeTestEntry("9h", 0, 0, 0, 0, 9, 0),
-      new RelativeTimeTestEntry("23h", 0, 0, 0, 0, 23, 0),
-      new RelativeTimeTestEntry("76h", 0, 0, 0, 0, 76, 0),
-      new RelativeTimeTestEntry("1d", 0, 0, 0, 1, 0, 0),
-      new RelativeTimeTestEntry("6d", 0, 0, 0, 6, 0, 0),
-      new RelativeTimeTestEntry("31d", 0, 0, 0, 31, 0, 0),
-      new RelativeTimeTestEntry("117d", 0, 0, 0, 117, 0, 0),
-      new RelativeTimeTestEntry("1w", 0, 0, 1, 0, 0, 0),
-      new RelativeTimeTestEntry("4w", 0, 0, 4, 0, 0, 0),
-      new RelativeTimeTestEntry("33w", 0, 0, 33, 0, 0, 0),
-      new RelativeTimeTestEntry("201w", 0, 0, 201, 0, 0, 0),
-      new RelativeTimeTestEntry("1M", 0, 1, 0, 0, 0, 0),
-      new RelativeTimeTestEntry("4M", 0, 4, 0, 0, 0, 0),
-      new RelativeTimeTestEntry("11M", 0, 11, 0, 0, 0, 0),
-      new RelativeTimeTestEntry("35M", 0, 35, 0, 0, 0, 0),
-      new RelativeTimeTestEntry("1y", 1, 0, 0, 0, 0, 0),
-      new RelativeTimeTestEntry("3y", 3, 0, 0, 0, 0, 0),
-      new RelativeTimeTestEntry("2h3m", 0, 0, 0, 0, 2, 3),
-      new RelativeTimeTestEntry("8d9h13m", 0, 0, 0, 8, 9, 13),
-      new RelativeTimeTestEntry("3w4d30m", 0, 0, 3, 4, 0, 30),
-      new RelativeTimeTestEntry("2M3d", 0, 2, 0, 3, 0, 0),
-      new RelativeTimeTestEntry("1y4M7m", 1, 4, 0, 0, 0, 7),
-      new RelativeTimeTestEntry("2y9M3w1d7h50m", 2, 9, 3, 1, 7, 50)
+      new RelativeTimeTestEntry("1m", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(1);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.MINUTES);
+        }
+      })),
+      new RelativeTimeTestEntry("7m", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(7);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.MINUTES);
+        }
+      })),
+      new RelativeTimeTestEntry("40m", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(40);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.MINUTES);
+        }
+      })),
+      new RelativeTimeTestEntry("177m", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(177);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.MINUTES);
+        }
+      })),
+      new RelativeTimeTestEntry("1h", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(1);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.HOURS);
+        }
+      })),
+      new RelativeTimeTestEntry("9h", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(9);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.HOURS);
+        }
+      })),
+      new RelativeTimeTestEntry("23h", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(23);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.HOURS);
+        }
+      })),
+      new RelativeTimeTestEntry("76h", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(76);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.HOURS);
+        }
+      })),
+      new RelativeTimeTestEntry("1d", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(1);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.DAYS);
+        }
+      })),
+      new RelativeTimeTestEntry("6d", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(6);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.DAYS);
+        }
+      })),
+      new RelativeTimeTestEntry("28d", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(28);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.DAYS);
+        }
+      })),
+      new RelativeTimeTestEntry("117d", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(117);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.DAYS);
+        }
+      })),
+      new RelativeTimeTestEntry("1w", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(1);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.WEEKS);
+        }
+      })),
+      new RelativeTimeTestEntry("4w", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(4);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.WEEKS);
+        }
+      })),
+      new RelativeTimeTestEntry("33w", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(33);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.WEEKS);
+        }
+      })),
+      new RelativeTimeTestEntry("201w", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(201);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.WEEKS);
+        }
+      })),
+      new RelativeTimeTestEntry("1M", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(1);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.MONTHS);
+        }
+      })),
+      new RelativeTimeTestEntry("4M", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(4);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.MONTHS);
+        }
+      })),
+      new RelativeTimeTestEntry("11M", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(11);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.MONTHS);
+        }
+      })),
+      new RelativeTimeTestEntry("35M", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(35);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.MONTHS);
+        }
+      })),
+      new RelativeTimeTestEntry("1y", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(1);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.YEARS);
+        }
+      })),
+      new RelativeTimeTestEntry("3y", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(3);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.YEARS);
+        }
+      })),
+      new RelativeTimeTestEntry("2h3m", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(2);
+          add(3);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.HOURS);
+          add(ChronoUnit.MINUTES);
+        }
+      })),
+      new RelativeTimeTestEntry("8d9h13m", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(8);
+          add(9);
+          add(13);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.DAYS);
+          add(ChronoUnit.HOURS);
+          add(ChronoUnit.MINUTES);
+        }
+      })),
+      new RelativeTimeTestEntry("3w4d30m", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(3);
+          add(4);
+          add(30);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.WEEKS);
+          add(ChronoUnit.DAYS);
+          add(ChronoUnit.MINUTES);
+        }
+      })),
+      new RelativeTimeTestEntry("2M3d", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(2);
+          add(3);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.MONTHS);
+          add(ChronoUnit.DAYS);
+        }
+      })),
+      new RelativeTimeTestEntry("1y4M7m", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(1);
+          add(4);
+          add(7);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.YEARS);
+          add(ChronoUnit.MONTHS);
+          add(ChronoUnit.MINUTES);
+        }
+      })),
+      new RelativeTimeTestEntry("2y9M3w1d7h50m", generateRelativeMultiples(new ArrayList<Integer>() {
+        {
+          add(2);
+          add(9);
+          add(3);
+          add(1);
+          add(7);
+          add(50);
+        }
+      }, new ArrayList<ChronoUnit>() {
+        {
+          add(ChronoUnit.YEARS);
+          add(ChronoUnit.MONTHS);
+          add(ChronoUnit.WEEKS);
+          add(ChronoUnit.DAYS);
+          add(ChronoUnit.HOURS);
+          add(ChronoUnit.MINUTES);
+        }
+      }))
   };
   //@formatter:on
   
@@ -469,6 +730,27 @@ public class TestTimeConfigurations {
         result.add(zdt.toEpochSecond());
         iterations++;
       }
+      
+    }
+    
+    return result;
+  }
+  
+  private static final ArrayList<Long> generateRelativeMultiples(final ArrayList<Integer> intervals,
+      final ArrayList<ChronoUnit> units) {
+    
+    final ArrayList<Long> result = new ArrayList<Long>();
+    
+    for (int i = 1; i <= RELATIVE_TEST_SIZE; i++) {
+      
+      ZonedDateTime zdt = ZDT_NOW;
+      for (int j = 0; j < intervals.size(); j++) {
+        
+        zdt = zdt.plus(intervals.get(j) * i, units.get(j));
+        
+      }
+      
+      result.add(zdt.toEpochSecond());
       
     }
     
@@ -691,6 +973,48 @@ public class TestTimeConfigurations {
     System.out.println();
     
     assertEquals(failCount, 0);
+    
+  }
+  
+  @Test
+  @SuppressWarnings("static-method")
+  public void testBadRelConfigs() {
+    
+    System.out.println("=== Testing bad relative time configs ===");
+    
+    int numErrors = 0;
+    for (int i = 0; i < BAD_FORMAT_REL_CONFIGS.length; i++) {
+      
+      final String config = BAD_FORMAT_REL_CONFIGS[i];
+      System.out.print("Testing config: \"" + config + "\":");
+      
+      boolean caughtExc = false;
+      
+      try {
+        new RelativeTimeConfiguration(config, TEST_ZONE_ID);
+      } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
+        caughtExc = true;
+      } catch (@SuppressWarnings("unused") InternalTimeConfigException itc) {
+        caughtExc = true;
+      }
+      
+      if (caughtExc) {
+        numErrors++;
+        System.out.println(" OK");
+      } else {
+        System.out.println(" NOEXCEPT");
+      }
+    }
+    
+    System.out.println();
+    
+    assertEquals(numErrors, BAD_FORMAT_REL_CONFIGS.length);
+    
+  }
+  
+  @Test
+  @SuppressWarnings("static-method")
+  public void testGoodRelConfigs() {
     
   }
   

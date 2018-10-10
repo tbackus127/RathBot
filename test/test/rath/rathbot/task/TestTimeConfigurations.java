@@ -2,6 +2,7 @@
 package test.rath.rathbot.task;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -775,8 +776,10 @@ public class TestTimeConfigurations {
         new AbsoluteTimeConfiguration(config, TEST_ZONE_ID);
       } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
         caughtExc = true;
-      } catch (@SuppressWarnings("unused") InternalTimeConfigException itc) {
-        caughtExc = true;
+      } catch (@SuppressWarnings("unused") final InternalTimeConfigException itc) {
+        System.out.println(" INTERNAL EXCEPTION");
+        numErrors++;
+        continue;
       }
       
       if (caughtExc) {
@@ -811,6 +814,10 @@ public class TestTimeConfigurations {
         new AbsoluteTimeConfiguration(config, TEST_ZONE_ID);
       } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
         caughtExc = true;
+      } catch (@SuppressWarnings("unused") final InternalTimeConfigException itc) {
+        System.out.println(" INTERNAL EXCEPTION");
+        numErrors++;
+        continue;
       }
       
       if (caughtExc) {
@@ -880,6 +887,10 @@ public class TestTimeConfigurations {
         System.out.println(" EXCEPTION");
         failCount++;
         continue;
+      } catch (@SuppressWarnings("unused") final InternalTimeConfigException itc) {
+        System.out.println(" INTERNAL EXCEPTION");
+        failCount++;
+        continue;
       }
       
       final Long expectedVal = entry.getExpected().get(0);
@@ -929,11 +940,13 @@ public class TestTimeConfigurations {
       AbsoluteTimeConfiguration atc = null;
       try {
         atc = new AbsoluteTimeConfiguration(entry.getConfigString(), TEST_ZONE_ID);
-      } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
+      } catch (@SuppressWarnings("unused") final BadTimeConfigException btc) {
         System.out.println(" EXCEPTION");
-        
-        // TODO: Stuff here
-        
+        failCount++;
+        continue;
+      } catch (@SuppressWarnings("unused") final InternalTimeConfigException itc) {
+        System.out.println(" INTERNAL EXCEPTION");
+        failCount++;
         continue;
       }
       
@@ -994,8 +1007,10 @@ public class TestTimeConfigurations {
         new RelativeTimeConfiguration(config, TEST_ZONE_ID);
       } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
         caughtExc = true;
-      } catch (@SuppressWarnings("unused") InternalTimeConfigException itc) {
+      } catch (final InternalTimeConfigException itc) {
+        itc.printStackTrace();
         caughtExc = true;
+        continue;
       }
       
       if (caughtExc) {
@@ -1015,6 +1030,57 @@ public class TestTimeConfigurations {
   @Test
   @SuppressWarnings("static-method")
   public void testGoodRelConfigs() {
+    
+    System.out.println("=== Testing good relative time configs ===");
+    
+    int failCount = 0;
+    for (int i = 0; i < GOOD_RELATIVE_CONFIGS.length; i++) {
+      
+      final RelativeTimeTestEntry currEntry = GOOD_RELATIVE_CONFIGS[i];
+      final String configString = currEntry.getConfigString();
+      
+      System.out.print("Testing config \"" + configString + "\":");
+      
+      RelativeTimeConfiguration rtc = null;
+      try {
+        rtc = new RelativeTimeConfiguration(configString, TEST_ZONE_ID);
+      } catch (@SuppressWarnings("unused") final BadTimeConfigException btc) {
+        System.out.println(" EXCEPTION");
+        failCount++;
+        continue;
+      } catch (@SuppressWarnings("unused") final InternalTimeConfigException itc) {
+        System.out.println(" INTERNAL EXCEPTION");
+        failCount++;
+        continue;
+      }
+      
+      System.out.println(" build OK");
+      
+      final Iterator<Long> itr = rtc.iterator();
+      final ArrayList<Long> expectedTimes = currEntry.getExpectedTimes();
+      for (int j = 0; j < expectedTimes.size(); j++) {
+        
+        final long exp = expectedTimes.get(j);
+        System.out.print("  #" + (j + 1) + ": Expected=" + exp + ", Result: ");
+        
+        if (!itr.hasNext()) {
+          failCount++;
+          System.out.println("ERROR, Empty");
+          continue;
+        }
+        
+        final long val = itr.next();
+        if (exp != val) {
+          failCount++;
+          System.out.println("ERROR, got" + val);
+          continue;
+        }
+        
+        System.out.println("OK");
+        
+      }
+      
+    }
     
   }
   

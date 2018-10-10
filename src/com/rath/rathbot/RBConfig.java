@@ -145,6 +145,11 @@ public class RBConfig {
   }
   
   public static final ZoneId getTimeZone() {
+    
+    if(configMap == null) {
+      return RathBot.DEFAULT_ZONE_ID;
+    }
+    
     return ZoneId.of(configMap.get("timeZone"));
   }
   

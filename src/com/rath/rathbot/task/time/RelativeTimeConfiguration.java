@@ -5,9 +5,15 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Iterator;
 
+import com.rath.rathbot.RBConfig;
+
 public class RelativeTimeConfiguration extends TimeConfiguration {
   
   private final long scheduleTime;
+  
+  public RelativeTimeConfiguration(final String timeString) {
+    this(timeString, RBConfig.getTimeZone());
+  }
   
   public RelativeTimeConfiguration(final String timeString, final ZoneId testZoneId) {
     super(TimeConfigurationType.RELATIVE, timeString);

@@ -141,6 +141,16 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
   private transient boolean parsedOn = false;
   
   /**
+   * Constructs a new AbsoluteTimeConfiguration with the default time zone ID.
+   * 
+   * @param configString The {@link String} containing the at-clause and/or on-clause (command and to-clause are not
+   *        included).
+   */
+  public AbsoluteTimeConfiguration(final String configString) {
+    this(configString, RBConfig.getTimeZone());
+  }
+  
+  /**
    * Constructs a new AbsoluteTimeConfiguration object.
    * 
    * @param configString The {@link String} containing the at-clause and/or on-clause (command and to-clause are not

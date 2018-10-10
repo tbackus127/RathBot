@@ -4,6 +4,7 @@ package com.rath.rathbot;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -64,6 +65,9 @@ public class RathBot {
   
   /** The directory that images will be contained in. */
   public static final String DIR_IMG = DIR_RES + "img/";
+  
+  /** The default time zone ID to use for testing when loading from a config file doesn't work. */
+  public static final ZoneId DEFAULT_ZONE_ID = ZoneId.of("America/New_York");
   
   /** Relative path to the bot's config file containing the authentication key. */
   private static final String CONFIG_FILE_PATH = "rathbot.conf";

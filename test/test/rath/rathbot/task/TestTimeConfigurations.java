@@ -1036,8 +1036,9 @@ public class TestTimeConfigurations {
     int failCount = 0;
     for (int i = 0; i < GOOD_RELATIVE_CONFIGS.length; i++) {
       
+      // TODO: Test both "in X" and "every X"
       final RelativeTimeTestEntry currEntry = GOOD_RELATIVE_CONFIGS[i];
-      final String configString = currEntry.getConfigString();
+      final String configString = "every " + currEntry.getConfigString();
       
       System.out.print("Testing config \"" + configString + "\":");
       
@@ -1082,6 +1083,7 @@ public class TestTimeConfigurations {
       
     }
     
+    assertEquals(failCount, 0);
   }
   
 }

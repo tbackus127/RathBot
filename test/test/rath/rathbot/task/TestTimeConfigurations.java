@@ -630,6 +630,7 @@ public class TestTimeConfigurations {
             continue;
           }
           
+          // If the date/time has already passed, try the next one
           final ZonedDateTime genZdt = ZonedDateTime.of(d, LocalTime.of(14, 0), TEST_ZONE_ID);
           if (genZdt.compareTo(currZdt) <= 0) {
             continue;
@@ -657,6 +658,7 @@ public class TestTimeConfigurations {
       for (int i = 0; i < days.length; i++) {
         final int day = days[i];
         
+        // If the date/time has already passed, try the next one
         ZonedDateTime zdt;
         try {
           zdt = ZonedDateTime.of(2024, month, day, 17, 0, 0, 0, TEST_ZONE_ID);
@@ -687,6 +689,7 @@ public class TestTimeConfigurations {
           break;
         }
         
+        // If the date/time has already passed, try the next one
         ZonedDateTime zdt;
         try {
           zdt = ZonedDateTime.of(2026, month, day, 0, 0, 0, 0, TEST_ZONE_ID);
@@ -703,18 +706,19 @@ public class TestTimeConfigurations {
     return result;
   }
   
+  // Generates a list of epoch times following the specified list of ChronoUnits with their respective intervals.
   private static final ArrayList<Long> generateRelativeMultiples(final ArrayList<Integer> intervals,
       final ArrayList<ChronoUnit> units) {
     
     final ArrayList<Long> result = new ArrayList<Long>();
     
+    // For every relative test entry
     for (int i = 1; i <= RELATIVE_TEST_SIZE; i++) {
       
+      // Set the date/time to now and add the specified amount of each unit to it
       ZonedDateTime zdt = ZDT_NOW;
       for (int j = 0; j < intervals.size(); j++) {
-        
         zdt = zdt.plus(intervals.get(j) * i, units.get(j));
-        
       }
       
       result.add(zdt.toEpochSecond());
@@ -737,7 +741,6 @@ public class TestTimeConfigurations {
       System.out.print("Testing config: \"" + config + "\":");
       
       boolean caughtExc = false;
-      
       try {
         new AbsoluteTimeConfiguration(config, TEST_ZONE_ID);
       } catch (@SuppressWarnings("unused") BadTimeConfigException btc) {
@@ -1040,9 +1043,6 @@ public class TestTimeConfigurations {
         continue;
       }
       
-      // 23 21
-      
-      // TODO: Add in error here
       long val = itr.next();
       if (Math.abs(exp - val) > RELATIVE_EPOCH_SECOND_ERR) {
         failCount++;
@@ -1083,7 +1083,6 @@ public class TestTimeConfigurations {
           continue;
         }
         
-        // TODO: Add in error here
         val = itr.next();
         if (Math.abs(exp - val) > RELATIVE_EPOCH_SECOND_ERR) {
           failCount++;

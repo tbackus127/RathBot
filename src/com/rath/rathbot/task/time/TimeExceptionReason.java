@@ -21,7 +21,9 @@ public enum TimeExceptionReason {
   ABS_MINUTE_OOB("The entered minute is not a number between 0 and 59 (inclusive)."),
   
   // TODO: Let's find a workaround for this one...
-  ABS_YEAR_REQUIRED("A year or year list must be specified when providing a month list or day-of-month list.");
+  ABS_YEAR_REQUIRED("A year or year list must be specified when providing a month list or day-of-month list."),
+  
+  REL_MISSING_CLAUSE("The time configuration screen is missing either an in-clause or an every-clause.");
   // @formatter:on
   
   private final String reasonString;

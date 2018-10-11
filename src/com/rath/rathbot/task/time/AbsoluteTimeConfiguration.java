@@ -164,6 +164,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
     
     if (DEBUG_MODE) System.out.println("Entered constructor.");
     
+    // TODO: configString is included in the parent class.
     configString = configString.trim();
     
     this.fromTimeZone = timeZone;
@@ -303,7 +304,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
   }
   
   @Override
-  public Iterator<Long> iterator() {
+  public final Iterator<Long> iterator() {
     return new Iterator<Long>() {
       
       @Override

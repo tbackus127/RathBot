@@ -15,7 +15,7 @@ import com.rath.rathbot.RBConfig;
 import test.rath.rathbot.task.TestTimeConfigurations;
 
 /**
- * This class handles all time configurations that happen at specific points in time. e.g.: at February 10, 2019 at 6:00
+ * This class handles all time configurations that happen at specific points in time. e.g.: on February 10, 2019 at 6:00
  * PM CST.
  * 
  * @author Tim Backus tbackus127@gmail.com
@@ -253,7 +253,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
    * 
    * @return the time zone as a {@link ZoneId}.
    */
-  public ZoneId getFromTimeZone() {
+  public final ZoneId getFromTimeZone() {
     return this.fromTimeZone;
   }
   
@@ -591,7 +591,7 @@ public class AbsoluteTimeConfiguration extends TimeConfiguration {
       ZonedDateTime desiredZdt = ZonedDateTime.now(this.fromTimeZone).withMonth(this.monthList.get(0)).withDayOfMonth(
           this.dayList.get(0));
       
-      // If the desired time has already passed for today, use tomorrow's date
+      // If the desired time has already passed for today, use next year's date
       if (ZonedDateTime.now(this.fromTimeZone).compareTo(desiredZdt) >= 0) {
         desiredZdt = desiredZdt.plusYears(1);
       }

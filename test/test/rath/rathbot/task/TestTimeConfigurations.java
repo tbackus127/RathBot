@@ -31,7 +31,7 @@ public class TestTimeConfigurations {
   public static final int SPAN_FLAG_MONTH = 16;
   public static final int SPAN_FLAG_YEAR = 32;
   
-  private static final int MAX_WILDCARD_ITERATIONS = 1000;
+  private static final int MAX_WILDCARD_ITERATIONS = 200;
   private static final int RELATIVE_TEST_SIZE = 10;
   
   private static final long RELATIVE_EPOCH_SECOND_ERR = 3;
@@ -76,152 +76,118 @@ public class TestTimeConfigurations {
       
       new AbsoluteTimeTestEntry("at 6pm", new ArrayList<Long>() {
         { 
-          
-          // Now: 00:12
-          // Thn: 18:00
-          
           add( (ZDT_START_OF_TODAY.plusHours(18).compareTo(ZDT_NOW) > 0 ) ?
               (ZDT_START_OF_TODAY.plusHours(18)).toEpochSecond() :
               (ZDT_START_OF_TOMORROW.plusHours(18)).toEpochSecond()
           );
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("at 2100", new ArrayList<Long>() {
         { 
-          
           add( (ZDT_START_OF_TODAY.plusHours(21).compareTo(ZDT_NOW) > 0 ) ?
               (ZDT_START_OF_TODAY.plusHours(21)).toEpochSecond() :
               (ZDT_START_OF_TOMORROW.plusHours(21)).toEpochSecond()
           );
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("at 2AM", new ArrayList<Long>() {
         { 
-          
           add( (ZDT_START_OF_TODAY.plusHours(2).compareTo(ZDT_NOW) > 0 ) ?
               (ZDT_START_OF_TODAY.plusHours(2)).toEpochSecond() :
               (ZDT_START_OF_TOMORROW.plusHours(2)).toEpochSecond()
           );
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("at 7 AM", new ArrayList<Long>() {
         { 
-          
           add( (ZDT_START_OF_TODAY.plusHours(7).compareTo(ZDT_NOW) > 0 ) ?
               (ZDT_START_OF_TODAY.plusHours(7)).toEpochSecond() :
               (ZDT_START_OF_TOMORROW.plusHours(7)).toEpochSecond()
           );
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("on 4 1", new ArrayList<Long>() {
         { 
-          
           add( (ZDT_START_OF_THIS_YEAR.plusMonths(3).compareTo(ZDT_NOW) > 0 ) ?
               (ZDT_START_OF_THIS_YEAR.plusMonths(3).toEpochSecond()) :
               (ZDT_START_OF_NEXT_YEAR.plusMonths(3).toEpochSecond())
-              
           );
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("on 6 28 2029", new ArrayList<Long>() {
         { 
-          
           add(ZonedDateTime.of(2029, 6, 28, 0, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("on 7/7/2019", new ArrayList<Long>() {
         {
-          
           add(ZonedDateTime.of(2019, 7, 7, 0, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("on 8/11/19", new ArrayList<Long>() {
         {
-          
           add(ZonedDateTime.of(2019, 8, 11, 0, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("on feb 14", new ArrayList<Long>() {
         {
-          
           add( (ZDT_START_OF_THIS_YEAR.plusMonths(1).plusDays(13).compareTo(ZDT_NOW) > 0 ) ?
               (ZDT_START_OF_THIS_YEAR.plusMonths(1).plusDays(13).toEpochSecond()) :
               (ZDT_START_OF_NEXT_YEAR.plusMonths(1).plusDays(13).toEpochSecond())
           );
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("on may 10 2020", new ArrayList<Long>() {
         {
-          
           add(ZonedDateTime.of(2020, 5, 10, 0, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("on jun 14 at 4pm", new ArrayList<Long>() {
         {
-
           add( (ZDT_START_OF_THIS_YEAR.plusMonths(5).plusDays(13).plusHours(16).compareTo(ZDT_NOW) > 0 ) ?
               (ZDT_START_OF_THIS_YEAR.plusMonths(5).plusDays(13).plusHours(16).toEpochSecond()) :
               (ZDT_START_OF_NEXT_YEAR.plusMonths(5).plusDays(13).plusHours(16).toEpochSecond())
           );
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("on oct 21 at 6:00 PM", new ArrayList<Long>() {
         {
-          
           add( (ZDT_START_OF_THIS_YEAR.plusMonths(9).plusDays(20).plusHours(18).compareTo(ZDT_NOW) > 0 ) ?
               (ZDT_START_OF_THIS_YEAR.plusMonths(9).plusDays(20).plusHours(18).toEpochSecond()) :
               (ZDT_START_OF_NEXT_YEAR.plusMonths(9).plusDays(20).plusHours(18).toEpochSecond())
           );
-                    
         }
       }),
       
       new AbsoluteTimeTestEntry("on nov 26 at 2200", new ArrayList<Long>() {
         { 
-          
           add( (ZDT_START_OF_THIS_YEAR.plusMonths(10).plusDays(25).plusHours(22).compareTo(ZDT_NOW) > 0 ) ?
               (ZDT_START_OF_THIS_YEAR.plusMonths(10).plusDays(25).plusHours(22).toEpochSecond()) :
               (ZDT_START_OF_NEXT_YEAR.plusMonths(10).plusDays(25).plusHours(22).toEpochSecond())
           );
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("on feb/14/2024", new ArrayList<Long>() {
         {
-          
           add(ZonedDateTime.of(2024, 2, 14, 0, 0, 0, 0, TEST_ZONE_ID).toEpochSecond());
-          
         }
       }),
       
       new AbsoluteTimeTestEntry("at 4:53 pm on dec 31 2021", new ArrayList<Long>() {
         {
-          
           add(ZonedDateTime.of(2021, 12, 31, 16, 53, 0, 0, TEST_ZONE_ID).toEpochSecond());
-          
         }
       }),
   };
@@ -642,7 +608,6 @@ public class TestTimeConfigurations {
   private static final ArrayList<Long> generateAll14() {
     
     final ZonedDateTime currZdt = ZonedDateTime.now(TEST_ZONE_ID);
-    
     final ArrayList<Long> result = new ArrayList<Long>();
     int iterations = 0;
     
@@ -652,10 +617,12 @@ public class TestTimeConfigurations {
         
         for (int day = 1; day <= 31; day++) {
           
+          // Only allow a certain amount of wildcard iterations to prevent infinite loops
           if (iterations >= MAX_WILDCARD_ITERATIONS) {
             break;
           }
           
+          // Try constructing the current date, and if invalid, try another
           LocalDate d;
           try {
             d = LocalDate.of(year, month, day);
@@ -664,7 +631,6 @@ public class TestTimeConfigurations {
           }
           
           final ZonedDateTime genZdt = ZonedDateTime.of(d, LocalTime.of(14, 0), TEST_ZONE_ID);
-          
           if (genZdt.compareTo(currZdt) <= 0) {
             continue;
           }
@@ -1036,33 +1002,80 @@ public class TestTimeConfigurations {
     int failCount = 0;
     for (int i = 0; i < GOOD_RELATIVE_CONFIGS.length; i++) {
       
-      // TODO: Test both "in X" and "every X"
       final RelativeTimeTestEntry currEntry = GOOD_RELATIVE_CONFIGS[i];
-      final String configString = "every " + currEntry.getConfigString();
+      final String configString = currEntry.getConfigString();
       
-      System.out.print("Testing config \"" + configString + "\":");
+      System.out.println("Testing config \"" + configString + "\".");
       
       RelativeTimeConfiguration rtc = null;
+      
+      // "in" test
+      System.out.print("  \"in\" construction:");
       try {
-        rtc = new RelativeTimeConfiguration(configString, TEST_ZONE_ID);
+        rtc = new RelativeTimeConfiguration("in " + configString, TEST_ZONE_ID);
       } catch (@SuppressWarnings("unused") final BadTimeConfigException btc) {
-        System.out.println(" EXCEPTION");
+        System.out.println("   EXCEPTION");
         failCount++;
         continue;
       } catch (@SuppressWarnings("unused") final InternalTimeConfigException itc) {
-        System.out.println(" INTERNAL EXCEPTION");
+        System.out.println("   INTERNAL EXCEPTION");
         failCount++;
         continue;
       }
       
       System.out.println(" build OK");
       
-      final Iterator<Long> itr = rtc.iterator();
-      final ArrayList<Long> expectedTimes = currEntry.getExpectedTimes();
+      Iterator<Long> itr = rtc.iterator();
+      ArrayList<Long> expectedTimes = currEntry.getExpectedTimes();
+      if (expectedTimes == null || expectedTimes.size() <= 0) {
+        fail("Expected relative times is empty.");
+        return;
+      }
+      long exp = expectedTimes.get(0);
+      
+      System.out.print("  Expected=" + exp + ", Result: ");
+      if (!itr.hasNext()) {
+        failCount++;
+        System.out.println("ERROR, Empty");
+        continue;
+      }
+      
+      // 23 21
+      
+      // TODO: Add in error here
+      long val = itr.next();
+      if (Math.abs(exp - val) > RELATIVE_EPOCH_SECOND_ERR) {
+        failCount++;
+        System.out.println("ERROR, got " + val);
+        continue;
+      }
+      
+      System.out.println("OK");
+      
+      // ------------------------------------------------------------------------------------------
+      
+      // "every" test
+      System.out.print("  \"every\" construction:");
+      try {
+        rtc = new RelativeTimeConfiguration("in " + configString, TEST_ZONE_ID);
+      } catch (@SuppressWarnings("unused") final BadTimeConfigException btc) {
+        System.out.println("   EXCEPTION");
+        failCount++;
+        continue;
+      } catch (@SuppressWarnings("unused") final InternalTimeConfigException itc) {
+        System.out.println("   INTERNAL EXCEPTION");
+        failCount++;
+        continue;
+      }
+      
+      System.out.println(" build OK");
+      
+      itr = rtc.iterator();
+      expectedTimes = currEntry.getExpectedTimes();
       for (int j = 0; j < expectedTimes.size(); j++) {
         
-        final long exp = expectedTimes.get(j);
-        System.out.print("  #" + (j + 1) + ": Expected=" + exp + ", Result: ");
+        exp = expectedTimes.get(j);
+        System.out.print("    #" + (j + 1) + ": Expected=" + exp + ", Result: ");
         
         if (!itr.hasNext()) {
           failCount++;
@@ -1070,10 +1083,11 @@ public class TestTimeConfigurations {
           continue;
         }
         
-        final long val = itr.next();
-        if (exp != val) {
+        // TODO: Add in error here
+        val = itr.next();
+        if (Math.abs(exp - val) > RELATIVE_EPOCH_SECOND_ERR) {
           failCount++;
-          System.out.println("ERROR, got" + val);
+          System.out.println("ERROR, got " + val);
           continue;
         }
         
@@ -1083,6 +1097,7 @@ public class TestTimeConfigurations {
       
     }
     
+    System.out.println();
     assertEquals(failCount, 0);
   }
   
